@@ -1,0 +1,17 @@
+{
+  "name": "mocha_joint",
+  "description": "모카에 질환 joint_disease 추가 (성묘라 연령 필터는 통과). 질환 금기 필터 단독 검증",
+  "used_by": [
+    "S07"
+  ],
+  "update": {
+    "pets": [
+      {
+        "id": "pet_mocha",
+        "conditions": [
+          "joint_disease"
+        ]
+      }
+    ]
+  }
+}

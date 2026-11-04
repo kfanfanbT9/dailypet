@@ -1,0 +1,47 @@
+{
+  "name": "bori_pending_hitl",
+  "description": "보리 대화 thread에 승인 대기 중인 건강 일정 생성 요청 1건. interrupt 상태는 checkpoint라 JSON으로 만들 수 없으므로, seed:reset이 시드 적재 후 아래 setup_queries를 Agent /query로 실행해 interrupt를 만든다 (Agent 서버 필요)",
+  "used_by": [
+    "S10"
+  ],
+  "add": {
+    "chat_logs": [
+      {
+        "id": "log_bori_pending_1",
+        "user_id": "usr_69d308a849e0",
+        "pet_id": "pet_bori",
+        "thread_id": "thr_usr_69d308a849e0_pet_bori_7a1e4c2b",
+        "question": "보리 심장사상충 예방 일정 11월 20일로 등록해줘",
+        "answer": "아래 일정을 등록할까요? 승인해 주세요.",
+        "trace": [
+          {
+            "type": "handoff",
+            "to": "health_agent"
+          },
+          {
+            "type": "interrupt",
+            "tool": "create_health_event",
+            "args": {
+              "catalog_item_id": "hc_dog_heartworm_prevention",
+              "due_date": "2026-11-20"
+            },
+            "thread_id": "thr_usr_69d308a849e0_pet_bori_7a1e4c2b"
+          }
+        ],
+        "created_at": "2026-11-10T09:00:00+09:00"
+      }
+    ]
+  },
+  "setup_queries": [
+    {
+      "user_id": "usr_69d308a849e0",
+      "pet_id": "pet_bori",
+      "thread_id": "thr_usr_69d308a849e0_pet_bori_7a1e4c2b",
+      "question": "보리 심장사상충 예방 일정 11월 20일로 등록해줘",
+      "expect": {
+        "trace_type": "interrupt",
+        "tool": "create_health_event"
+      }
+    }
+  ]
+}

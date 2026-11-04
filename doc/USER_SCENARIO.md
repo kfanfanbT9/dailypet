@@ -38,6 +38,7 @@ cd src/backend && npm run seed:reset -- --variant <이름>   # 변형 시드 (�
 ```
 - 하는 일: Chroma 앱 데이터 컬렉션(users, pets, tasks, health_events, weight_logs, interactions, preferences, chat_logs) 비우기 → `data/checkpoints/` 비우기 → `data/seed/*.json` 적재 → 변형 적용
 - 카탈로그·지식 컬렉션(`catalog_*`, `pet_knowledge`)은 건드리지 않는다.
+- 변형 시드에 `setup_queries`가 있으면(예: `bori_pending_hitl`) JSON 적재 뒤 Agent `POST /query`를 순서대로 호출해 상태를 만든다. 승인 대기(interrupt)는 checkpoint에 저장되므로 JSON만으로는 재현할 수 없기 때문이다. 이 변형은 Agent 서버가 떠 있어야 한다.
 - 비밀번호는 모든 시드 계정이 `Demo!2345`다 (로컬 데모 전용).
 
 ## 2. 등장인물과 시드 데이터
@@ -78,13 +79,15 @@ cd src/backend && npm run seed:reset -- --variant <이름>   # 변형 시드 (�
 | `evt_nabi_checkup` | 나비 | `hc_cat_annual_checkup` | — | 2026-11-20 | scheduled |
 | `evt_hodu_senior` | 호두 | `hc_cat_senior_checkup` | — | 2026-12-07 | scheduled (마지막 검진 2026-06-10 + 180일) |
 
+> 위 5건은 **활성 일정**이다. 시드에는 계산 근거가 되는 **완료 이력**(콩이 DHPP 1차 10-02·2차 10-23, 호두 검진 06-10)과 코코 일정 1건도 함께 넣는다 (`data/seed/health_events.json`, 총 9건).
+
 ### 2.4 변형 시드 (`--variant`)
 
 | 이름 | 바뀌는 내용 | 쓰는 곳 |
 |------|-------------|---------|
 | `mocha_joint` | 모카에 질환 `joint_disease` 추가 (성묘라 연령 필터는 통과) | S07 질환 필터 단독 검증 |
 | `hodu_dislikes` | 호두가 저강도 실내 활동 대부분에 👎 (11/09) | S07 후보 부족 완화 |
-| `bori_pending_hitl` | 보리 대화 thread에 승인 대기 중인 일정 생성 요청 1건 | S10 반려동물 전환 예외 |
+| `bori_pending_hitl` | 보리 대화 thread에 승인 대기 중인 일정 생성 요청 1건 (`setup_queries`로 Agent를 호출해 만든다, 1.1) | S10 반려동물 전환 예외 |
 
 ## 3. 시나리오 목록
 
@@ -592,11 +595,11 @@ cd src/backend && npm run seed:reset -- --variant <이름>   # 변형 시드 (�
 |---|---|---|---|
 
 **대화 예시**
-> 👤 모카 병원 예약할 때 제 번호 010-1234-5678이랑 seojun.park@mail.com 알려줘야 하는데, 근처 고양이 전문 병원 고르는 기준 알려줘. 주소는 서울시 마포구 월드컵로 123이야
+> 👤 모카 병원 예약할 때 제 번호 010-1234-5678이랑 seojun.test@example.com 알려줘야 하는데, 근처 고양이 전문 병원 고르는 기준 알려줘. 주소는 서울시 마포구 월드컵로 123이야
 
 | 확인 지점 | 기대 결과 |
 |-----------|-----------|
-| 모델 입력 | `010-****-5678`, `se***@mail.com`, `[REDACTED_ADDRESS]` |
+| 모델 입력 | `010-****-5678`, `se***@example.com`, `[REDACTED_ADDRESS]` |
 | general_agent 검색 질의 | "cat friendly clinic how to choose" 같은 일반 질의 (번호·이메일·주소·이름 없음) |
 | answer / contexts / trace | 마스킹된 값만 있음 |
 | `chat_logs`, 서버 로그 | 마스킹된 값만 있음 |
@@ -689,7 +692,7 @@ cd src/backend && npm run seed:reset -- --variant <이름>   # 변형 시드 (�
 
 | # | 상황 | 기대 동작 |
 |---|------|-----------|
-| 1 | Agent 서버 중지 → 대시보드 진입 (오늘 목록 **있음**) | 할 일·일정·알림 정상 조회 |
+| 1 | (Agent 서버가 켜진 상태에서 오늘 할 일을 먼저 생성한 뒤) Agent 서버 중지 → 대시보드 진입 (오늘 목록 **있음**) | 할 일·일정·알림 정상 조회 |
 | 2 | Agent 서버 중지 → 채팅 질문 | `/api/chat` **503**, 화면에 "잠시 후 다시 시도해 주세요" (마스코트 안내) |
 | 3 | Agent 서버 중지 → 오늘 목록 **없음** 상태로 대시보드 진입 | 할 일 영역에 "추천을 불러오지 못했어요 [다시 시도]", 나머지 화면 정상 |
 | 4 | 정상 상태에서 일반 API 20회 호출 | p95 ≤ 500ms |

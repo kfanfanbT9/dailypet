@@ -1,0 +1,17 @@
+[
+  {
+    "id": "log_coco_1109_1",
+    "user_id": "usr_3263e0395d81",
+    "pet_id": "pet_coco",
+    "thread_id": "thr_usr_3263e0395d81_pet_coco_0d6c1f3a",
+    "question": "코코 하루에 물 얼마나 줘야 해?",
+    "answer": "코코(3.5kg)는 하루 약 175~210ml를 기준으로 신선한 물을 항상 둘 수 있게 해 주세요.",
+    "trace": [
+      {
+        "type": "handoff",
+        "to": "diet_agent"
+      }
+    ],
+    "created_at": "2026-11-09T20:30:00+09:00"
+  }
+]

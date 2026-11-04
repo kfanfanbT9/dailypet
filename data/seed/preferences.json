@@ -1,0 +1,35 @@
+[
+  {
+    "id": "pref_mocha_dislike_wand",
+    "user_id": "usr_a80678fb2f7a",
+    "pet_id": "pet_mocha",
+    "kind": "dislike",
+    "target": "act_cat_wand_hunt_01",
+    "note": "낚싯대 놀이 싫어요 (11/08)",
+    "score": -3,
+    "excluded_until": "2026-11-14",
+    "updated_at": "2026-11-08T21:00:00+09:00"
+  },
+  {
+    "id": "pref_seojun_time_constraint",
+    "user_id": "usr_a80678fb2f7a",
+    "pet_id": null,
+    "kind": "constraint",
+    "target": "activity_time_after:19:00",
+    "note": "놀이·산책은 19:00 이후 (사용자 공통)",
+    "score": 0,
+    "excluded_until": null,
+    "updated_at": "2026-10-01T11:10:00+09:00"
+  },
+  {
+    "id": "pref_coco_like_walk",
+    "user_id": "usr_3263e0395d81",
+    "pet_id": "pet_coco",
+    "kind": "like",
+    "target": "act_dog_daily_walk_01",
+    "note": "",
+    "score": 3,
+    "excluded_until": null,
+    "updated_at": "2026-11-09T20:00:00+09:00"
+  }
+]

@@ -1,0 +1,184 @@
+{
+  "name": "hodu_dislikes",
+  "description": "호두가 노령묘에 맞는 활동 대부분에 👎 (11/09). act_cat_scratching_stretch_01 1개만 남겨 후보 부족 완화를 재현",
+  "used_by": [
+    "S07"
+  ],
+  "add": {
+    "interactions": [
+      {
+        "id": "int_hodu_1109_dislike_01",
+        "user_id": "usr_d6eff68d8ef0",
+        "pet_id": "pet_hodu",
+        "catalog_item_id": "act_cat_puzzle_feeder_01",
+        "signal": "dislike",
+        "created_at": "2026-11-09T20:00:00+09:00"
+      },
+      {
+        "id": "int_hodu_1109_dislike_02",
+        "user_id": "usr_d6eff68d8ef0",
+        "pet_id": "pet_hodu",
+        "catalog_item_id": "act_cat_kibble_chase_01",
+        "signal": "dislike",
+        "created_at": "2026-11-09T20:00:00+09:00"
+      },
+      {
+        "id": "int_hodu_1109_dislike_03",
+        "user_id": "usr_d6eff68d8ef0",
+        "pet_id": "pet_hodu",
+        "catalog_item_id": "act_cat_box_explore_01",
+        "signal": "dislike",
+        "created_at": "2026-11-09T20:00:00+09:00"
+      },
+      {
+        "id": "int_hodu_1109_dislike_04",
+        "user_id": "usr_d6eff68d8ef0",
+        "pet_id": "pet_hodu",
+        "catalog_item_id": "act_cat_clicker_training_01",
+        "signal": "dislike",
+        "created_at": "2026-11-09T20:00:00+09:00"
+      },
+      {
+        "id": "int_hodu_1109_dislike_05",
+        "user_id": "usr_d6eff68d8ef0",
+        "pet_id": "pet_hodu",
+        "catalog_item_id": "act_cat_window_watch_01",
+        "signal": "dislike",
+        "created_at": "2026-11-09T20:00:00+09:00"
+      },
+      {
+        "id": "int_hodu_1109_dislike_06",
+        "user_id": "usr_d6eff68d8ef0",
+        "pet_id": "pet_hodu",
+        "catalog_item_id": "act_cat_senior_floor_play_01",
+        "signal": "dislike",
+        "created_at": "2026-11-09T20:00:00+09:00"
+      },
+      {
+        "id": "int_hodu_1109_dislike_07",
+        "user_id": "usr_d6eff68d8ef0",
+        "pet_id": "pet_hodu",
+        "catalog_item_id": "act_cat_kick_toy_01",
+        "signal": "dislike",
+        "created_at": "2026-11-09T20:00:00+09:00"
+      },
+      {
+        "id": "int_hodu_1109_dislike_08",
+        "user_id": "usr_d6eff68d8ef0",
+        "pet_id": "pet_hodu",
+        "catalog_item_id": "act_cat_toy_rotation_01",
+        "signal": "dislike",
+        "created_at": "2026-11-09T20:00:00+09:00"
+      },
+      {
+        "id": "int_hodu_1109_dislike_09",
+        "user_id": "usr_d6eff68d8ef0",
+        "pet_id": "pet_hodu",
+        "catalog_item_id": "act_cat_wand_hunt_01",
+        "signal": "dislike",
+        "created_at": "2026-11-09T20:00:00+09:00"
+      }
+    ],
+    "preferences": [
+      {
+        "id": "pref_hodu_dislike_01",
+        "user_id": "usr_d6eff68d8ef0",
+        "pet_id": "pet_hodu",
+        "kind": "dislike",
+        "target": "act_cat_puzzle_feeder_01",
+        "note": "",
+        "score": -3,
+        "excluded_until": "2026-11-15",
+        "updated_at": "2026-11-09T20:00:00+09:00"
+      },
+      {
+        "id": "pref_hodu_dislike_02",
+        "user_id": "usr_d6eff68d8ef0",
+        "pet_id": "pet_hodu",
+        "kind": "dislike",
+        "target": "act_cat_kibble_chase_01",
+        "note": "",
+        "score": -3,
+        "excluded_until": "2026-11-15",
+        "updated_at": "2026-11-09T20:00:00+09:00"
+      },
+      {
+        "id": "pref_hodu_dislike_03",
+        "user_id": "usr_d6eff68d8ef0",
+        "pet_id": "pet_hodu",
+        "kind": "dislike",
+        "target": "act_cat_box_explore_01",
+        "note": "",
+        "score": -3,
+        "excluded_until": "2026-11-15",
+        "updated_at": "2026-11-09T20:00:00+09:00"
+      },
+      {
+        "id": "pref_hodu_dislike_04",
+        "user_id": "usr_d6eff68d8ef0",
+        "pet_id": "pet_hodu",
+        "kind": "dislike",
+        "target": "act_cat_clicker_training_01",
+        "note": "",
+        "score": -3,
+        "excluded_until": "2026-11-15",
+        "updated_at": "2026-11-09T20:00:00+09:00"
+      },
+      {
+        "id": "pref_hodu_dislike_05",
+        "user_id": "usr_d6eff68d8ef0",
+        "pet_id": "pet_hodu",
+        "kind": "dislike",
+        "target": "act_cat_window_watch_01",
+        "note": "",
+        "score": -3,
+        "excluded_until": "2026-11-15",
+        "updated_at": "2026-11-09T20:00:00+09:00"
+      },
+      {
+        "id": "pref_hodu_dislike_06",
+        "user_id": "usr_d6eff68d8ef0",
+        "pet_id": "pet_hodu",
+        "kind": "dislike",
+        "target": "act_cat_senior_floor_play_01",
+        "note": "",
+        "score": -3,
+        "excluded_until": "2026-11-15",
+        "updated_at": "2026-11-09T20:00:00+09:00"
+      },
+      {
+        "id": "pref_hodu_dislike_07",
+        "user_id": "usr_d6eff68d8ef0",
+        "pet_id": "pet_hodu",
+        "kind": "dislike",
+        "target": "act_cat_kick_toy_01",
+        "note": "",
+        "score": -3,
+        "excluded_until": "2026-11-15",
+        "updated_at": "2026-11-09T20:00:00+09:00"
+      },
+      {
+        "id": "pref_hodu_dislike_08",
+        "user_id": "usr_d6eff68d8ef0",
+        "pet_id": "pet_hodu",
+        "kind": "dislike",
+        "target": "act_cat_toy_rotation_01",
+        "note": "",
+        "score": -3,
+        "excluded_until": "2026-11-15",
+        "updated_at": "2026-11-09T20:00:00+09:00"
+      },
+      {
+        "id": "pref_hodu_dislike_09",
+        "user_id": "usr_d6eff68d8ef0",
+        "pet_id": "pet_hodu",
+        "kind": "dislike",
+        "target": "act_cat_wand_hunt_01",
+        "note": "",
+        "score": -3,
+        "excluded_until": "2026-11-15",
+        "updated_at": "2026-11-09T20:00:00+09:00"
+      }
+    ]
+  }
+}

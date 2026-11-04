@@ -1,0 +1,74 @@
+[
+  {
+    "id": "int_bori_1103_complete",
+    "user_id": "usr_69d308a849e0",
+    "pet_id": "pet_bori",
+    "catalog_item_id": "act_dog_nosework_find_it_01",
+    "signal": "complete",
+    "created_at": "2026-11-03T18:20:00+09:00"
+  },
+  {
+    "id": "int_bori_1105_complete",
+    "user_id": "usr_69d308a849e0",
+    "pet_id": "pet_bori",
+    "catalog_item_id": "act_dog_nosework_find_it_01",
+    "signal": "complete",
+    "created_at": "2026-11-05T18:15:00+09:00"
+  },
+  {
+    "id": "int_bori_1108_complete",
+    "user_id": "usr_69d308a849e0",
+    "pet_id": "pet_bori",
+    "catalog_item_id": "act_dog_nosework_find_it_01",
+    "signal": "complete",
+    "created_at": "2026-11-08T18:30:00+09:00"
+  },
+  {
+    "id": "int_bori_1103_diet",
+    "user_id": "usr_69d308a849e0",
+    "pet_id": "pet_bori",
+    "catalog_item_id": "diet_dog_weight_loss_plan_01",
+    "signal": "complete",
+    "created_at": "2026-11-03T08:10:00+09:00"
+  },
+  {
+    "id": "int_bori_1105_diet",
+    "user_id": "usr_69d308a849e0",
+    "pet_id": "pet_bori",
+    "catalog_item_id": "diet_dog_carrot_treat_01",
+    "signal": "complete",
+    "created_at": "2026-11-05T08:10:00+09:00"
+  },
+  {
+    "id": "int_bori_1105_walk",
+    "user_id": "usr_69d308a849e0",
+    "pet_id": "pet_bori",
+    "catalog_item_id": "act_dog_daily_walk_01",
+    "signal": "complete",
+    "created_at": "2026-11-05T19:50:00+09:00"
+  },
+  {
+    "id": "int_mocha_1108_meal",
+    "user_id": "usr_a80678fb2f7a",
+    "pet_id": "pet_mocha",
+    "catalog_item_id": "diet_cat_adult_meal_guide_01",
+    "signal": "complete",
+    "created_at": "2026-11-08T08:05:00+09:00"
+  },
+  {
+    "id": "int_mocha_1108_dislike",
+    "user_id": "usr_a80678fb2f7a",
+    "pet_id": "pet_mocha",
+    "catalog_item_id": "act_cat_wand_hunt_01",
+    "signal": "dislike",
+    "created_at": "2026-11-08T21:00:00+09:00"
+  },
+  {
+    "id": "int_coco_1109_complete",
+    "user_id": "usr_3263e0395d81",
+    "pet_id": "pet_coco",
+    "catalog_item_id": "diet_dog_adult_meal_guide_01",
+    "signal": "complete",
+    "created_at": "2026-11-09T08:10:00+09:00"
+  }
+]

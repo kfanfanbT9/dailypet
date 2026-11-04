@@ -1,0 +1,23 @@
+[
+  {
+    "id": "wt_bori_1010",
+    "user_id": "usr_69d308a849e0",
+    "pet_id": "pet_bori",
+    "date": "2026-10-10",
+    "weight_kg": 35.0
+  },
+  {
+    "id": "wt_bori_1101",
+    "user_id": "usr_69d308a849e0",
+    "pet_id": "pet_bori",
+    "date": "2026-11-01",
+    "weight_kg": 34.0
+  },
+  {
+    "id": "wt_coco_1101",
+    "user_id": "usr_3263e0395d81",
+    "pet_id": "pet_coco",
+    "date": "2026-11-01",
+    "weight_kg": 3.5
+  }
+]

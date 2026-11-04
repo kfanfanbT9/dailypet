@@ -1,0 +1,44 @@
+[
+  {
+    "id": "usr_1c3544ae18bc",
+    "email": "haneul@demo.dailypet",
+    "password_hash": "$2b$10$L1OWUqLSH8nwo58HrdE7J.e32tMy8u3fqDy2z/hLirBRWgeHaQbtW",
+    "nickname": "하늘",
+    "created_at": "2026-10-01T10:00:00+09:00"
+  },
+  {
+    "id": "usr_a80678fb2f7a",
+    "email": "seojun@demo.dailypet",
+    "password_hash": "$2b$10$G3CMBZSjKrEm0A.aP5.EfOpbd8lj4BQxYqv/wx/21n9F1pQGvxavC",
+    "nickname": "서준",
+    "created_at": "2026-10-01T11:00:00+09:00"
+  },
+  {
+    "id": "usr_69d308a849e0",
+    "email": "jiwoo@demo.dailypet",
+    "password_hash": "$2b$10$KrVFL4.sI2tmnBsA1FrtzOunnpe8IAKocKUrmGVbu97RvgNTsmOrC",
+    "nickname": "지우",
+    "created_at": "2026-10-01T12:00:00+09:00"
+  },
+  {
+    "id": "usr_d6eff68d8ef0",
+    "email": "youngja@demo.dailypet",
+    "password_hash": "$2b$10$216Qsz3JNx0Ms2URrSGnuOUhWKxJGXWgbH/Td2zPVi3eOeK3UnQ3C",
+    "nickname": "영자",
+    "created_at": "2026-10-01T13:00:00+09:00"
+  },
+  {
+    "id": "usr_39e92ecdda26",
+    "email": "mallory@demo.dailypet",
+    "password_hash": "$2b$10$vbTawJSraSSfY84lxcdv1uLoEQIVGz7uYdRxgFnZQ3e9uijulcVSW",
+    "nickname": "mallory",
+    "created_at": "2026-10-01T14:00:00+09:00"
+  },
+  {
+    "id": "usr_3263e0395d81",
+    "email": "leaver@demo.dailypet",
+    "password_hash": "$2b$10$DDT43UREcK0xeORhnoSBAe5GJAPwsFvkSFJoIYoikZ2740u9YhNyq",
+    "nickname": "떠남",
+    "created_at": "2026-10-01T15:00:00+09:00"
+  }
+]

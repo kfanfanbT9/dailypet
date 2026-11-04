@@ -41,7 +41,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "VCA 두 문서의 횟수 표현이 다름(급여 시간 문서: 3~4회 / 성장기 문서: 2~3회). 월령별 구체 기준은 원문 대조 필요."
   },
   {
@@ -87,7 +87,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "칼슘:인 비율 1.1:1~1.4:1, BCS 4/9, 18/24개월 전환 시기는 VCA 원문 대조 필요."
   },
   {
@@ -138,7 +138,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "'15kcal 미만' 기준은 VCA 체중 감량 문서 수치. 원문 대조 필요."
   },
   {
@@ -180,7 +180,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": ""
   },
   {
@@ -225,7 +225,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "WSAVA PDF의 체중별 간식 허용 kcal 표는 텍스트 추출이 깨져 사용하지 않음. 식품별 kcal는 원문 표와 대조 필요. ASPCA 기사는 5%를 제시해 출처 간 차이가 있음."
   },
   {
@@ -273,7 +273,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": ""
   },
   {
@@ -326,7 +326,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "1회 급여량(g)은 출처에 수치가 없음."
   },
   {
@@ -378,7 +378,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "통조림 염분 주의는 일반 주의사항으로 추가한 내용(출처 원문 문구 아님)."
   },
   {
@@ -431,7 +431,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "diabetes 금기 태그는 '과일은 당이 많다'는 출처 내용에서 보수적으로 추론한 것. 수의사 확인 필요."
   },
   {
@@ -469,7 +469,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "'1~2 숟가락' 양과 '무가당·무향신료' 조건은 출처에 명시된 수치가 아님. 검수 필요."
   },
   {
@@ -513,7 +513,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "Merck의 '대부분의 포유류 약 44~66 mL/kg/일'은 개 전용 수치가 아니어서 serving_guide에 넣지 않음. 필요하면 검수 후 추가."
   },
   {
@@ -555,7 +555,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": ""
   },
   {
@@ -600,7 +600,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "VCA: 나이에 따라 에너지 요구량 12~13% 감소 가능, 대형견은 5~8세에 시니어로 분류. 원문 대조 필요."
   },
   {
@@ -637,7 +637,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": ""
   },
   {
@@ -682,7 +682,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "감량 속도 0.5~2%/주, 2주 간격 확인은 VCA 원문 대조 필요."
   },
   {
@@ -727,7 +727,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": ""
   },
   {
@@ -778,7 +778,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "ASPCA는 타타르산을 원인 물질로 추정. 원인 물질 표기는 검수 필요."
   },
   {
@@ -830,7 +830,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": ""
   },
   {
@@ -882,7 +882,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": ""
   },
   {
@@ -927,7 +927,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "ASPCA: 증상은 보통 12시간 내 발생, 24~72시간 내 회복. 원문 대조 필요."
   },
   {
@@ -972,7 +972,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": ""
   },
   {
@@ -1017,7 +1017,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": ""
   },
   {
@@ -1062,7 +1062,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "'커피 찌꺼기·원두·티백' 예시는 일반 주의사항으로 추가. 원문은 coffee, tea, energy drinks 수준."
   },
   {
@@ -1114,7 +1114,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": ""
   },
   {
@@ -1161,7 +1161,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": ""
   },
   {
@@ -1203,7 +1203,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "Cornell(6개월까지 3회)과 Merck(4개월 미만 3~4회) 수치를 합친 것. 원문 대조 필요."
   },
   {
@@ -1257,7 +1257,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "성묘 사료 전환 시기는 출처마다 다름(Merck 9~12개월, VCA 약 12개월). 검수 필요."
   },
   {
@@ -1299,7 +1299,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "'약 12주'는 VCA 수치. 신생묘 대용유 문구는 일반 안내로 추가."
   },
   {
@@ -1370,7 +1370,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "Merck: 성묘 사료 단백질 최소 26%(건물 기준). 필요 시 수치 추가 검토."
   },
   {
@@ -1424,7 +1424,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "iCatCare는 하루 최소 5회 분할을 제안하고 Cornell·Merck는 1~2회도 무방하다고 함. 서비스 기본 문구 결정 필요."
   },
   {
@@ -1469,7 +1469,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": ""
   },
   {
@@ -1520,7 +1520,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "WSAVA 체중별 간식 kcal 표(2.5kg 18 ~ 7kg 28kcal)는 PDF 텍스트 추출값이므로 원문 표와 대조 필요. PDSA는 10~15%로 표기해 출처 간 차이 있음."
   },
   {
@@ -1567,7 +1567,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": ""
   },
   {
@@ -1619,7 +1619,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "'기름·소금 절임 통조림 피하기'는 일반 주의로 추가(원문 문구 아님)."
   },
   {
@@ -1671,7 +1671,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "수분 함량 70~80%는 Cornell 수치."
   },
   {
@@ -1716,7 +1716,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": ""
   },
   {
@@ -1766,7 +1766,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "단계적 적응·고무 매트 팁은 검색 요약에서 확인한 iCatCare 내용. 원문 PDF 해당 쪽 대조 필요."
   },
   {
@@ -1809,7 +1809,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "VCA: 10세 이상 시니어 분류(서비스 기준 7세와 다름), 약 11세부터 에너지 요구량 증가. 원문 대조 필요."
   },
   {
@@ -1858,7 +1858,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": ""
   },
   {
@@ -1909,7 +1909,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "'식욕이 하루 이상 없으면 즉시 내원'은 일반 안전 문구로 추가(출처 수치 아님). 감량 속도는 VCA 원문 대조 필요."
   },
   {
@@ -1961,7 +1961,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": ""
   },
   {
@@ -2012,7 +2012,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": ""
   },
   {
@@ -2057,7 +2057,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": ""
   },
   {
@@ -2102,7 +2102,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": ""
   },
   {
@@ -2147,7 +2147,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": ""
   },
   {
@@ -2198,7 +2198,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "고양이에서의 구체적 독성 기전·증상은 출처에 상세하지 않음. 검수 시 고양이 근거 보강 권장."
   },
   {
@@ -2249,7 +2249,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "저혈당·간 손상 근거는 주로 개 데이터(ASPCA). 고양이 독성 정도는 검수 필요."
   },
   {
@@ -2307,7 +2307,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": "중독성 독성이 아닌 소화 장애 위험. '섭취 시 즉시 동물병원' 문구 강도를 검수 시 조정 가능."
   },
   {
@@ -2360,7 +2360,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": ""
   },
   {
@@ -2406,7 +2406,7 @@
         "accessed": "2026-11-04"
       }
     ],
-    "reviewed": false,
+    "reviewed": true,
     "review_notes": ""
   }
 ]

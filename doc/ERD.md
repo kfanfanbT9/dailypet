@@ -49,12 +49,12 @@ erDiagram
         string name
         string species "dog | cat"
         string breed
-        string sex "성별"
+        string sex "male | female"
         boolean neutered
         string size "small | medium | large"
         string birth_date "YYYY-MM-DD"
         float weight_kg "개 0.5~100 / 고양이 0.3~15"
-        string activity_level
+        string activity_level "low | normal | high (낮음/보통/높음)"
         string allergies "예: chicken"
         string conditions "질환 태그, 예: joint_disease"
         string memo "자유 메모"
@@ -184,8 +184,8 @@ erDiagram
     PET_KNOWLEDGE {
         string id PK "자동 생성"
         string source
-        string species
-        string category
+        string species "dog | cat | all"
+        string category "activity | diet | health | general"
         string document "RAG 지식 청크 (임베딩)"
     }
 ```

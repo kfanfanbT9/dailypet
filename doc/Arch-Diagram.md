@@ -35,7 +35,7 @@ flowchart LR
 
     subgraph External["외부 서비스"]
         LLM["Amazon Bedrock<br/>ChatBedrockConverse<br/>+ Embeddings"]
-        WEB["웹 검색 API<br/>Tavily / DuckDuckGo"]
+        WEB["웹 검색<br/>DuckDuckGo (키 없음)"]
     end
 
     User -->|HTTPS 없음, 로컬| FE

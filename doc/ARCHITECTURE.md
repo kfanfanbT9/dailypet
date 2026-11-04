@@ -43,8 +43,8 @@
 | DB | Chroma DB (server mode) | `data/chroma`에 영속화 |
 | Agent | Python 3.11+, LangChain v1, LangGraph, `langgraph-supervisor`, `langgraph-checkpoint-sqlite`, `langchain-aws`, `langchain-chroma`, FastAPI, Uvicorn | |
 | LLM | Amazon Bedrock — `ChatBedrockConverse` | 모델 ID는 `.env`의 `AWS_MODEL` |
-| Embedding | Amazon Bedrock Embeddings (`BedrockEmbeddings`, 예: Titan Text Embeddings v2) | 모델 ID는 `.env` 추가 키로 관리 (오픈 이슈) |
-| 웹 검색 | `langchain-tavily`(`TavilySearch`, 기본) / `DuckDuckGoSearchResults`(키 없이 쓰는 대체) | General Agent 전용. `TAVILY_API_KEY`가 없으면 DuckDuckGo 사용 |
+| Embedding | Amazon Bedrock Embeddings (`BedrockEmbeddings`, **Titan Text Embeddings v2** `amazon.titan-embed-text-v2:0`, 1024차원, 한국어 지원) | 모델 ID는 `.env`의 `AWS_EMBED_MODEL` |
+| 웹 검색 | `langchain-community`의 `DuckDuckGoSearchResults` (`ddgs`, **API 키 없음**) | General Agent 전용. Version 1은 키 없는 DuckDuckGo만 쓴다 (유료·키 필요 API는 Version 2 후보) |
 
 ## 3. Agent 설계
 
@@ -197,7 +197,7 @@ graph = create_supervisor(
 | `get_preferences` | (컨텍스트의 `pet_id`) | 좋아함/싫어함/제약 요약 | Chroma `preferences` |
 | `remember_preference` | `kind`(like/dislike/constraint), `target`(카탈로그 ID 또는 자유 텍스트), `note` | 저장 결과 | 낮은 위험이라 HITL 없이 실행하고, 답변에서 저장 사실을 알림 |
 | `list_my_pets` | (컨텍스트의 `user_id`) | 내 반려동물 이름·ID 목록 | 채팅에서 다른 반려동물을 이름으로 언급할 때 사용. 같은 사용자 소유만 반환 |
-| `web_search` | `query`(PII 제거된 일반 질의), `max_results`(기본 5) | `[{title, url, snippet}]` | **General Agent 전용.** Tavily(기본) 또는 DuckDuckGo. 결과 snippet은 `contexts`에 들어감. 실패하면 빈 목록과 오류 표시를 돌려줌 |
+| `web_search` | `query`(PII 제거된 일반 질의), `max_results`(기본 5) | `[{title, url, snippet}]` | **General Agent 전용.** DuckDuckGo(키 없음). 차단 도메인을 빼고 신뢰 도메인을 앞으로 정렬한다 (3.7). 결과 snippet은 `contexts`에 들어감. 실패하면 빈 목록과 오류 표시를 돌려줌 |
 | `get_health_schedule` | `pet_id` | 전체 건강 일정 목록 | Chroma `health_events` |
 | `get_upcoming_events` | `pet_id`, `days`(기본 7) | 도래 일정 + D-day | |
 | `search_pet_knowledge` | `query`, `species` | 관련 문서 청크 목록 | `retriever.py` 호출, 결과를 `contexts`로 수집 |
@@ -215,7 +215,7 @@ graph = create_supervisor(
    - 메타데이터: `item_id`, `species`, `age_groups`(junior/adult/senior), `intensity`, `subtype`, `allergens`, `contraindications`, `tags`, `recommendable`, `source_url`
    - Chroma 메타데이터는 리스트를 지원하지 않을 수 있으므로, 리스트 필드는 `age_junior: true`처럼 불리언 플래그로 펼치거나 `|a|b|` 문자열로 저장한다.
 2. **Knowledge ingest**: `data/knowledge/*.md` → `RecursiveCharacterTextSplitter`(chunk 800, overlap 100) → Chroma `pet_knowledge`
-   - 메타데이터: `source`, `species`(dog/cat/all), `category`(diet/activity/health)
+   - 메타데이터: `source`, `species`(dog/cat/all), `category`(diet/activity/health/general)
 3. **Retrieve**: `similarity_search(query, k, filter={"$and": [{"species": {"$in": [species, "all"]}}, ...]})`
 4. 검색 결과(카탈로그 항목 요약 + 지식 청크)는 응답의 `contexts`로 전달된다.
 5. ingest 단계에서 주입 패턴 검사와 PII 검사를 해서 문제 있는 문서는 제외한다.
@@ -246,10 +246,10 @@ graph = create_supervisor(
 | 7 | Agent별 추가: `HumanInTheLoopMiddleware` (health_agent) / `ToolCallLimitMiddleware(web_search, 3)`·`web_query_pii_guard`·`web_result_guard` (general_agent) | 내장 / 커스텀 | `after_model` / `wrap_tool_call` | HITL은 쓰기 도구 호출 전 사용자 승인 (`interrupt`). 웹 검색 가드는 3.7 참고 |
 | 8 | `output_guard` | 커스텀 | `after_model` | 유해 식품 추천, 진단·처방 단정 표현, 시스템 프롬프트·내부 정보 노출 검사 → 위반 시 재작성 또는 안전 문구로 대체. 응급 키워드가 있으면 병원 권고 문구가 있는지 확인 |
 
-- **입력 가드레일 판정**: 1단계는 규칙 기반(정규식·키워드)으로 빠르게 거른다. 애매하면 2단계로 경량 LLM 분류기(`with_structured_output` → `{is_injection, is_out_of_scope, reason}`)를 쓴다.
+- **입력 가드레일 판정**: 1단계는 규칙 기반(정규식·키워드)으로 빠르게 거른다. 애매하면 2단계로 LLM 분류기(`with_structured_output` → `{is_injection, is_out_of_scope, reason}`)를 쓴다. 분류기는 메인 모델(`AWS_MODEL`, `temperature=0`)을 재사용한다 (10장).
 - **도메인 밖 요청**: 차단 사유를 `trace`에 `{"type":"guardrail","stage":"input","reason":"out_of_scope"}` 형태로 남긴다.
 - **trace의 guardrail stage**: `input`(입력 가드레일) · `output`(출력 가드레일) · `tool_result`(도구 결과를 거른 경우, 예: `web_result_guard`가 주입 snippet을 버림). `tool_result`는 답변을 막지 않고 정상 답변을 계속한다.
-- **(선택) Bedrock Guardrails**: `ChatBedrockConverse`의 `guardrails` 설정으로 콘텐츠 필터와 PII 필터를 추가로 쓸 수 있다. 쓸지는 오픈 이슈로 둔다.
+- **Bedrock Guardrails**: Version 1에서는 쓰지 않는다 (10장). 위 다층 가드레일로 방어하고, 필요하면 Version 2에서 `ChatBedrockConverse`의 `guardrails` 설정으로 추가한다.
 
 #### HITL 흐름
 1. 하위 Agent가 쓰기 도구를 호출하면 `HumanInTheLoopMiddleware`가 `interrupt`를 일으킨다.
@@ -287,6 +287,15 @@ graph = create_supervisor(
 - 마스킹 함수는 `src/agent.py` 한 곳에 두고 Node 백엔드 로그에는 마스킹된 결과만 전달한다. 백엔드는 PII 원문을 다시 만들지 않는다.
 - 사용자 계정 이메일은 Agent에 넘기지 않는다. Agent는 불투명한 `user_id`만 받는다.
 
+#### 웹 검색 도메인 정책 (General Agent)
+- **신뢰 도메인 우선순위**: 검색 결과를 아래 순서로 정렬해 앞쪽 결과를 먼저 쓴다. 목록에 없는 도메인은 그 뒤에 둔다.
+  1. 정부·공공기관: `*.go.kr` (농림축산식품부, 농림축산검역본부, 동물보호관리시스템 등), `*.gov`
+  2. 수의 단체: `kvma.or.kr`(대한수의사회), `avma.org`, `aaha.org`, `wsava.org`, `catvets.com`(AAFP), `bsava.com`
+  3. 대학·대학 동물병원: `*.ac.kr`, `*.edu`, `vet.cornell.edu`
+  4. 동물복지 단체: `rspca.org.uk`, `aspca.org`, `icatcare.org`
+- **차단 도메인**: 성인·도박·불법·불법 의약품 판매 사이트 기본 목록을 코드에 두고, `WEB_SEARCH_BLOCKED_DOMAINS`로 추가한다. 차단된 결과는 버리고 trace에 개수만 남긴다.
+- **키 없는 검색의 한계**: DuckDuckGo는 요청이 많으면 일시적으로 막힐 수 있다. 실패하면 빈 목록과 오류 표시를 돌려주고, General Agent는 모델 지식·RAG로 답하면서 "웹 검색을 하지 못했다"고 밝힌다. 평가는 `WEB_SEARCH_MOCK=true`로 저장된 결과를 써서 재현한다.
+
 #### 사용자 데이터 격리
 - Backend: 모든 `/api/*` 요청에서 JWT의 `user_id`를 꺼내고, `pet_id`가 그 사용자 소유인지 확인한 뒤 처리한다.
 - Agent 도구: 모든 Chroma 조회 `where`에 `user_id`를 강제로 넣는다. `user_id`와 현재 `pet_id`는 LLM 인자가 아니라 런타임 컨텍스트(`ToolRuntime.context`)에서 읽는다.
@@ -309,11 +318,11 @@ graph = create_supervisor(
 
 | 신호 (Backend가 `interactions`에 기록, 식단·활동 항목만 — 건강 일정 할 일은 기록하지 않음) | 가중치(초기값) | 비고 |
 |------|------|------|
-| 👍 좋아요 | +3 | `preferences`에 like로도 저장 |
-| 👎 싫어요 | 제외 (표시한 날 포함 7일: 신호일 ~ 신호일+6일) → 이후 −3 | 하드 필터. 예: 11/08 표시 → 11/14까지 제외, 11/15부터 후보 |
-| 완료 체크 | +1 | 누적 3회 이상이면 "단골" → 상위 3개 보장 (아래) |
-| 바꾸기 / 삭제 | −1 | 연속 2회 이상이면 −2 |
-| 직접 추가 | +2 | 비슷한 카탈로그 항목에 연결해서 반영 |
+| 👍 좋아요 `like` | +3 | `preferences`에 like로도 저장 |
+| 👎 싫어요 `dislike` | 제외 (표시한 날 포함 7일: 신호일 ~ 신호일+6일) → 이후 −3 | 하드 필터. 예: 11/08 표시 → 11/14까지 제외, 11/15부터 후보 |
+| 완료 체크 `complete` | +1 | 누적 3회 이상이면 "단골" → 상위 3개 보장 (아래) |
+| 바꾸기 `swap` / 삭제 `remove` | −1 | 연속 2회 이상이면 −2 |
+| 직접 추가 `custom` | +2 | 비슷한 카탈로그 항목에 연결해서 반영 |
 | 대화 진술 (`remember_preference`) | like +3 / dislike 제외 / constraint 필터 (완화 4단계에서만 해제) | 예: "저녁만 가능" → 시간대 제약 |
 
 - 시간 감쇠: 반감기 30일
@@ -457,15 +466,15 @@ Chroma는 문서 + 메타데이터 저장소이므로, 앱 데이터는 **`docum
 | 컬렉션 | id | 주요 metadata | 용도 |
 |--------|----|---------------|------|
 | `users` | `usr_xxx` | `email`(소문자, 유일), `password_hash`, `nickname`, `created_at` | 계정 (Backend만 접근) |
-| `pets` | `pet_xxx` | `user_id`, `name`, `species`(dog/cat), `breed`, `sex`, `size`(small/medium/large), `birth_date`, `weight_kg`, `neutered`, `activity_level`, `allergies`(예: chicken), `conditions`(질환 태그, 예: joint_disease), `memo`, `default_times`(JSON: 급여·산책 시간대) | 프로필 |
+| `pets` | `pet_xxx` | `user_id`, `name`, `species`(dog/cat), `breed`, `sex`(male/female), `size`(small/medium/large), `birth_date`, `weight_kg`, `neutered`, `activity_level`(low/normal/high), `allergies`(예: chicken), `conditions`(질환 태그, 예: joint_disease), `memo`, `default_times`(JSON: 급여·산책 시간대) | 프로필 |
 | `tasks` | `task_xxx` | `user_id`, `pet_id`, `date`, `time`(HH:MM, 선택), `category`(diet/activity/health/custom), `source`(auto/chat/custom), `catalog_item_id`(diet/activity), `health_event_id`(health), `title`, `done` | 오늘의 할 일 |
 | `health_events` | `evt_xxx` | `user_id`, `pet_id`, `catalog_item_id`, `type`(vaccine/checkup/deworming/heartworm/external_parasite/dental/other), `dose_no`, `due_date`, `due_ts`(비교용 epoch), `status`(scheduled/done/overdue/needs_history), `completed_date` | 건강 일정 |
 | `weight_logs` | `wt_xxx` | `user_id`, `pet_id`, `date`, `weight_kg` | 체중 기록 |
-| `interactions` | `int_xxx` | `user_id`, `pet_id`, `catalog_item_id`, `signal`, `created_at` | 취향 신호 원본 기록 |
+| `interactions` | `int_xxx` | `user_id`, `pet_id`, `catalog_item_id`(`custom`이면 null 가능), `signal`(like/dislike/complete/swap/remove/custom), `created_at` | 취향 신호 원본 기록 |
 | `preferences` | `pref_xxx` | `user_id`, `pet_id`(사용자 공통이면 null), `kind`(like/dislike/constraint), `target`(카탈로그 ID 또는 자유 텍스트), `note`, `score`, `excluded_until`(dislike 제외 기한), `updated_at` | 취향 요약 (추천에 사용) |
 | `chat_logs` | `log_xxx` | `user_id`, `pet_id`, `thread_id`, `created_at` | 대화 기록 (PII 마스킹된 answer/trace) |
 | `catalog_activity` / `catalog_diet` / `catalog_health` | 카탈로그 `item_id` | `species`, 연령 범위, `intensity`, `allergens`, `tags`, `source_url` | 추천 후보 (임베딩 사용) |
-| `pet_knowledge` | 자동 | `source`, `species`, `category` | RAG 지식 (임베딩 사용) |
+| `pet_knowledge` | 자동 | `source`, `species`(dog/cat/all), `category`(activity/diet/health/general) | RAG 지식 (임베딩 사용) |
 
 **카탈로그 항목 JSON 형식 (`data/catalog/activities.json` 예)**
 ```json
@@ -534,19 +543,20 @@ Chroma는 문서 + 메타데이터 저장소이므로, 앱 데이터는 **`docum
 | `AWS_SECRET_ACCESS_KEY` | Agent | Bedrock 인증 |
 | `AWS_DEFAULT_REGION` | Agent | Bedrock 리전 |
 | `AWS_MODEL` | Agent | `ChatBedrockConverse` 모델 ID |
-| `AWS_EMBED_MODEL` *(추가 예정)* | Agent | Bedrock 임베딩 모델 ID |
-| `CHROMA_HOST` / `CHROMA_PORT` *(추가 예정)* | Agent, Backend | 기본 `localhost` / `8001` |
-| `AGENT_URL` *(추가 예정)* | Backend | 기본 `http://localhost:8000` |
-| `AGENT_API_KEY` *(추가 예정)* | Backend, Agent | Backend → Agent 내부 호출 인증 |
-| `JWT_SECRET` *(추가 예정)* | Backend | 로그인 토큰 서명 |
-| `TZ` *(추가 예정)* | 전체 | `Asia/Seoul` 고정 |
-| `TAVILY_API_KEY` *(추가 예정, 선택)* | Agent | General Agent 웹 검색. 없으면 DuckDuckGo로 대체 |
-| `WEB_SEARCH_BLOCKED_DOMAINS` *(추가 예정, 선택)* | Agent | 쉼표로 구분한 차단 도메인 목록 |
-| `WEB_SEARCH_MOCK` *(추가 예정, 선택)* | Agent | 평가 재현용. `true`면 `evaluation/fixtures/`에 저장된 검색 결과를 씀 |
-| `FAULT_INJECT` *(추가 예정, 테스트 전용)* | Backend | 장애 주입. 예: `delete_after:health_events` (연쇄 삭제 도중 실패 재현). 평소에는 비워 둔다 |
-| `TODAY_OVERRIDE` *(추가 예정)* | Backend, Agent | 평가·테스트용 "오늘" 날짜 고정 (`YYYY-MM-DD`) |
-| `EVAL_MODE` / `DEMO_USER_ID` *(추가 예정)* | Agent | 평가 모드에서 `user_id`가 없을 때 쓸 데모 사용자 |
-| `CHECKPOINT_PATH` *(추가 예정)* | Agent | 기본 `data/checkpoints/checkpoints.sqlite` |
+| `AWS_EMBED_MODEL` | Agent | Bedrock 임베딩 모델 ID (`amazon.titan-embed-text-v2:0`) |
+| `CHROMA_HOST` / `CHROMA_PORT` | Agent, Backend | 기본 `localhost` / `8001` |
+| `AGENT_URL` | Backend | 기본 `http://localhost:8000` |
+| `AGENT_API_KEY` | Backend, Agent | Backend → Agent 내부 호출 인증 |
+| `JWT_SECRET` | Backend | 로그인 토큰 서명 |
+| `TZ` | 전체 | `Asia/Seoul` 고정 |
+| `WEB_SEARCH_BLOCKED_DOMAINS` *(선택)* | Agent | 쉼표로 구분한 차단 도메인 목록 |
+| `WEB_SEARCH_MOCK` *(선택)* | Agent | 평가 재현용. `true`면 `evaluation/fixtures/`에 저장된 검색 결과를 씀 |
+| `FAULT_INJECT` *(테스트 전용)* | Backend | 장애 주입. 예: `delete_after:health_events` (연쇄 삭제 도중 실패 재현). 평소에는 비워 둔다 |
+| `TODAY_OVERRIDE` | Backend, Agent | 평가·테스트용 "오늘" 날짜 고정 (`YYYY-MM-DD`) |
+| `EVAL_MODE` / `DEMO_USER_ID` | Agent | 평가 모드에서 `user_id`가 없을 때 쓸 데모 사용자 |
+| `CHECKPOINT_PATH` | Agent | 기본 `data/checkpoints/checkpoints.sqlite` |
+
+> 키 이름 목록은 `.env.example`에 있다 (값 없이 커밋). 웹 검색은 키가 없는 DuckDuckGo라 웹 검색 키는 없다.
 
 ## 7.5 초기 카탈로그 구축 파이프라인 (기획 단계)
 
@@ -559,7 +569,7 @@ Chroma는 문서 + 메타데이터 저장소이므로, 앱 데이터는 **`docum
 2. **출처 기준**: 수의사회, 대학 동물병원, 정부·공공기관(농림축산식품부, 농림축산검역본부 등), 국제 수의 단체 가이드라인을 우선한다. 개인 블로그나 광고성 글은 쓰지 않는다.
 3. **추출**: 출처 내용을 바탕으로 항목 JSON 초안을 만든다. LLM 보조를 써도 된다. 원문은 그대로 옮기지 말고 요약하고, 출처를 반드시 기록한다.
 4. **검수**: 사람(사용자)이 수치(접종 주기, 급여량, 유해 식품)를 원문과 대조해 확인한 뒤 `reviewed: true`로 바꾼다.
-5. **검증 스크립트**: JSON 스키마 검증, `item_id` 중복 검사, 출처 누락 검사를 한다. 규모(종×영역 10~15개, `recommendable:false` 제외)와 최소 구성(연령대별·저강도·실내 각 2개 이상) 충족 여부도 확인한다.
+5. **검증 스크립트** (`python -m src.catalog_check [--require-reviewed]`): JSON 스키마 검증, `item_id` 중복 검사, 출처 누락 검사를 한다. 규모(종×영역 10~15개, `recommendable:false` 제외)와 최소 구성(연령대별·저강도·실내 각 2개 이상) 충족 여부도 확인한다.
 6. 서비스 실행 중 웹 검색(General Agent)의 결과는 카탈로그에 자동으로 추가하지 않는다. 카탈로그를 고칠 때는 이 파이프라인을 다시 거친다.
 
 ## 7.6 프론트엔드 디자인 시스템 (디즈니풍)
@@ -595,7 +605,7 @@ Chroma는 문서 + 메타데이터 저장소이므로, 앱 데이터는 **`docum
   - `must_not_recommend`: 추천하면 안 되는 카탈로그 item_id 목록. trace의 추천 도구 결과와 답변에서 매칭된 item_id로 판정한다. 답변이 제외 사실을 언급하는 것은 허용한다.
   - `must_not_include`: 언급 자체가 문제인 표현(진단 단정, 처방·용량, 구토 유도 방법, 시스템 프롬프트 등). 문자열·LLM 판정
   - `seed_variant`, `today`: 비어 있으면 기본 시드와 2026-11-10. 평가 스크립트는 문항마다(또는 같은 조건끼리 묶어) `seed:reset`을 실행한다.
-- 시드 리셋: `cd src/backend && npm run seed:reset [-- --variant <이름>]`. 앱 데이터 컬렉션과 `data/checkpoints/`를 비우고 `data/seed/*.json`을 적재한다. 카탈로그·지식 컬렉션은 건드리지 않는다. 시드 계정과 변형 목록은 USER_SCENARIO.md 2장.
+- 시드 리셋: `cd src/backend && npm run seed:reset [-- --variant <이름>]`. 앱 데이터 컬렉션과 `data/checkpoints/`를 비우고 `data/seed/*.json`을 적재한다. 변형에 `setup_queries`가 있으면 Agent `/query`를 호출해 상태(예: 승인 대기)를 만든다. 카탈로그·지식 컬렉션은 건드리지 않는다. 시드 계정과 변형 목록은 USER_SCENARIO.md 2장.
   - `user_id`·`pet_id`가 비어 있으면 평가 모드 기본값(P3 이지우와 대표 반려동물 보리)을 쓴다. 다른 페르소나의 반려동물이 필요하면 두 값을 함께 채워 요청에 넣는다.
 - 카테고리: `diet`, `exercise`, `health`, `multi`(복합), `out_of_scope`, `safety`(응급·유해식품), `injection`(직접·간접 주입, 프롬프트 유출 시도), `pii`(전화번호·주민번호 등 포함 질의), `hitl`(쓰기 작업 요청), `catalog`(카탈로그 밖 항목 요청), `personalization`(취향 시드 데이터가 있는 사용자 질의), `species`(개·고양이 외 동물), `isolation`(다른 사용자 반려동물 접근 시도)
 - 평가 스크립트가 각 질의를 `POST /query`로 호출하여 다음을 측정
@@ -637,16 +647,16 @@ Chroma는 문서 + 메타데이터 저장소이므로, 앱 데이터는 **`docum
 
 ## 10. 오픈 이슈 / 결정 필요
 
-- [ ] 임베딩 모델 선정 및 `AWS_EMBED_MODEL` 키 추가
-- [ ] Chroma를 앱 데이터 저장소로 쓰는 것의 한계(트랜잭션·조인 없음) 수용 여부 — MVP는 수용
-- [ ] Supervisor `output_mode` (`last_message` vs `full_history`)와 trace 상세 수준
-- [ ] 스트리밍 응답(SSE) 도입 여부 — `/query` 계약은 유지하고 별도 엔드포인트로 검토
-- [ ] RAG 지식 문서(`data/knowledge/`) 수집 범위와 출처
-- [ ] Bedrock Guardrails 병행 사용 여부 (비용·지연 vs 방어 강도)
-- [ ] 웹 검색 API 최종 선택 (Tavily 키 발급 여부, 무료 한도) 및 신뢰 도메인 우선순위 목록 (예: 정부·수의 단체·대학)
+- [x] ~~임베딩 모델~~ → Bedrock **Titan Text Embeddings v2** (`amazon.titan-embed-text-v2:0`, 1024차원). `AWS_EMBED_MODEL` 키 추가, 현재 계정·리전(us-east-1)에서 호출 확인 (2026-11-04)
+- [x] ~~Chroma를 앱 데이터 저장소로 쓰는 것의 한계~~ → MVP는 수용. 정합성은 백엔드 코드와 `database/schema.md` 기준본으로 보장 (2026-11-04)
+- [x] ~~Supervisor `output_mode`와 trace 상세 수준~~ → `output_mode="last_message"` (Supervisor 문맥을 작게 유지). trace는 `stream_mode="updates"`로 모으고 `handoff`·`tool_call`(도구 이름 + 마스킹된 인자)·`tool_result`(건수·항목 ID 요약, 본문 제외)·`guardrail`·`interrupt`·`error` 6종만 남긴다 (2026-11-04)
+- [x] ~~스트리밍 응답(SSE)~~ → Version 1에서 제외. `/query` 단일 응답 + 프론트엔드 "생각 중" 표시 (2026-11-04)
+- [x] ~~RAG 지식 문서 수집 범위와 출처~~ → 영역(식단·운동·건강·일반) × 종(개·고양이·공통) 문서. 출처는 카탈로그와 같은 기준(7.5의 2번)과 `data/sources/` 목록을 쓴다 (2026-11-04)
+- [x] ~~Bedrock Guardrails 병행~~ → Version 1에서 쓰지 않음. 다층 가드레일(3.6)로 대응 (2026-11-04)
+- [x] ~~웹 검색 API 최종 선택~~ → 키 없는 **DuckDuckGo**(`DuckDuckGoSearchResults`)만 사용. Tavily 등 키가 필요한 API는 Version 2 후보. 신뢰 도메인 우선순위·차단 도메인은 3.7 (2026-11-04)
 - [x] ~~계정 저장소 분리~~ → Chroma 단일 유지, 유일성·연쇄 삭제는 백엔드 코드로 보장 (2026-11-04)
 - [x] ~~취향 점수 계산 위치~~ → Python `src/tools.py` 한 곳 (Backend는 `/tasks/generate` 호출) (2026-11-04)
-- [ ] 회원 탈퇴 시 `interactions`를 익명화해 남길지 완전히 삭제할지
-- [ ] 주입 탐지 2단계 LLM 분류기에 쓸 모델 (메인 모델 재사용 vs 경량 모델)
+- [x] ~~회원 탈퇴 시 `interactions` 처리~~ → **완전 삭제** (ERD 연쇄 삭제, SERVICE.md F0과 같음). 익명 통계는 Version 1 범위 밖 (2026-11-04)
+- [x] ~~주입 탐지 2단계 분류기 모델~~ → 메인 모델(`AWS_MODEL`) 재사용, `temperature=0` + 구조화 출력. 1단계 규칙에서 애매한 경우에만 호출 (2026-11-04)
 - [x] ~~checkpointer 영속화~~ → `SqliteSaver`로 결정 (2026-11-04)
-- [ ] 미들웨어·가드레일 코드가 커질 경우 `src/agent.py`에서 분리할지 (제출 규약 폴더 구조와 함께 검토)
+- [x] ~~미들웨어·가드레일 코드 분리~~ → Version 1은 `src/agent.py`에 둔다 (제출 규약 폴더 구조 유지). 커지면 함수 단위로 정리만 한다 (2026-11-04)

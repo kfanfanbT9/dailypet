@@ -49,6 +49,7 @@ mini-pjt/
 │   ├── agent.py            메인 에이전트 그래프 (Supervisor + 하위 Agent, POST /query 서버)
 │   ├── tools.py            도메인 도구 (식단·운동·건강 일정 계산, 반려동물 정보 조회 등)
 │   ├── retriever.py        RAG 파이프라인 (Chroma 검색)
+│   ├── catalog_check.py    카탈로그 검증 스크립트 (스키마·출처·규모·검수 여부)
 │   ├── frontend/           프론트엔드 (React + TypeScript)
 │   └── backend/            백엔드 (Node.js + JavaScript)
 ├── doc/                    만들어진 문서
@@ -58,7 +59,8 @@ mini-pjt/
 │   ├── ERD.md              데이터 모델 ERD (Mermaid)
 │   ├── plan.md             실행 계획 (task·완료 조건·의존성)
 │   ├── wireframe.md        화면 와이어프레임 (W00~W12)
-│   └── Style-guide.md      프론트엔드 스타일 가이드 (디자인 토큰·컴포넌트)
+│   ├── Style-guide.md      프론트엔드 스타일 가이드 (디자인 토큰·컴포넌트)
+│   └── assets.md           디자인 에셋(글꼴·마스코트·아이콘) 출처·라이선스 기록
 ├── database/               DB 스키마
 │   └── schema.md           ERD 기반 논리 스키마 DDL (SQLite)
 ├── data/                   사용한 데이터
@@ -78,6 +80,7 @@ mini-pjt/
 | `src/agent.py` | 그래프 구성, Supervisor, 하위 Agent 생성, 미들웨어·가드레일, FastAPI 엔드포인트 | 도구 구현 세부, 검색 로직 |
 | `src/tools.py` | `@tool` 함수들 | 모델·그래프 생성 코드 |
 | `src/retriever.py` | 문서 적재(ingest), 임베딩, 검색 함수 | Agent 프롬프트 |
+| `src/catalog_check.py` | 카탈로그 JSON 검증 (ARCHITECTURE.md 7.5) | 카탈로그 데이터 수정 |
 | `src/frontend/` | React 앱 전체 (자체 `package.json`) | 비밀키, LLM 직접 호출 |
 | `src/backend/` | REST API, Agent 서버 프록시, 알림 스케줄러 (자체 `package.json`) | LLM 직접 호출 |
 | `data/` | 카탈로그 JSON, 출처, 지식 문서, 시드 JSON, `data/chroma/` 저장소 | 코드, 실제 사용자 개인정보 |
@@ -108,7 +111,8 @@ mini-pjt/
 
 ### 4.3 환경변수 / 보안
 - `.env`는 절대 커밋하지 않는다 (`.gitignore`에 포함됨). 새 키를 추가하면 `.env.example`에도 키 이름만 추가한다.
-- 현재 사용하는 키: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_DEFAULT_REGION`, `AWS_MODEL`
+- 현재 사용하는 키: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_DEFAULT_REGION`, `AWS_MODEL`, `AWS_EMBED_MODEL` (전체 목록은 `.env.example`, ARCHITECTURE.md 7장)
+- 웹 검색은 Version 1에서 **키 없는 DuckDuckGo**만 쓴다. 웹 검색용 API 키를 추가하지 않는다.
 - 로그·trace에 자격증명이나 개인정보를 남기지 않는다.
 
 ### 4.4 코드 컨벤션
@@ -188,6 +192,7 @@ chroma run --path data/chroma --port 8001
 # 2) Agent 서버 (Python)
 python -m venv .venv && source .venv/Scripts/activate   # Windows Git Bash 기준
 pip install -r requirements.txt
+python -m src.catalog_check --require-reviewed         # 카탈로그 검증 (검수 완료 전에는 옵션 없이)
 python -m src.retriever --ingest                        # data/catalog, data/knowledge 를 Chroma에 적재
 (cd src/backend && npm run seed:reset)                  # 데모·평가용 시드 데이터 적재 (USER_SCENARIO.md 2장)
 uvicorn src.agent:app --port 8000 --reload

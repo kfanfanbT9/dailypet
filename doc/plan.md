@@ -16,12 +16,12 @@
 |--------|------|------|
 | `SERVICE.md`, `doc/ARCHITECTURE.md`, `doc/USER_SCENARIO.md`, `doc/Arch-Diagram.md`, `doc/ERD.md` | ✅ 초안 | 일부는 아직 커밋 전 |
 | `database/schema.md` | ✅ 초안 | SQLite로 실행 검증함 |
-| `data/catalog/*.json` | ⚠️ 초안 | 107개 항목 **모두 `reviewed: false`**. 규모·최소 구성(연령대·저강도·실내 2개 이상)은 충족 |
+| `data/catalog/*.json` | ✅ 검수 완료 | 107개 항목 모두 `reviewed: true` (2026-11-04). `catalog_check --require-reviewed` 통과 |
 | `data/sources/` | ✅ 초안 | 영역별 출처·검색 질의 |
-| `data/knowledge/` | ❌ 없음 | RAG 지식 문서 |
-| `data/seed/` | ❌ 없음 | USER_SCENARIO.md 2장에 정의만 있음 |
-| `evaluation/test_queries.csv` | ❌ 없음 | ARCHITECTURE.md 8장에 문항 배분만 있음 |
-| `.env.example`, `requirements.txt`, `doc/assets.md` | ❌ 없음 | |
+| `data/knowledge/` | ✅ 초안 | 8개 문서, 카탈로그 107개 항목 근거 포함 (`reviewed: false`) |
+| `data/seed/` | ✅ | 컬렉션 8종 + 변형 3종, schema.md DDL 적재 검증 |
+| `evaluation/test_queries.csv` | ✅ | 50문항 (8장 배분 일치) + 웹 검색 고정 결과·오염 문서 fixture |
+| `.env.example`, `requirements.txt`, `doc/assets.md` | ✅ | `.venv`(Python 3.14) 설치·Bedrock·Chroma·DuckDuckGo 동작 확인 |
 | `src/` | ❌ 없음 | |
 
 > 2026-11-04 doc/ 정합성 점검 결과(건강 `type` enum, 단골 보장 규칙, 도구 입력, 미들웨어 순서, 평가 인증, 예시 ID·날짜 등)를 문서에 반영했다.
@@ -96,15 +96,15 @@ ARCHITECTURE.md 10장의 미결 항목 중, 코드 구조에 영향을 주는 �
 - [x] 없음
 
 **완료 조건**
-- [ ] 임베딩 모델을 정하고 `AWS_EMBED_MODEL` 키를 ARCHITECTURE.md 7장과 `.env.example`에 추가했다
-- [ ] 웹 검색 API(Tavily / DuckDuckGo)와 신뢰 도메인 우선순위·차단 도메인 목록을 정했다
-- [ ] Supervisor `output_mode`와 trace 상세 수준을 정했다
-- [ ] 주입 탐지 2단계 분류기 모델(메인 재사용 / 경량)을 정했다
-- [ ] Bedrock Guardrails 병행 여부를 정했다
-- [ ] 회원 탈퇴 시 `interactions` 처리(익명화 / 완전 삭제)를 정했다
-- [ ] 미들웨어 코드를 `src/agent.py`에서 분리할지 정했다 (분리하면 CLAUDE.md 3장도 고친다)
-- [ ] SSE 스트리밍은 Version 1에서 제외할지 정했다
-- [ ] 결정 내용을 ARCHITECTURE.md 10장에 날짜와 함께 `[x]`로 기록했다
+- [x] 임베딩 모델을 정하고 `AWS_EMBED_MODEL` 키를 ARCHITECTURE.md 7장과 `.env.example`에 추가했다
+- [x] 웹 검색 API(DuckDuckGo, 키 없음)와 신뢰 도메인 우선순위·차단 도메인 목록을 정했다
+- [x] Supervisor `output_mode`와 trace 상세 수준을 정했다
+- [x] 주입 탐지 2단계 분류기 모델(메인 재사용 / 경량)을 정했다
+- [x] Bedrock Guardrails 병행 여부를 정했다
+- [x] 회원 탈퇴 시 `interactions` 처리(익명화 / 완전 삭제)를 정했다
+- [x] 미들웨어 코드를 `src/agent.py`에서 분리할지 정했다 (분리하면 CLAUDE.md 3장도 고친다)
+- [x] SSE 스트리밍은 Version 1에서 제외할지 정했다
+- [x] 결정 내용을 ARCHITECTURE.md 10장에 날짜와 함께 `[x]`로 기록했다
 
 ### P0-2. 문서 정합성 정리 🔁
 문서끼리, 문서와 데이터 사이의 어긋난 부분을 고친다.
@@ -114,9 +114,9 @@ ARCHITECTURE.md 10장의 미결 항목 중, 코드 구조에 영향을 주는 �
 
 **완료 조건**
 - [x] 문서 예시 ID(`diet_dog_feed_guide_01`, `hc_dog_dhppl`)를 실제 카탈로그 ID로 바꿨다 (2026-11-04 정합성 점검)
-- [ ] USER_SCENARIO.md가 참조하는 카탈로그 ID가 모두 `data/catalog/`에 있다 (스크립트로 확인)
-- [ ] ARCHITECTURE.md 5장 ↔ ERD.md ↔ `database/schema.md`의 필드·enum 값이 같다 (`activity_level`, `sex` 값 범위 포함)
-- [ ] `doc/assets.md`를 만들었다 (마스코트·일러스트 출처 기록용, CLAUDE.md 4.5.2)
+- [x] USER_SCENARIO.md가 참조하는 카탈로그 ID가 모두 `data/catalog/`에 있다 (스크립트로 확인)
+- [x] ARCHITECTURE.md 5장 ↔ ERD.md ↔ `database/schema.md`의 필드·enum 값이 같다 (`activity_level`, `sex` 값 범위 포함)
+- [x] `doc/assets.md`를 만들었다 (마스코트·일러스트 출처 기록용, CLAUDE.md 4.5.2)
 
 ### P0-3. 카탈로그 검증 스크립트 🔁
 ARCHITECTURE.md 7.5의 검증 규칙을 스크립트로 만든다. 사람 검수(P0-4) 전후에 모두 쓴다.
@@ -125,94 +125,94 @@ ARCHITECTURE.md 7.5의 검증 규칙을 스크립트로 만든다. 사람 검수
 - [x] 없음
 
 **완료 조건**
-- [ ] JSON 스키마 검증 (필수 필드, enum 값, ID 접두사 `act_`/`diet_`/`hc_`)
-- [ ] `item_id` 중복 검사, 출처 누락(`sources` 1개 이상, `url`·`publisher`·`accessed`) 검사
-- [ ] 규모 검사: 종×영역 10~15개 (`recommendable: false` 제외)
-- [ ] 최소 구성 검사: 종×영역마다 연령대별(junior/adult/senior)·저강도·실내 항목 각 2개 이상
-- [ ] `harmful_food`는 모두 `recommendable: false`인지 검사
-- [ ] `--require-reviewed` 옵션으로 `reviewed: false` 항목이 있으면 실패한다
-- [ ] 현재 카탈로그에서 `--require-reviewed` 없이 실행하면 통과한다
+- [x] JSON 스키마 검증 (필수 필드, enum 값, ID 접두사 `act_`/`diet_`/`hc_`)
+- [x] `item_id` 중복 검사, 출처 누락(`sources` 1개 이상, `url`·`publisher`·`accessed`) 검사
+- [x] 규모 검사: 종×영역 10~15개 (`recommendable: false` 제외)
+- [x] 최소 구성 검사: 종×영역마다 연령대별(junior/adult/senior)·저강도·실내 항목 각 2개 이상
+- [x] `harmful_food`는 모두 `recommendable: false`인지 검사
+- [x] `--require-reviewed` 옵션으로 `reviewed: false` 항목이 있으면 실패한다
+- [x] 현재 카탈로그에서 `--require-reviewed` 없이 실행하면 통과한다
 
 ### P0-4. 카탈로그 사람 검수 👤
 **이 task가 끝나지 않으면 카탈로그를 적재할 수 없다** (CLAUDE.md 4.5.1).
 
 **의존성**
-- [ ] P0-3 카탈로그 검증 스크립트
+- [x] P0-3 카탈로그 검증 스크립트
 
 **완료 조건**
-- [ ] 활동 28개: `review_notes`의 수치·주의사항을 출처 원문과 대조했다
-- [ ] 식단 50개: 급여량·칼로리·알레르기·유해 식품 정보를 대조했다
-- [ ] 정기점검 29개: 접종 일정(`dose_schedule`, 간격, 시작 주령)과 법정 의무 여부를 대조했다
-- [ ] 수정한 항목은 `review_notes`에 수정 내용을 남겼다
-- [ ] 107개 항목이 모두 `reviewed: true`다
-- [ ] 검증 스크립트를 `--require-reviewed`로 실행해 통과했다
-- [ ] `data/sources/sources.md`의 상태 문구를 "검수 완료(날짜)"로 바꿨다
+- [x] 활동 28개: `review_notes`의 수치·주의사항을 출처 원문과 대조했다
+- [x] 식단 50개: 급여량·칼로리·알레르기·유해 식품 정보를 대조했다
+- [x] 정기점검 29개: 접종 일정(`dose_schedule`, 간격, 시작 주령)과 법정 의무 여부를 대조했다
+- [x] 수정한 항목은 `review_notes`에 수정 내용을 남겼다
+- [x] 107개 항목이 모두 `reviewed: true`다
+- [x] 검증 스크립트를 `--require-reviewed`로 실행해 통과했다
+- [x] `data/sources/sources.md`의 상태 문구를 "검수 완료(날짜)"로 바꿨다
 
 ### P0-5. RAG 지식 문서 작성 🔁
 `search_pet_knowledge`가 검색할 근거 문서를 만든다.
 
 **의존성**
-- [ ] P0-1 (지식 문서 수집 범위·출처 결정)
+- [x] P0-1 (지식 문서 수집 범위·출처 결정)
 
 **완료 조건**
-- [ ] `data/knowledge/`에 영역(식단·운동·건강·일반)×종(개·고양이)별 문서가 있다
-- [ ] 각 문서 머리에 메타데이터(`source`, `species`, `category`)와 출처 URL이 있다
-- [ ] 카탈로그 항목의 근거 설명(왜 이 항목을 추천하는지)이 들어 있다
-- [ ] 문서 안에 프롬프트 주입 패턴(지시문, 역할 변경 문구 등)이 없다
-- [ ] 평가셋의 `injection` 간접 주입 문항용 "오염 문서"는 실제 지식 문서와 분리해서 둔다 (평가 전용)
+- [x] `data/knowledge/`에 영역(식단·운동·건강·일반)×종(개·고양이)별 문서가 있다
+- [x] 각 문서 머리에 메타데이터(`source`, `species`, `category`)와 출처 URL이 있다
+- [x] 카탈로그 항목의 근거 설명(왜 이 항목을 추천하는지)이 들어 있다
+- [x] 문서 안에 프롬프트 주입 패턴(지시문, 역할 변경 문구 등)이 없다
+- [x] 평가셋의 `injection` 간접 주입 문항용 "오염 문서"는 실제 지식 문서와 분리해서 둔다 (평가 전용)
 
 ### P0-6. 시드 데이터 작성 🔁
 USER_SCENARIO.md 2장의 시드 정의를 JSON으로 만든다.
 
 **의존성**
-- [ ] P0-2 문서 정합성 정리 (시드가 참조하는 카탈로그 ID 확정)
+- [x] P0-2 문서 정합성 정리 (시드가 참조하는 카탈로그 ID 확정)
 
 **완료 조건**
-- [ ] `data/seed/`에 컬렉션별 JSON(`users`, `pets`, `health_events`, `tasks`, `weight_logs`, `interactions`, `preferences`, `chat_logs`)이 있다
-- [ ] 사용자 6명의 `user_id`가 `usr_` + sha256(소문자 이메일) 앞 12자리와 일치한다 (스크립트로 확인)
-- [ ] 비밀번호는 해시값만 있고, 데모 비밀번호는 USER_SCENARIO.md에만 적었다
-- [ ] 반려동물 7마리, 건강 일정 5건, 보리의 완료 기록 3회·체중 2건, 모카의 👎 등 2장 내용이 모두 들어 있다
-- [ ] 변형 시드(`--variant`, 2.4장)를 별도 파일로 정의했다
-- [ ] 모든 시드 데이터가 `database/schema.md` DDL에 오류 없이 들어간다 (SQLite로 적재해 확인)
-- [ ] 실제 개인정보가 없다 (데모 도메인 `@demo.dailypet`만 사용)
+- [x] `data/seed/`에 컬렉션별 JSON(`users`, `pets`, `health_events`, `tasks`, `weight_logs`, `interactions`, `preferences`, `chat_logs`)이 있다
+- [x] 사용자 6명의 `user_id`가 `usr_` + sha256(소문자 이메일) 앞 12자리와 일치한다 (스크립트로 확인)
+- [x] 비밀번호는 해시값만 있고, 데모 비밀번호는 USER_SCENARIO.md에만 적었다
+- [x] 반려동물 7마리, 활성 건강 일정 5건(+ 완료 이력), 보리의 완료 기록 3회·체중 2건, 모카의 👎 등 2장 내용이 모두 들어 있다
+- [x] 변형 시드(`--variant`, 2.4장)를 별도 파일로 정의했다
+- [x] 모든 시드 데이터가 `database/schema.md` DDL에 오류 없이 들어간다 (SQLite로 적재해 확인)
+- [x] 실제 개인정보가 없다 (데모 도메인 `@demo.dailypet`만 사용)
 
 ### P0-7. 평가 질의셋 작성 🔁
 ARCHITECTURE.md 8장의 배분대로 50문항을 만든다.
 
 **의존성**
-- [ ] P0-6 시드 데이터 (문항이 시드의 `user_id`·`pet_id`·변형을 참조)
-- [ ] P0-5 RAG 지식 문서 (간접 주입 문항)
+- [x] P0-6 시드 데이터 (문항이 시드의 `user_id`·`pet_id`·변형을 참조)
+- [x] P0-5 RAG 지식 문서 (간접 주입 문항)
 
 **완료 조건**
-- [ ] `evaluation/test_queries.csv`가 ARCHITECTURE.md 8장의 컬럼을 모두 갖는다
-- [ ] 카테고리별 문항 수가 배분표와 같다 (총 50, `injection` 5·`pii` 5 포함)
-- [ ] 모든 문항에 `scenario_id`(S01~S22)가 있고, USER_SCENARIO.md 6장 후보와 대응한다
-- [ ] `must_not_recommend`의 ID가 모두 카탈로그에 있다
-- [ ] `pii` 문항의 개인정보는 가짜 값이다
-- [ ] 웹 검색 재현용 저장 결과(`WEB_SEARCH_MOCK`)가 필요한 `general` 문항을 표시했다
+- [x] `evaluation/test_queries.csv`가 ARCHITECTURE.md 8장의 컬럼을 모두 갖는다
+- [x] 카테고리별 문항 수가 배분표와 같다 (총 50, `injection` 5·`pii` 5 포함)
+- [x] 모든 문항에 `scenario_id`(S01~S22)가 있고, USER_SCENARIO.md 6장 후보와 대응한다
+- [x] `must_not_recommend`의 ID가 모두 카탈로그에 있다
+- [x] `pii` 문항의 개인정보는 가짜 값이다
+- [x] 웹 검색 재현용 저장 결과(`WEB_SEARCH_MOCK`)가 필요한 `general` 문항을 표시했다
 
 ### P0-8. 프로젝트 기반 설정 🔁
 
 **의존성**
-- [ ] P0-1 (임베딩·웹 검색 키 결정)
+- [x] P0-1 (임베딩·웹 검색 키 결정)
 
 **완료 조건**
-- [ ] `.env.example`에 모든 키 이름만 있다 (`AWS_*`, `AWS_EMBED_MODEL`, `AGENT_API_KEY`, `JWT_SECRET`, `EVAL_MODE`, `DEMO_USER_ID`, `TODAY_OVERRIDE`, 웹 검색 키, `WEB_SEARCH_MOCK` 등)
-- [ ] `requirements.txt`에 버전을 고정한 의존성이 있다 (`langchain`, `langgraph`, `langgraph-supervisor`, `langgraph-checkpoint-sqlite`, `langchain-aws`, `chromadb`, `fastapi`, `uvicorn`, `pydantic` 등)
-- [ ] `.venv`에서 `pip install -r requirements.txt`가 성공한다
-- [ ] `chroma run --path data/chroma --port 8001`이 실행된다
-- [ ] `.env`의 Bedrock 키로 모델 호출 1회가 성공한다 (키는 출력·로그에 남기지 않음)
-- [ ] `.gitignore`에 `.env`, `data/chroma/`, `data/checkpoints/`, `node_modules/`, `.venv/`가 있다
+- [x] `.env.example`에 모든 키 이름만 있다 (`AWS_*`, `AWS_EMBED_MODEL`, `AGENT_API_KEY`, `JWT_SECRET`, `EVAL_MODE`, `DEMO_USER_ID`, `TODAY_OVERRIDE`, `WEB_SEARCH_MOCK` 등. 웹 검색은 키 없는 DuckDuckGo)
+- [x] `requirements.txt`에 버전을 고정한 의존성이 있다 (`langchain`, `langgraph`, `langgraph-supervisor`, `langgraph-checkpoint-sqlite`, `langchain-aws`, `chromadb`, `fastapi`, `uvicorn`, `pydantic` 등)
+- [x] `.venv`에서 `pip install -r requirements.txt`가 성공한다
+- [x] `chroma run --path data/chroma --port 8001`이 실행된다
+- [x] `.env`의 Bedrock 키로 모델 호출 1회가 성공한다 (키는 출력·로그에 남기지 않음)
+- [x] `.gitignore`에 `.env`, `data/chroma/`, `data/checkpoints/`, `node_modules/`, `.venv/`가 있다
 
 ### P0-9. 기획 산출물 커밋
 
 **의존성**
-- [ ] P0-1 ~ P0-8 전부
+- [x] P0-1 ~ P0-8 전부
 
 **완료 조건**
-- [ ] 기획 산출물을 커밋했다 (`docs:` / `chore:`)
-- [ ] `git status`에 `.env`, `data/chroma/`, `data/checkpoints/`가 나오지 않는다
-- [ ] `prompt.txt`의 처리(삭제 / 보관)를 정했다
+- [x] 기획 산출물을 커밋했다 (`docs:` / `chore:`)
+- [x] `git status`에 `.env`, `data/chroma/`, `data/checkpoints/`가 나오지 않는다
+- [x] `prompt.txt`의 처리(삭제 / 보관)를 정했다 → 커밋하지 않고 로컬에만 보관 (`.vscode/`도 커밋 제외)
 
 ---
 
@@ -553,7 +553,7 @@ LLM 없이 결정적으로 동작하는 순수 함수. `/tasks/generate`와 채�
 
 | Phase | Task | 상태 |
 |-------|------|------|
-| 0 기획 | P0-1 ~ P0-9 | ⬜ 0 / 9 |
+| 0 기획 | P0-1 ~ P0-9 | ✅ 9 / 9 (2026-11-04) |
 | 1 Agent | A-1 ~ A-9 | ⬜ 0 / 9 |
 | 2 Backend | B-1 ~ B-8 | ⬜ 0 / 8 |
 | 3 Frontend | F-1 ~ F-6 | ⬜ 0 / 6 |
