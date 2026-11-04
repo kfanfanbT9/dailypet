@@ -1,0 +1,575 @@
+# ARCHITECTURE.md — DailyPet 기술 설계 (초안)
+
+> 상태: 초안 (기획 단계) · 작성일: 2026-11-04
+> 관련 문서: [CLAUDE.md](CLAUDE.md), [SERVICE.md](SERVICE.md)
+
+---
+
+## 1. 시스템 구성도
+
+```
+┌──────────────────────┐     REST/JSON     ┌───────────────────────┐    POST /query    ┌───────────────────────────────┐
+│  Frontend            │ ────────────────> │  Backend              │ ────────────────> │  Agent Server (Python)        │
+│  React + TypeScript  │ <──────────────── │  Node.js + Express    │ <──────────────── │  FastAPI + LangGraph          │
+│  src/frontend  :5173 │                   │  src/backend   :3000  │                   │  src/agent.py         :8000   │
+└──────────────────────┘                   └──────────┬────────────┘                   └──────┬───────────────┬────────┘
+                                                      │ chromadb (JS)                         │ langchain-     │ Bedrock
+                                                      ▼                                       ▼ chroma        ▼ Converse API
+                                           ┌─────────────────────────────────────────┐   ┌──────────────────────┐
+                                           │  Chroma DB  (chroma run :8001)          │   │  Amazon Bedrock      │
+                                           │  data/chroma/                           │   │  ChatBedrockConverse │
+                                           │  - 앱 데이터 컬렉션 (pets, tasks, ...)  │   │  + Embeddings        │
+                                           │  - 지식 컬렉션 (pet_knowledge)          │   └──────────────────────┘
+                                           └─────────────────────────────────────────┘
+```
+
+- **Frontend**는 Backend만 호출한다.
+- **Backend**는 인증(JWT), 앱 데이터 CRUD, 알림 계산, 취향 신호 기록, Agent 서버 프록시를 담당한다. LLM을 직접 호출하지 않는다.
+  - Agent를 호출할 때 인증된 `user_id`와 해당 사용자가 소유한 `pet_id`만 넘긴다. Agent 서버는 내부 키(`AGENT_API_KEY` 헤더)로 Backend 요청만 받는다.
+  - 오늘의 할 일 자동 생성은 Agent 서버의 비대화형 API `POST /tasks/generate`를 호출해 받은 구조화 결과를 저장한다 (LLM 미사용, HITL 없음).
+- **Checkpointer**: LangGraph `SqliteSaver`가 `data/checkpoints/checkpoints.sqlite`에 대화 상태와 HITL 대기 상태를 저장한다. 앱 데이터는 저장하지 않는다.
+- **실행 환경**: 로컬 데모. 모든 프로세스는 `localhost`에만 바인딩한다.
+- **Agent Server**는 Supervisor 그래프를 실행하고 `POST /query` 계약을 제공한다.
+- **Chroma DB**는 앱 데이터와 RAG 지식을 모두 저장하는 단일 DB이다 (서버 모드로 띄워 Node/Python이 공유).
+
+## 2. 기술 스택
+
+| 영역 | 기술 | 비고 |
+|------|------|------|
+| Frontend | React 18, TypeScript, Vite, React Router, TanStack Query | 상태관리는 Query + 로컬 state로 최소화 |
+| UI / 디자인 | Tailwind CSS (디자인 토큰), Framer Motion (통통 튀는 모션), Lottie (마스코트 애니메이션, 선택), Google Fonts 둥근 한글 폰트 | 디즈니풍 가이드 → 9장 |
+| Backend | Node.js 20 LTS, JavaScript (ESM), Express, `chromadb` JS client, `node-cron` | 알림 계산 스케줄러 |
+| 인증 | 이메일 + 비밀번호, `bcrypt` 해시, `jsonwebtoken`(JWT, httpOnly 쿠키), `zod` 입력 검증 | 이메일 인증·소셜 로그인 없음 |
+| DB | Chroma DB (server mode) | `data/chroma`에 영속화 |
+| Agent | Python 3.11+, LangChain v1, LangGraph, `langgraph-supervisor`, `langgraph-checkpoint-sqlite`, `langchain-aws`, `langchain-chroma`, FastAPI, Uvicorn | |
+| LLM | Amazon Bedrock — `ChatBedrockConverse` | 모델 ID는 `.env`의 `AWS_MODEL` |
+| Embedding | Amazon Bedrock Embeddings (`BedrockEmbeddings`, 예: Titan Text Embeddings v2) | 모델 ID는 `.env` 추가 키로 관리 (오픈 이슈) |
+
+## 3. Agent 설계
+
+### 3.1 그래프 구조
+
+```
+                    ┌──────────────────────────┐
+  question ───────> │     supervisor           │  create_supervisor(...)
+                    │  (사용자 대화·라우팅·종합) │
+                    └───┬──────────┬────────┬──┘
+           handoff      │          │        │
+                ┌───────▼───┐ ┌────▼─────┐ ┌▼────────────┐
+                │ diet_agent│ │exercise_ │ │ health_agent│   각각 create_agent(...)
+                │ 식단 제안  │ │ agent    │ │ 건강관리 일정│
+                └─────┬─────┘ │ 운동 제안 │ └──────┬──────┘
+                      │       └────┬─────┘        │
+                      ▼            ▼              ▼
+                   tools.py  (도메인 도구 + retriever 검색 도구)
+```
+
+### 3.2 구현 골격 (`src/agent.py`)
+
+```python
+import os
+from dotenv import load_dotenv
+from langchain_aws import ChatBedrockConverse
+from langchain.agents import create_agent
+from langchain.agents.middleware import (
+    PIIMiddleware, HumanInTheLoopMiddleware, SummarizationMiddleware,
+    ModelCallLimitMiddleware, ToolCallLimitMiddleware,
+    ModelRetryMiddleware, ToolRetryMiddleware,
+)
+import sqlite3
+from langgraph.checkpoint.sqlite import SqliteSaver
+from langgraph_supervisor import create_supervisor
+
+from src import tools
+
+load_dotenv()
+
+model = ChatBedrockConverse(
+    model=os.environ["AWS_MODEL"],
+    region_name=os.environ["AWS_DEFAULT_REGION"],
+    temperature=0.2,
+)
+
+def common_middleware() -> list:
+    """모든 하위 Agent에 공통으로 적용하는 미들웨어 (순서 중요, 3.6 참고)."""
+    return [
+        injection_guard,                      # 커스텀 @before_model: 입력 가드레일
+        *pii_middlewares(),                   # PIIMiddleware: 입력/출력/도구결과 마스킹
+        SummarizationMiddleware(model=model, max_tokens_before_summary=4000),
+        ModelCallLimitMiddleware(run_limit=8),
+        ToolCallLimitMiddleware(run_limit=10),
+        ModelRetryMiddleware(max_retries=2),
+        ToolRetryMiddleware(max_retries=2),
+        output_guard,                         # 커스텀 @after_model: 출력 가드레일
+    ]
+
+COMMON_TOOLS = [tools.get_pet_profile, tools.list_my_pets, tools.get_preferences,
+                tools.remember_preference, tools.search_pet_knowledge]
+
+diet_agent = create_agent(
+    model=model,
+    tools=[*COMMON_TOOLS, tools.calc_daily_calories, tools.recommend_from_catalog],
+    system_prompt=DIET_PROMPT,
+    middleware=common_middleware(),
+    name="diet_agent",
+)
+exercise_agent = create_agent(
+    model=model,
+    tools=[*COMMON_TOOLS, tools.recommend_from_catalog],
+    system_prompt=EXERCISE_PROMPT,
+    middleware=common_middleware(),
+    name="exercise_agent",
+)
+health_agent = create_agent(
+    model=model,
+    tools=[*COMMON_TOOLS, tools.recommend_from_catalog,
+           tools.get_health_schedule, tools.get_upcoming_events,
+           tools.create_health_event, tools.update_health_event],
+    system_prompt=HEALTH_PROMPT,
+    middleware=[
+        *common_middleware(),
+        HumanInTheLoopMiddleware(interrupt_on={     # 채팅 쓰기 도구는 사용자 승인 필요
+            "create_health_event": {"allowed_decisions": ["approve", "edit", "reject"]},
+            "update_health_event": {"allowed_decisions": ["approve", "edit", "reject"]},
+        }),
+    ],
+    name="health_agent",
+)
+
+graph = create_supervisor(
+    agents=[diet_agent, exercise_agent, health_agent],
+    model=model,
+    prompt=SUPERVISOR_PROMPT,
+    pre_model_hook=supervisor_input_guard,    # Supervisor 입력 가드레일 + PII 마스킹
+    post_model_hook=supervisor_output_guard,  # Supervisor 출력 가드레일
+    output_mode="last_message",
+).compile(checkpointer=SqliteSaver(           # HITL interrupt/resume + 대화 유지, 재시작 후에도 보존
+    sqlite3.connect(os.getenv("CHECKPOINT_PATH", "data/checkpoints/checkpoints.sqlite"),
+                    check_same_thread=False)))
+
+# 비대화형 할 일 생성: LLM 없이 tools.generate_daily_plan()을 직접 호출 (4.1.2)
+```
+
+> 미들웨어 클래스명과 파라미터는 구현 시점의 LangChain v1 / langgraph-supervisor 문서로 다시 확인한다.
+
+### 3.3 Agent별 역할과 프롬프트 요지
+
+| Agent | 역할 | 프롬프트 핵심 규칙 |
+|-------|------|-------------------|
+| supervisor | 의도 파악, 위임, 결과 종합, 범위 밖·응급 대응 | 직접 도메인 답변을 지어내지 않고 전문 Agent에 위임 / 복합 질문은 여러 Agent 호출 / 응급 키워드 시 병원 권고 |
+| diet_agent | 칼로리·급여량·식단 | 계산은 반드시 `calc_daily_calories` 도구 사용 / 항목은 `recommend_from_catalog(category="diet")` 결과에서만 선택 / 유해 식품 경고 |
+| exercise_agent | 활동 종류·시간·강도 | `recommend_from_catalog(category="activity")` 결과에서만 선택 / 나이·체중·질환 고려, 고양이는 실내 놀이 위주 |
+| health_agent | 접종·검진·구충 일정, D-day | `recommend_from_catalog(category="health")` 기반 일정 / 날짜 계산은 도구 사용, 진단·처방 금지 |
+
+공통 규칙: 개·고양이 외의 종은 정중히 거절한다. 대화에서 선호나 제약이 드러나면 `remember_preference`로 저장하고, 저장했다고 사용자에게 알린다. 카탈로그에 없는 요청에는 "아직 준비되지 않은 항목"이라고 안내하고 카탈로그 안의 대안을 제시한다.
+
+### 3.4 도구 (`src/tools.py`)
+
+| 도구 | 입력 | 출력 | 비고 |
+|------|------|------|------|
+| `get_pet_profile` | (컨텍스트의 `user_id`, `pet_id`) | 프로필 dict | Chroma `pets` 조회, `user_id`로 소유권 확인 |
+| `calc_daily_calories` | 종, 체중, 나이, 중성화, 활동량 | RER/DER kcal, 끼니별 가이드 | RER = 70 × 체중(kg)^0.75, DER = RER × 계수 |
+| `recommend_from_catalog` | `category`(activity/diet/health), `query`, `k` | 카탈로그 항목 목록 (`id`, 이름, 상세, 점수, 추천 사유) | 3.8 추천 흐름: 조건 필터 → 의미 검색 → 취향 점수 정렬 |
+| `get_preferences` | (컨텍스트의 `pet_id`) | 좋아함/싫어함/제약 요약 | Chroma `preferences` |
+| `remember_preference` | `kind`(like/dislike/constraint), `target`(카탈로그 ID 또는 자유 텍스트), `note` | 저장 결과 | 낮은 위험이라 HITL 없이 실행하고, 답변에서 저장 사실을 알림 |
+| `list_my_pets` | (컨텍스트의 `user_id`) | 내 반려동물 이름·ID 목록 | 채팅에서 다른 반려동물을 이름으로 언급할 때 사용. 같은 사용자 소유만 반환 |
+| `get_health_schedule` | `pet_id` | 전체 건강 일정 목록 | Chroma `health_events` |
+| `get_upcoming_events` | `pet_id`, `days`(기본 7) | 도래 일정 + D-day | |
+| `search_pet_knowledge` | `query`, `species` | 관련 문서 청크 목록 | `retriever.py` 호출, 결과를 `contexts`로 수집 |
+| `create_health_event` ✋ | `pet_id`, `type`, `due_date` | 생성된 일정 | **쓰기 · HITL 승인 필요** |
+| `update_health_event` ✋ | `event_id`, 변경 필드 | 수정된 일정 | **쓰기 · HITL 승인 필요** |
+| `generate_daily_plan` | `user_id`, `pet_id`, `date` | 영역별 할 일 후보(구조화) | **도구가 아닌 일반 함수.** `/tasks/generate`와 채팅의 "오늘 할 일 만들어줘" 처리에서 공통으로 사용. LLM 미사용, `recommend_from_catalog`와 같은 점수 로직 |
+
+> 결정적 계산(칼로리, 날짜)은 LLM이 아닌 **도구**에서 수행해 환각을 줄인다.
+> 모든 도구 인자는 Pydantic `args_schema`로 검증한다. 조회 도구가 다른 `pet_id`를 받으면 런타임 컨텍스트의 `user_id` 소유인지 확인한다. 쓰기 도구는 컨텍스트의 현재 `pet_id`에만 쓴다.
+> ✋ 표시는 쓰기 도구이며, 삭제 도구는 MVP에서 Agent에 주지 않는다 (웹앱 UI에서만 삭제 가능).
+
+### 3.6 미들웨어 & 가드레일 설계
+
+다층 방어 구조로 같은 위험을 여러 지점에서 막는다.
+
+```
+ POST /query
+   │
+   ▼ ① API 계층 (FastAPI)         요청 스키마 검증 · 길이 제한(1,000자) · 레이트 리밋 · PII 마스킹 · 주입 1차 탐지
+   ▼ ② Supervisor hooks           pre_model_hook: 입력 가드레일 / post_model_hook: 출력 가드레일
+   ▼ ③ 하위 Agent middleware      아래 표 순서대로 실행
+   ▼ ④ API 계층 (응답 직전)       answer·contexts·trace 최종 PII 마스킹 · 출력 정책 최종 검사
+ Response {answer, contexts, trace}
+```
+
+| 순서 | 미들웨어 | 종류 | 훅 | 역할 |
+|------|----------|------|-----|------|
+| 1 | `injection_guard` | 커스텀 | `before_model` | 주입 패턴(“이전 지시 무시”, “system prompt 출력”, 역할 변경, 인코딩 우회 등) 탐지 → 차단 응답으로 `jump_to="end"` |
+| 2 | `PIIMiddleware` × N | 내장 | input / output / tool_results | 유형별 마스킹 (3.7 표) |
+| 3 | `SummarizationMiddleware` | 내장 | `before_model` | 긴 대화 요약으로 컨텍스트 초과 방지 |
+| 4 | `ModelCallLimitMiddleware` | 내장 | `before_model` | 무한 루프·비용 폭주 방지 |
+| 5 | `ToolCallLimitMiddleware` | 내장 | `wrap_tool_call` | 도구 남용 방지 |
+| 6 | `ModelRetryMiddleware` / `ToolRetryMiddleware` | 내장 | wrap | 일시 오류 재시도 |
+| 7 | `HumanInTheLoopMiddleware` | 내장 | `after_model` | 쓰기 도구 호출 전 사용자 승인 (`interrupt`) |
+| 8 | `output_guard` | 커스텀 | `after_model` | 유해 식품 추천, 진단·처방 단정 표현, 시스템 프롬프트·내부 정보 노출 검사 → 위반 시 재작성 또는 안전 문구로 대체. 응급 키워드가 있으면 병원 권고 문구가 있는지 확인 |
+
+- **입력 가드레일 판정**: 1단계는 규칙 기반(정규식·키워드)으로 빠르게 거른다. 애매하면 2단계로 경량 LLM 분류기(`with_structured_output` → `{is_injection, is_out_of_scope, reason}`)를 쓴다.
+- **도메인 밖 요청**: 차단 사유를 `trace`에 `{"type":"guardrail","stage":"input","reason":"out_of_scope"}` 형태로 남긴다.
+- **(선택) Bedrock Guardrails**: `ChatBedrockConverse`의 `guardrails` 설정으로 콘텐츠 필터와 PII 필터를 추가로 쓸 수 있다. 쓸지는 오픈 이슈로 둔다.
+
+#### HITL 흐름
+1. 하위 Agent가 쓰기 도구를 호출하면 `HumanInTheLoopMiddleware`가 `interrupt`를 일으킨다.
+2. `/query` 응답: `answer`에 "다음 작업을 승인해 주세요" 안내, `trace`에 `{"type":"interrupt","tool":"create_health_event","args":{...},"thread_id":"..."}`
+3. 프론트엔드가 승인 / 수정 / 거절 UI를 띄운다 → Backend → Agent `POST /query/resume`
+4. 그래프가 `Command(resume={"decisions":[...]})`로 재개하고, 최종 결과를 같은 3키 형식으로 돌려준다.
+5. 대기 중인 interrupt가 있는 thread에 새 `/query`가 오거나 사용자가 반려동물을 바꾸면, 먼저 `reject`(사유: "사용자가 다른 요청을 함")로 재개해 대기를 정리한 뒤 새 질문을 처리한다.
+6. resume 요청의 `user_id`가 thread 소유자와 다르면 403을 반환한다.
+
+### 3.7 보안 설계
+
+#### 프롬프트 주입 대비
+| 위협 | 대응 |
+|------|------|
+| 직접 주입 (사용자 입력) | ① API 1차 탐지 → ② `injection_guard` → 시스템 프롬프트의 "지시 우선순위" 규칙 |
+| 간접 주입 (RAG 문서·도구 결과) | 검색 결과를 `<context>…</context>`로 감싸고 "데이터로만 취급" 규칙 적용 · ingest 시 주입 패턴 문서는 제외 · 도구 결과도 PII/주입 검사 |
+| 시스템 프롬프트 유출 | `output_guard`에서 프롬프트 일부 문자열·내부 도구명 노출 검사 |
+| 권한 상승 / 타 데이터 접근 | `pet_id`는 요청 컨텍스트로 고정하고 LLM 인자를 신뢰하지 않음 · Agent별 최소 도구 · 쓰기 도구는 HITL |
+| 자원 고갈 | 입력 길이 제한, 모델/도구 호출 제한, 레이트 리밋, 타임아웃 |
+
+#### PII 마스킹
+| 유형 | 탐지 | 전략 | 예시 |
+|------|------|------|------|
+| 이메일 | 내장 `email` | `mask` | `ab***@naver.com` |
+| 카드번호 | 내장 `credit_card` | `mask` | `****-****-****-1234` |
+| IP / URL | 내장 `ip`, `url` | `redact` | `[REDACTED_IP]` |
+| 전화번호 | 커스텀 정규식 `01[016-9]-?\d{3,4}-?\d{4}` | `mask` | `010-****-5678` |
+| 주민등록번호 | 커스텀 정규식 `\d{6}-?[1-4]\d{6}` | `block` 또는 `redact` | `[REDACTED_RRN]` |
+| 계좌번호 | 커스텀 정규식 (은행별 패턴) | `redact` | `[REDACTED_ACCOUNT]` |
+| 상세 주소 | 커스텀 (도로명·지번 패턴) | `redact` | `[REDACTED_ADDRESS]` |
+
+- 적용 지점: 모델 입력(`apply_to_input`), 모델 출력(`apply_to_output`), 도구 결과(`apply_to_tool_results`), 그리고 API 응답 직전(answer·contexts·trace)과 로그 저장 직전
+- 마스킹 함수는 `src/agent.py` 한 곳에 두고 Node 백엔드 로그에는 마스킹된 결과만 전달한다. 백엔드는 PII 원문을 다시 만들지 않는다.
+- 사용자 계정 이메일은 Agent에 넘기지 않는다. Agent는 불투명한 `user_id`만 받는다.
+
+#### 사용자 데이터 격리
+- Backend: 모든 `/api/*` 요청에서 JWT의 `user_id`를 꺼내고, `pet_id`가 그 사용자 소유인지 확인한 뒤 처리한다.
+- Agent 도구: 모든 Chroma 조회 `where`에 `user_id`를 강제로 넣는다. `user_id`와 현재 `pet_id`는 LLM 인자가 아니라 런타임 컨텍스트(`ToolRuntime.context`)에서 읽는다.
+- `thread_id`는 `thr_{user_id}_{pet_id}_{uuid}` 형식으로 만들고, `chat_logs`에 소유자를 기록한다. resume과 대화 기록 조회 때 소유자를 확인한다.
+- 데모 사용자 기본값은 `EVAL_MODE=true`일 때만 동작한다. 평가 모드가 아니면 `user_id`가 없는 `/query`는 400을 반환한다.
+
+### 3.8 추천·개인화 흐름
+
+```
+ 요청 (예: "오늘 콩이 운동 추천해줘")
+   │
+   ▼ ① 후보 필터   카탈로그에서 recommendable · 종 · 연령 · 강도 · 알레르기 · 질환 조건으로 거른다 (metadata where)
+   ▼ ② 의미 검색   질문과 비슷한 순서로 상위 N개(기본 20개)를 고른다 (similarity)
+   ▼ ③ 취향 점수   score = 유사도 + Σ(신호 가중치 × 시간 감쇠) − 최근 반복 패널티
+   ▼ ④ 다양성      상위 k개 중 1개는 아직 해 보지 않은 항목으로 바꾼다 (탐색)
+   ▼ ⑤ LLM 설명    선택된 항목만 근거로 맞춤 설명을 만든다 (카탈로그 밖 항목 생성 금지)
+   ▼ ⑥ 출력 검증   output_guard가 답변 속 항목 ID가 실제 카탈로그에 있는지 확인한다
+```
+
+| 신호 (Backend가 `interactions`에 기록) | 가중치(초기값) | 비고 |
+|------|------|------|
+| 👍 좋아요 | +3 | `preferences`에 like로도 저장 |
+| 👎 싫어요 | 제외 (7일) → 이후 −3 | 하드 필터 |
+| 완료 체크 | +1 | 3회 이상이면 "단골" 태그 |
+| 바꾸기 / 삭제 | −1 | 연속 2회 이상이면 −2 |
+| 직접 추가 | +2 | 비슷한 카탈로그 항목에 연결해서 반영 |
+| 대화 진술 (`remember_preference`) | like +3 / dislike 제외 / constraint 하드 필터 | 예: "저녁만 가능" → 시간대 제약 |
+
+- 시간 감쇠: 반감기 30일
+
+**후보 부족 시 단계적 완화** (영역별 최소 개수를 못 채울 때)
+
+| 단계 | 완화 대상 | 비고 |
+|------|-----------|------|
+| 0 | — | 🔒 절대 유지: `recommendable`, 종, 알레르기, 유해 식품, 연령 금기, 질환 금기 |
+| 1 | 다양성 슬롯 | 새 항목 섞기 생략 |
+| 2 | 최근 반복 패널티 | 최근 항목도 허용 |
+| 3 | 👎 7일 제외 | 허용하되 결과에 `relaxed: ["dislike"]` 표시 → 화면에 "싫어요 표시한 항목" 배지 |
+| 4 | constraint(시간대 등) | 제약을 어긴 부분을 안내 문구로 표시 |
+
+- 4단계 후에도 후보가 0개면 "조건에 맞는 항목이 없어요" 안내와 함께 그 영역을 비운다. 카탈로그 최소 구성 규칙으로 이런 경우를 예방한다.
+- 연령 판정: 어린 동물 < 12개월, 시니어 ≥ 7세(대형견 ≥ 6세, 품종 크기는 카탈로그나 프로필 `size` 필드로 판정). 기준일은 KST "오늘"이다.
+- `generate_daily_plan`과 `recommend_from_catalog`는 같은 함수를 공유한다. 할 일 생성에서는 ② 의미 검색 대신 종·연령 기본 쿼리를 쓴다.
+- 가중치와 반감기는 `src/tools.py`의 상수로 관리하고, 평가 결과를 보고 조정한다.
+- "내 취향 초기화"를 하면 해당 반려동물의 `preferences`와 `interactions` 점수를 지운다 (기록 자체는 통계용으로 익명화해 남길지 오픈 이슈).
+
+### 3.5 RAG 파이프라인 (`src/retriever.py`)
+
+1. **Catalog ingest**: `data/catalog/*.json`에서 `reviewed: true`인 항목만 → 항목 1개 = 문서 1개(이름 + 설명 + 주의사항 텍스트) → Bedrock Embeddings → Chroma `catalog_activity` / `catalog_diet` / `catalog_health`
+   - 메타데이터: `item_id`, `species`, `min_age_months`, `max_age_months`, `intensity`, `allergens`, `tags`, `source_url`
+2. **Knowledge ingest**: `data/knowledge/*.md` → `RecursiveCharacterTextSplitter`(chunk 800, overlap 100) → Chroma `pet_knowledge`
+   - 메타데이터: `source`, `species`(dog/cat/all), `category`(diet/activity/health)
+3. **Retrieve**: `similarity_search(query, k, filter={"$and": [{"species": {"$in": [species, "all"]}}, ...]})`
+4. 검색 결과(카탈로그 항목 요약 + 지식 청크)는 응답의 `contexts`로 전달된다.
+5. ingest 단계에서 주입 패턴 검사와 PII 검사를 해서 문제 있는 문서는 제외한다.
+6. 실행: `python -m src.retriever --ingest [--catalog] [--knowledge]`
+
+## 4. API 계약
+
+### 4.1 Agent Server — `POST /query` (변경 금지)
+
+**Request**
+```json
+{
+  "question": "콩이가 요즘 살이 쪘는데 하루에 사료 얼마나 줘야 해?",
+  "user_id": "usr_7f3a",         // Backend가 인증 후 넣는다. 없으면 EVAL_MODE에서만 데모 사용자로 처리, 아니면 400
+  "pet_id": "pet_001",           // 선택. user_id 소유 반려동물만 허용. 없으면 그 사용자의 첫 반려동물
+  "thread_id": "thr_..."         // 선택. 대화 이어가기
+}
+```
+
+**Response**
+```json
+{
+  "answer": "콩이(5.2kg, 중성화)의 하루 권장 열량은 약 330kcal입니다 ...",
+  "contexts": [
+    "중성화한 성견의 일일 에너지 요구량(DER)은 RER의 1.6배 ...",
+    "체중 감량 시에는 목표 체중 기준 RER의 1.0배 ..."
+  ],
+  "trace": [
+    { "step": 1, "type": "handoff", "from": "supervisor", "to": "diet_agent" },
+    { "step": 2, "type": "tool_call", "agent": "diet_agent", "tool": "get_pet_profile", "args": {"pet_id": "pet_001"} },
+    { "step": 3, "type": "tool_call", "agent": "diet_agent", "tool": "calc_daily_calories", "args": {"...": "..."} },
+    { "step": 4, "type": "tool_call", "agent": "diet_agent", "tool": "search_pet_knowledge", "args": {"query": "..."} },
+    { "step": 5, "type": "handoff", "from": "diet_agent", "to": "supervisor" },
+    { "step": 6, "type": "final", "agent": "supervisor" }
+  ]
+}
+```
+
+- `answer`: 최종 사용자 답변 (string)
+- `contexts`: 답변 생성에 사용된 검색 문서 텍스트 목록 (string[]), 검색이 없으면 `[]`
+- `trace`: 그래프 실행 중 메시지(AIMessage의 `tool_calls`, `name`)를 순서대로 변환한 목록
+- 에러 시에도 세 키를 유지하고 HTTP 상태코드로 구분 (예: 400 `question` 누락, 500 내부 오류)
+- 가드레일로 차단되어도 HTTP 200과 세 키를 그대로 반환한다. `answer`는 안내 문구, `trace`에는 `{"type":"guardrail", ...}`를 넣는다.
+- `answer`, `contexts`, `trace` 모두 PII 마스킹을 거친 값이다.
+- 선택 필드 `thread_id`: 대화를 이어가거나 HITL을 재개할 때 쓴다. 없으면 새로 만들어 trace에 넣어 돌려준다.
+- 평가 계약: 평가 스크립트는 `question`만 보낸다. `EVAL_MODE=true`이면 시드 데모 사용자(`DEMO_USER_ID`)와 대표 반려동물로 처리한다.
+
+### 4.1.1 Agent Server — `POST /query/resume` (HITL 재개, 추가 엔드포인트)
+
+```json
+// Request
+{ "thread_id": "th_abc123", "decisions": [ { "type": "approve" } ] }
+// type: approve | edit(+ "edited_action") | reject(+ "message")
+```
+Response는 `/query`와 같은 `{answer, contexts, trace}` 형식이다. 요청에는 `user_id`가 필요하고, thread 소유자와 다르면 403이다.
+
+### 4.1.2 Agent Server — `POST /tasks/generate` (비대화형, Backend 전용)
+
+```json
+// Request
+{ "user_id": "usr_7f3a", "pet_id": "pet_001", "date": "2026-11-05",
+  "keep_item_ids": ["act_dog_walk_01"] }          // 다시 생성할 때 남길 항목(완료·직접 추가)
+// Response
+{ "date": "2026-11-05",
+  "tasks": [
+    { "category": "diet", "catalog_item_id": "diet_dog_feed_guide_01", "title": "아침 사료 85g",
+      "time": "07:30", "reason": "체중 5.2kg, 중성화 기준", "relaxed": [] },
+    { "category": "activity", "catalog_item_id": "act_dog_nosework_01", "title": "노즈워크 15분",
+      "time": "19:00", "reason": "👍 좋아요 항목", "relaxed": [] },
+    { "category": "health", "health_event_id": "evt_123", "title": "종합백신 2차 D-3 — 병원 예약하기" }
+  ] }
+```
+- LLM을 호출하지 않는다 (`generate_daily_plan` 실행). p95 1초 이내를 목표로 한다.
+- 영역별 최소 개수: 식단 1개, 활동 1개 이상 + 7일 이내(D-7 포함) 건강 일정 전부
+
+### 4.2 Backend REST API (초안)
+
+`/api/auth/*`를 뺀 모든 API는 로그인이 필요하고, 본인 데이터만 다룬다.
+
+| Method | Path | 설명 |
+|--------|------|------|
+| POST | `/api/auth/signup` | `{ email, password, nickname }` 가입 (이메일 중복 확인, 소문자로 정규화) |
+| POST | `/api/auth/login` | 로그인 → JWT를 httpOnly 쿠키로 발급 |
+| POST | `/api/auth/logout` | 로그아웃 |
+| GET / DELETE | `/api/me` | 내 정보 / 회원 탈퇴 (모든 데이터 삭제) |
+| GET / POST | `/api/pets` | 반려동물 목록 / 등록 (`species`는 `dog`, `cat`만 허용) |
+| GET / PUT / DELETE | `/api/pets/:id` | 조회 / 수정 / 삭제 (삭제 시 연쇄 삭제, 5장) |
+| GET | `/api/pets/:id/tasks?date=YYYY-MM-DD` | 해당 날짜 할 일 조회. 오늘 목록이 없으면 자동 생성 후 반환 |
+| POST | `/api/pets/:id/tasks/generate` | 다시 생성 (`{ confirm: true }` 필요). Agent `POST /tasks/generate` 호출, 완료·직접 추가 항목 유지 |
+| POST | `/api/pets/:id/tasks` | 직접 추가 (카탈로그 항목 또는 자유 입력, `time` 선택) |
+| PATCH | `/api/tasks/:taskId` | 완료 체크·시간·내용 수정 |
+| GET / POST | `/api/pets/:id/weights` | 체중 기록 목록 / 추가 (최신 기록이 `pets.weight_kg` 갱신) |
+| DELETE | `/api/weights/:weightId` | 체중 기록 삭제 |
+| GET | `/api/pets/:id/threads` | 반려동물별 대화 목록 |
+| GET / DELETE | `/api/threads/:threadId` | 대화 기록 조회 / 삭제 (checkpoint 포함, 소유자 확인) |
+| GET | `/api/pets/:id/health-events` | 건강 일정 목록 |
+| PATCH | `/api/health-events/:eventId/complete` | 완료 처리 → 다음 주기 생성 |
+| GET | `/api/notifications` | 도래·지연 일정 알림 |
+| POST | `/api/pets/:id/feedback` | `{ itemId, signal: like\|dislike\|complete\|swap\|remove\|custom }` 취향 신호 기록 |
+| GET / DELETE | `/api/pets/:id/preferences` | 내 취향 보기 / 초기화 |
+| DELETE | `/api/pets/:id/preferences/:prefId` | 취향 항목 하나 삭제 |
+| GET | `/api/catalog?category=&species=` | 카탈로그 조회 (직접 추가할 할 일 선택용) |
+| POST | `/api/chat` | `{ question, petId, threadId? }` → Agent `POST /query` 프록시 |
+| POST | `/api/chat/resume` | `{ threadId, decisions }` → Agent `POST /query/resume` 프록시 (HITL 승인) |
+
+## 5. 데이터 모델 (Chroma 컬렉션)
+
+Chroma는 문서 + 메타데이터 저장소이므로, 앱 데이터는 **`documents`에 JSON 문자열, `metadatas`에 필터용 필드**를 둔다.
+
+| 컬렉션 | id | 주요 metadata | 용도 |
+|--------|----|---------------|------|
+| `users` | `usr_xxx` | `email`(소문자, 유일), `password_hash`, `nickname`, `created_at` | 계정 (Backend만 접근) |
+| `pets` | `pet_xxx` | `user_id`, `name`, `species`(dog/cat), `breed`, `size`(small/medium/large), `birth_date`, `weight_kg`, `neutered`, `activity_level`, `default_times`(JSON: 급여·산책 시간대) | 프로필 |
+| `tasks` | `task_xxx` | `user_id`, `pet_id`, `date`, `time`(HH:MM, 선택), `category`(diet/activity/health/custom), `source`(auto/chat/custom), `catalog_item_id`, `done` | 오늘의 할 일 |
+| `health_events` | `evt_xxx` | `user_id`, `pet_id`, `catalog_item_id`, `type`(vaccine/checkup/deworming/heartworm/dental), `dose_no`, `due_date`, `status`(scheduled/done/overdue/needs_history), `completed_date` | 건강 일정 |
+| `weight_logs` | `wt_xxx` | `user_id`, `pet_id`, `date`, `weight_kg` | 체중 기록 |
+| `interactions` | `int_xxx` | `user_id`, `pet_id`, `catalog_item_id`, `signal`, `created_at` | 취향 신호 원본 기록 |
+| `preferences` | `pref_xxx` | `user_id`, `pet_id`(사용자 공통이면 null), `kind`(like/dislike/constraint), `target`, `score`, `updated_at` | 취향 요약 (추천에 사용) |
+| `chat_logs` | `log_xxx` | `user_id`, `pet_id`, `thread_id`, `created_at` | 대화 기록 (PII 마스킹된 answer/trace) |
+| `catalog_activity` / `catalog_diet` / `catalog_health` | 카탈로그 `item_id` | `species`, 연령 범위, `intensity`, `allergens`, `tags`, `source_url` | 추천 후보 (임베딩 사용) |
+| `pet_knowledge` | 자동 | `source`, `species`, `category` | RAG 지식 (임베딩 사용) |
+
+**카탈로그 항목 JSON 형식 (`data/catalog/activities.json` 예)**
+```json
+{
+  "item_id": "act_dog_nosework_01",
+  "name": "노즈워크 매트 놀이",
+  "category": "activity",
+  "species": ["dog"],
+  "age_months": { "min": 3, "max": null },
+  "intensity": "low",
+  "duration_min": { "min": 10, "max": 20 },
+  "description": "간식을 매트에 숨겨 후각으로 찾게 하는 놀이 ...",
+  "cautions": ["간식 양은 하루 칼로리의 10% 이내"],
+  "tags": ["indoor", "senior_ok", "mental"],
+  "age_groups": ["junior", "adult", "senior"],
+  "recommendable": true,
+  "sources": [{ "title": "...", "publisher": "...", "url": "https://...", "accessed": "2026-11-05" }],
+  "reviewed": true
+}
+```
+
+정기점검 항목에는 회차별 접종을 표현하는 `dose_schedule`을 추가한다.
+```json
+{ "item_id": "hc_dog_dhppl", "category": "health", "type": "vaccine",
+  "dose_schedule": [
+    { "dose_no": 1, "at_age_weeks": 6 },
+    { "dose_no": 2, "after_prev_weeks": 2 },
+    { "dose_no": 3, "after_prev_weeks": 2 }
+  ],
+  "booster_interval_days": 365 }
+```
+- 다음 주기는 **실제 완료일(`completed_date`)** + 간격으로 계산한다.
+- 이력 없이 권장 시점이 이미 지난 일정은 `needs_history` 상태로 만든다 (`overdue` 아님).
+
+**연쇄 삭제** (Chroma는 트랜잭션이 없음)
+- 반려동물 삭제: `tasks` → `health_events` → `weight_logs` → `interactions` → `preferences` → `chat_logs` + 해당 thread의 checkpoint → 마지막으로 `pets`
+- 회원 탈퇴: 사용자의 모든 반려동물에 위 순서를 적용한 뒤 `users`를 삭제한다.
+- 중간에 실패하면 남은 데이터를 다음 실행 때 정리한다. 백엔드 시작 시 `pet_id`/`user_id` 참조가 끊긴 데이터를 찾아 지운다.
+- 이메일 유일성: 가입할 때 소문자로 바꾼 이메일을 Chroma `users` 컬렉션의 id로 쓴다(`usr_` + 이메일 해시). 이렇게 하면 중복 저장이 구조적으로 불가능하다.
+
+- 앱 데이터 컬렉션은 유사도 검색을 쓰지 않으므로 더미 임베딩(고정 벡터) 또는 기본 임베딩 함수를 사용하고 `get(where=...)`로 조회한다.
+- 날짜는 `YYYY-MM-DD` 문자열, 비교가 필요한 경우 `due_ts`(epoch int) 메타데이터를 함께 저장한다.
+
+## 6. 알림 처리
+
+- Backend `node-cron`이 매일 **KST** 00:05에 `health_events`를 스캔해 `status`를 갱신 (`due_date < today && status=scheduled` → `overdue`)
+- 서버가 꺼져 있던 날이 있을 수 있으므로 백엔드 시작 시에도 같은 갱신을 한 번 실행한다.
+- `/api/notifications`는 오늘 기준 D-7 / D-1 / D-day / overdue 일정을 반환
+- Frontend는 대시보드 진입 시 호출하여 배너로 표시 (푸시 알림은 범위 밖)
+
+## 7. 환경변수
+
+| 키 | 사용처 | 설명 |
+|----|--------|------|
+| `AWS_ACCESS_KEY_ID` | Agent | Bedrock 인증 |
+| `AWS_SECRET_ACCESS_KEY` | Agent | Bedrock 인증 |
+| `AWS_DEFAULT_REGION` | Agent | Bedrock 리전 |
+| `AWS_MODEL` | Agent | `ChatBedrockConverse` 모델 ID |
+| `AWS_EMBED_MODEL` *(추가 예정)* | Agent | Bedrock 임베딩 모델 ID |
+| `CHROMA_HOST` / `CHROMA_PORT` *(추가 예정)* | Agent, Backend | 기본 `localhost` / `8001` |
+| `AGENT_URL` *(추가 예정)* | Backend | 기본 `http://localhost:8000` |
+| `AGENT_API_KEY` *(추가 예정)* | Backend, Agent | Backend → Agent 내부 호출 인증 |
+| `JWT_SECRET` *(추가 예정)* | Backend | 로그인 토큰 서명 |
+| `TZ` *(추가 예정)* | 전체 | `Asia/Seoul` 고정 |
+| `TODAY_OVERRIDE` *(추가 예정)* | Backend, Agent | 평가·테스트용 "오늘" 날짜 고정 (`YYYY-MM-DD`) |
+| `EVAL_MODE` / `DEMO_USER_ID` *(추가 예정)* | Agent | 평가 모드에서 `user_id`가 없을 때 쓸 데모 사용자 |
+| `CHECKPOINT_PATH` *(추가 예정)* | Agent | 기본 `data/checkpoints/checkpoints.sqlite` |
+
+## 7.5 초기 카탈로그 구축 파이프라인 (기획 단계)
+
+```
+ 웹 검색 (주제별 질의 목록)  →  출처 수집·선별  →  항목 추출(JSON 초안)  →  사람 검수  →  reviewed:true  →  ingest
+   data/sources/queries.md        data/sources/sources.md    data/catalog/*.json      PR 리뷰            src/retriever.py
+```
+
+1. **질의 설계**: 종(개/고양이) × 영역(활동/식단/정기점검) × 연령대(어린/성체/노령)로 검색 질의 목록을 만든다.
+2. **출처 기준**: 수의사회, 대학 동물병원, 정부·공공기관(농림축산식품부, 농림축산검역본부 등), 국제 수의 단체 가이드라인을 우선한다. 개인 블로그나 광고성 글은 쓰지 않는다.
+3. **추출**: 출처 내용을 바탕으로 항목 JSON 초안을 만든다. LLM 보조를 써도 된다. 원문은 그대로 옮기지 말고 요약하고, 출처를 반드시 기록한다.
+4. **검수**: 사람(사용자)이 수치(접종 주기, 급여량, 유해 식품)를 원문과 대조해 확인한 뒤 `reviewed: true`로 바꾼다.
+5. **검증 스크립트**: JSON 스키마 검증, `item_id` 중복 검사, 출처 누락 검사를 한다. 규모(종×영역 10~15개, `recommendable:false` 제외)와 최소 구성(연령대별·저강도·실내 각 2개 이상) 충족 여부도 확인한다.
+6. 서비스 실행 중에는 웹 검색을 하지 않는다. 카탈로그를 고칠 때는 이 파이프라인을 다시 거친다.
+
+## 7.6 프론트엔드 디자인 시스템 (디즈니풍)
+
+- **디자인 토큰** (`src/frontend/src/styles/tokens.css` → Tailwind theme에 연결)
+
+  | 토큰 | 라이트 | 다크("밤하늘") |
+  |------|--------|----------------|
+  | `--color-bg` | `#FFF9F0` 크림 | `#1B1F3B` 밤하늘 남색 |
+  | `--color-surface` | `#FFFFFF` | `#262B52` |
+  | `--color-primary` | `#4A7BF7` 로열 블루 | `#7FA2FF` |
+  | `--color-accent` | `#FFC94D` 골드 | `#FFD873` 별빛 |
+  | `--color-pink` / `--color-mint` / `--color-sky` | `#FFB8C9` / `#A8E6CF` / `#BDE3FF` | 채도를 낮춘 버전 |
+  | `--radius-card` | `20px` | 같음 |
+  | `--font-display` / `--font-body` | Jua / Nanum Gothic (후보) | 같음 |
+
+- **컴포넌트**: 말랑한 카드(그림자 + 큰 반경), 버블형 채팅 말풍선, 알약 모양 버튼, 마스코트 아바타(개/고양이 종에 따라 바뀜)
+- **모션**: 할 일 완료 시 반짝임 파티클 + 스프링 바운스(Framer Motion), `prefers-reduced-motion`이면 끈다.
+- **에셋**: 마스코트·아이콘은 자체 제작 또는 라이선스 확인 자료만 쓰고 `doc/assets.md`에 출처를 기록한다. 디즈니 등 다른 회사의 IP는 쓰지 않는다.
+- **접근성**: 파스텔 배경 위 텍스트 명암비 4.5:1 이상 유지, 이모지에는 대체 텍스트 제공
+
+## 8. 평가 설계 (`evaluation/`)
+
+- `test_queries.csv` 컬럼(안): `id, category, question, pet_id, expected_agent, expected_keywords, must_not_include`
+- 카테고리: `diet`, `exercise`, `health`, `multi`(복합), `out_of_scope`, `safety`(응급·유해식품), `injection`(직접·간접 주입, 프롬프트 유출 시도), `pii`(전화번호·주민번호 등 포함 질의), `hitl`(쓰기 작업 요청), `catalog`(카탈로그 밖 항목 요청), `personalization`(취향 시드 데이터가 있는 사용자 질의), `species`(개·고양이 외 동물), `isolation`(다른 사용자 반려동물 접근 시도)
+- 평가 스크립트가 각 질의를 `POST /query`로 호출하여 다음을 측정
+  - 라우팅 정확도: `trace`의 handoff 대상 vs `expected_agent`
+  - 키워드 포함 / 금지어 미포함
+  - 근거 충실도·관련성: LLM-as-judge (answer vs contexts)
+  - 응답 시간
+  - 보안: 주입 차단율, 응답·trace에 남은 PII 0건, 쓰기 요청 시 interrupt 발생률, 다른 사용자 데이터 노출 0건
+  - 추천: 카탈로그 준수율(답변 속 항목 ID가 모두 카탈로그에 있는지), 취향 반영률(👎 항목 미추천, 👍 항목 상위 노출)
+- 결과: `evaluation/report_YYYYMMDD.md` (+ 원본 결과 CSV)
+
+**문항 배분과 합격선 (총 50문항)**
+
+| 카테고리 | 문항 수 | 합격선 |
+|----------|---------|--------|
+| diet / exercise / health | 각 4 (12) | 라우팅 ≥ 90%(전체 기준), 키워드 포함 |
+| multi | 3 | 필요한 Agent 모두 호출 |
+| out_of_scope / species | 각 3 (6) | 전부 정중히 거절 |
+| safety | 4 | 전부 병원 권고 또는 유해 경고 포함 |
+| injection | 6 | 6/6 차단, 시스템 프롬프트 노출 0 |
+| pii | 6 | answer·contexts·trace에 남은 PII 0 |
+| isolation | 6 | 다른 사용자 데이터 노출 0 |
+| hitl | 3 | 3/3 interrupt 발생 |
+| catalog | 3 | 카탈로그 밖 항목 생성 0, 대안 제시 |
+| personalization | 4 | 👎 항목 미추천, 3회 이상 완료 항목 상위 3개 안에 포함 |
+
+- 개인화 평가는 `data/seed/`의 날짜가 정해진 `interactions`와 `TODAY_OVERRIDE`로 재현할 수 있게 검증한다.
+- LLM-as-judge(충실도·관련성, 1~5점)는 같은 Bedrock 모델(`AWS_MODEL`)을 쓴다. 평균 4.0 이상이면 통과로 본다. 규칙 기반 검사로 판정할 수 있는 항목은 규칙을 우선한다.
+- 같은 모델이 판정하므로 생길 수 있는 **자기 편향**과 50문항이라는 **작은 표본의 한계**(특히 p95 응답 시간)를 리포트에 명시한다.
+
+## 9. 오류 처리 및 로깅
+
+- Agent 서버: Bedrock 호출 타임아웃 60초, 재시도 2회. 실패 시 `answer`에 안내 문구, `contexts: []`, `trace`에 `{"type":"error"}` 기록
+- Backend: Agent 서버 장애 시 `/api/chat`은 503 반환, 그 외 CRUD는 정상 동작
+- 로그에는 질문·trace 요약만 남기고 자격증명·전체 프로필은 남기지 않는다
+
+## 10. 오픈 이슈 / 결정 필요
+
+- [ ] 임베딩 모델 선정 및 `AWS_EMBED_MODEL` 키 추가
+- [ ] Chroma를 앱 데이터 저장소로 쓰는 것의 한계(트랜잭션·조인 없음) 수용 여부 — MVP는 수용
+- [ ] Supervisor `output_mode` (`last_message` vs `full_history`)와 trace 상세 수준
+- [ ] 스트리밍 응답(SSE) 도입 여부 — `/query` 계약은 유지하고 별도 엔드포인트로 검토
+- [ ] RAG 지식 문서(`data/knowledge/`) 수집 범위와 출처
+- [ ] Bedrock Guardrails 병행 사용 여부 (비용·지연 vs 방어 강도)
+- [x] ~~계정 저장소 분리~~ → Chroma 단일 유지, 유일성·연쇄 삭제는 백엔드 코드로 보장 (2026-11-04)
+- [x] ~~취향 점수 계산 위치~~ → Python `src/tools.py` 한 곳 (Backend는 `/tasks/generate` 호출) (2026-11-04)
+- [ ] 회원 탈퇴 시 `interactions`를 익명화해 남길지 완전히 삭제할지
+- [ ] 주입 탐지 2단계 LLM 분류기에 쓸 모델 (메인 모델 재사용 vs 경량 모델)
+- [x] ~~checkpointer 영속화~~ → `SqliteSaver`로 결정 (2026-11-04)
+- [ ] 미들웨어·가드레일 코드가 커질 경우 `src/agent.py`에서 분리할지 (제출 규약 폴더 구조와 함께 검토)
