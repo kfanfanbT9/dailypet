@@ -1,0 +1,2412 @@
+[
+  {
+    "item_id": "diet_dog_puppy_meal_guide_01",
+    "name": "강아지(퍼피) 하루 급여 횟수 가이드",
+    "category": "diet",
+    "subtype": "feeding_guide",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "junior"
+    ],
+    "description": "어린 강아지는 위가 작아 하루 사료량을 여러 끼로 나눠 주는 것이 좋습니다. 사료를 계속 놓아두는 자율 급여는 비만과 골격 문제 위험이 있어 정해진 시간에 계량해서 줍니다.",
+    "serving_guide": "하루 3~4회 나눠 급여, 성장하면서 하루 2~3회로 줄이기 (체형·연령에 따라 수의사와 조정)",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "자율 급여(사료 상시 방치)는 권장되지 않음",
+      "성장기용(또는 전 연령용) 완전·균형 사료를 급여",
+      "수의사 상담 없이 비타민·미네랄 보충제를 추가하지 않기",
+      "식후 10~15분 안에 배변하는 경우가 많아 배변 훈련과 함께 계획"
+    ],
+    "tags": [
+      "puppy",
+      "meal_frequency",
+      "portion_control"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Feeding Times and Frequency for Your Dog",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/feeding-times-and-frequency-for-your-dog",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding Growing Puppies",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/feeding-growing-puppies",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "VCA 두 문서의 횟수 표현이 다름(급여 시간 문서: 3~4회 / 성장기 문서: 2~3회). 월령별 구체 기준은 원문 대조 필요."
+  },
+  {
+    "item_id": "diet_dog_large_breed_puppy_01",
+    "name": "대형견 강아지 성장기 급여 원칙",
+    "category": "diet",
+    "subtype": "feeding_guide",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "junior"
+    ],
+    "description": "대형·초대형견 강아지는 너무 빨리 자라면 뼈 발달 문제가 생길 수 있어 칼슘·인이 조절된 대형견 성장기 사료를 소량씩 자주 급여합니다. 성견 사료로 너무 일찍 바꾸지 않습니다.",
+    "serving_guide": "하루 최소 4회 소량 급여, 대형견은 약 18개월·초대형견은 약 24개월까지 성장기 사료 유지",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "칼슘·비타민 보충제는 수의사 권고 없이 주지 않기",
+      "약간 마른 체형(BCS 4/9) 유지 권장",
+      "위확장·염전 예방을 위해 식사 전후 격한 운동 피하기",
+      "물을 제한하지는 않되 한꺼번에 과음하지 않게 하기"
+    ],
+    "tags": [
+      "puppy",
+      "large_breed",
+      "growth",
+      "portion_control"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Nutritional Considerations for Large and Giant Breed Dogs",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/nutritional-considerations-for-large-and-giant-breed-dogs",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding Growing Puppies",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/feeding-growing-puppies",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "칼슘:인 비율 1.1:1~1.4:1, BCS 4/9, 18/24개월 전환 시기는 VCA 원문 대조 필요."
+  },
+  {
+    "item_id": "diet_dog_training_treat_01",
+    "name": "훈련용 간식 칼로리 관리",
+    "category": "diet",
+    "subtype": "treat",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "junior",
+      "adult"
+    ],
+    "description": "훈련 보상 간식도 하루 총 칼로리에 포함됩니다. 아주 작게 자른 저칼로리 간식이나 하루 사료 일부를 보상으로 쓰면 체중 증가 없이 훈련할 수 있습니다.",
+    "serving_guide": "간식 총량은 하루 칼로리의 10% 이내, 간식을 준 만큼 식사량을 줄이기",
+    "kcal_note": "VCA 기준 개 간식은 1개당 15kcal 미만이면 저칼로리로 분류",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "목에 걸리지 않을 크기·모양으로 급여",
+      "간식이 식사를 대신하면 안 됨",
+      "자일리톨이 든 사람 음식(땅콩버터 등) 사용 금지"
+    ],
+    "tags": [
+      "training",
+      "low_calorie",
+      "treat_budget"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Feeding Growing Puppies",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/feeding-growing-puppies",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding treats to your dog",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2025/11/WSAVA_GuidetoTreats_Dogs_251107.pdf",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Tips for Successful Weight Loss in Dogs and Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/tips-for-successful-weight-loss-in-dogs-and-cats",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "'15kcal 미만' 기준은 VCA 체중 감량 문서 수치. 원문 대조 필요."
+  },
+  {
+    "item_id": "diet_dog_adult_meal_guide_01",
+    "name": "성견 하루 2회 정량 급여",
+    "category": "diet",
+    "subtype": "feeding_guide",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "adult"
+    ],
+    "description": "성견은 하루 최소 두 번 정해진 시간에 계량한 사료를 주는 것이 좋습니다. 자율 급여는 비만, 폭식, 당뇨 위험과 관련이 있어 권장되지 않습니다.",
+    "serving_guide": "하루 2회 이상 나눠 급여, 하루 권장 칼로리는 calc_daily_calories 결과 기준",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "사료 포장지 급여량은 출발점일 뿐이므로 체형을 보며 수의사와 조정",
+      "남긴 양을 기록하면 식욕 변화를 빨리 알아챌 수 있음"
+    ],
+    "tags": [
+      "meal_frequency",
+      "portion_control"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Feeding Times and Frequency for Your Dog",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/feeding-times-and-frequency-for-your-dog",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Global Nutrition Guidelines (Nutrition Toolkit)",
+        "publisher": "WSAVA",
+        "url": "https://wsava.org/global-guidelines/global-nutrition-guidelines/",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": ""
+  },
+  {
+    "item_id": "diet_dog_treat_rule_01",
+    "name": "간식 10% 규칙",
+    "category": "diet",
+    "subtype": "treat",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "간식, 씹는 간식, 사람 음식을 모두 합쳐 하루 칼로리의 10%를 넘지 않게 하면 영양 균형과 적정 체중을 지키기 쉽습니다. 시판 간식은 라벨이나 제조사에 칼로리를 확인합니다.",
+    "serving_guide": "하루 칼로리의 10% 이내 (간식을 준 날은 사료량을 조금 줄이기)",
+    "kcal_note": "WSAVA 표 예시: 저지방 소고기 28g 약 64kcal, 땅콩버터 1큰술 약 81kcal, 체다치즈 28g 약 120kcal, 소가죽 껌 190g 약 700kcal",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "익히거나 날것인 뼈, 사슴뿔·발굽처럼 지나치게 딱딱한 씹을거리는 피하기",
+      "가공하지 않은 날 동물성 간식(돼지귀 등)은 세균 감염 위험",
+      "질환이 있거나 처방식을 먹는 경우 수의사와 상의"
+    ],
+    "tags": [
+      "treat_budget",
+      "weight_management"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Feeding treats to your dog",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2025/11/WSAVA_GuidetoTreats_Dogs_251107.pdf",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Tips for Successful Weight Loss in Dogs and Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/tips-for-successful-weight-loss-in-dogs-and-cats",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "WSAVA PDF의 체중별 간식 허용 kcal 표는 텍스트 추출이 깨져 사용하지 않음. 식품별 kcal는 원문 표와 대조 필요. ASPCA 기사는 5%를 제시해 출처 간 차이가 있음."
+  },
+  {
+    "item_id": "diet_dog_chicken_topping_01",
+    "name": "삶은 닭가슴살 토핑",
+    "category": "diet",
+    "subtype": "topping",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "껍질과 뼈를 제거하고 양념 없이 익힌 닭가슴살은 소량 토핑이나 보상으로 쓸 수 있는 저지방 단백질입니다. 주식을 대신하지 않고 간식 허용량 안에서 줍니다.",
+    "serving_guide": "간식·토핑 합계가 하루 칼로리의 10% 이내가 되도록 소량",
+    "kcal_note": "껍질 없는 익힌 닭가슴살 28g(1oz) 약 47kcal (WSAVA)",
+    "allergens": [
+      "chicken"
+    ],
+    "contraindications": [],
+    "cautions": [
+      "뼈·껍질·양념(소금, 양파, 마늘) 제거",
+      "닭고기 알레르기가 있으면 급여 금지",
+      "날것으로 주지 않기"
+    ],
+    "tags": [
+      "lean_protein",
+      "topping",
+      "low_fat"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Feeding treats to your dog",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2025/11/WSAVA_GuidetoTreats_Dogs_251107.pdf",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Sharing is Caring: Foods You Can Safely Share with Your Pet",
+        "publisher": "ASPCA",
+        "url": "https://www.aspca.org/news/sharing-caring-foods-you-can-safely-share-your-pet",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": ""
+  },
+  {
+    "item_id": "diet_dog_carrot_treat_01",
+    "name": "당근 간식",
+    "category": "diet",
+    "subtype": "treat",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "당근은 생으로도 익혀서도 줄 수 있는 저칼로리 채소 간식입니다. 씹는 맛이 있어 시판 간식을 대체하기 좋습니다.",
+    "serving_guide": "한입 크기로 잘라 소량, 하루 칼로리의 10% 이내",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "버터·소금·양념 없이 급여",
+      "통째로 주면 목에 걸릴 수 있으니 작게 자르기",
+      "새 음식은 한 가지씩 시작해 설사 등 반응 관찰"
+    ],
+    "tags": [
+      "low_calorie",
+      "weight_loss",
+      "vegetable",
+      "senior_ok"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Safe fruit and veg for dogs",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/puppies-dogs/safe-fruit-and-veg-for-dogs",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Sharing is Caring: Foods You Can Safely Share with Your Pet",
+        "publisher": "ASPCA",
+        "url": "https://www.aspca.org/news/sharing-caring-foods-you-can-safely-share-your-pet",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding Mature and Senior Dogs",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/feeding-mature-and-senior-dogs",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "1회 급여량(g)은 출처에 수치가 없음."
+  },
+  {
+    "item_id": "diet_dog_green_bean_treat_01",
+    "name": "그린빈(껍질콩) 간식",
+    "category": "diet",
+    "subtype": "weight_management",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "adult",
+      "senior"
+    ],
+    "description": "양념하지 않은 그린빈은 칼로리가 낮아 체중 관리 중인 개의 간식으로 활용됩니다. 생으로 또는 익혀서 줄 수 있습니다.",
+    "serving_guide": "간식 몫(하루 칼로리 10%) 안에서 소량, 식사량 대체로 대량 급여는 하지 않기",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "통조림 제품은 염분이 없는지 확인",
+      "기름·소금·양념 없이 급여",
+      "감량 계획은 수의사와 함께 세우기"
+    ],
+    "tags": [
+      "low_calorie",
+      "weight_loss",
+      "vegetable",
+      "senior_ok"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Safe fruit and veg for dogs",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/puppies-dogs/safe-fruit-and-veg-for-dogs",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding Mature and Senior Dogs",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/feeding-mature-and-senior-dogs",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Sharing is Caring: Foods You Can Safely Share with Your Pet",
+        "publisher": "ASPCA",
+        "url": "https://www.aspca.org/news/sharing-caring-foods-you-can-safely-share-your-pet",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "통조림 염분 주의는 일반 주의사항으로 추가한 내용(출처 원문 문구 아님)."
+  },
+  {
+    "item_id": "diet_dog_fruit_treat_01",
+    "name": "사과(씨 제거)·블루베리 과일 간식",
+    "category": "diet",
+    "subtype": "treat",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "씨와 심을 뺀 사과, 블루베리 같은 과일은 가끔 주는 간식으로 괜찮습니다. 과일은 채소보다 당이 많아 아주 적게 줍니다.",
+    "serving_guide": "가끔 아주 소량, 하루 칼로리의 10% 이내",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [
+      "diabetes"
+    ],
+    "cautions": [
+      "사과 씨·심, 과일 씨·껍질은 반드시 제거",
+      "포도·건포도·커런트는 절대 금지",
+      "당 함량이 있어 자주 주지 않기"
+    ],
+    "tags": [
+      "fruit",
+      "treat"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Safe fruit and veg for dogs",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/puppies-dogs/safe-fruit-and-veg-for-dogs",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Sharing is Caring: Foods You Can Safely Share with Your Pet",
+        "publisher": "ASPCA",
+        "url": "https://www.aspca.org/news/sharing-caring-foods-you-can-safely-share-your-pet",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Can you feed pets certain fruits and veggies",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/resources/preventive-dog/nutrition/can-you-feed-pets-certain-fruits-and-veggies",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "diabetes 금기 태그는 '과일은 당이 많다'는 출처 내용에서 보수적으로 추론한 것. 수의사 확인 필요."
+  },
+  {
+    "item_id": "diet_dog_pumpkin_topping_01",
+    "name": "익힌 호박(무가당) 토핑",
+    "category": "diet",
+    "subtype": "topping",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "adult",
+      "senior"
+    ],
+    "description": "양념과 설탕이 없는 익힌 호박은 사료 위에 조금 얹어 줄 수 있는 채소 토핑입니다.",
+    "serving_guide": "1~2 숟가락 이내 소량, 간식·토핑 합계 하루 칼로리의 10% 이내",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "설탕·향신료가 든 호박파이 필링 제품은 사용하지 않기",
+      "새 음식은 소량부터 시작"
+    ],
+    "tags": [
+      "topping",
+      "vegetable",
+      "low_calorie"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Sharing is Caring: Foods You Can Safely Share with Your Pet",
+        "publisher": "ASPCA",
+        "url": "https://www.aspca.org/news/sharing-caring-foods-you-can-safely-share-your-pet",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "'1~2 숟가락' 양과 '무가당·무향신료' 조건은 출처에 명시된 수치가 아님. 검수 필요."
+  },
+  {
+    "item_id": "diet_dog_hydration_01",
+    "name": "신선한 물 상시 제공",
+    "category": "diet",
+    "subtype": "hydration",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "물은 모든 연령에서 가장 중요한 영양소입니다. 깨끗한 물을 항상 마실 수 있게 하고 그릇은 자주 씻어 줍니다. 평소보다 물을 갑자기 많이 마시면 질환 신호일 수 있습니다.",
+    "serving_guide": "항상 자유 급수, 그릇은 매일 세척",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "수의사 지시 없이 물을 제한하지 않기",
+      "음수량이 갑자기 늘면 동물병원 상담",
+      "더운 날·운동 후에는 필요량이 늘어남"
+    ],
+    "tags": [
+      "hydration"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Feeding Mature and Senior Dogs",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/feeding-mature-and-senior-dogs",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Nutritional Requirements of Small Animals",
+        "publisher": "Merck Veterinary Manual",
+        "url": "https://www.merckvetmanual.com/management-and-nutrition/nutrition-small-animals/nutritional-requirements-of-small-animals",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "Merck의 '대부분의 포유류 약 44~66 mL/kg/일'은 개 전용 수치가 아니어서 serving_guide에 넣지 않음. 필요하면 검수 후 추가."
+  },
+  {
+    "item_id": "diet_dog_senior_hydration_01",
+    "name": "노령견 수분 보충 팁",
+    "category": "diet",
+    "subtype": "hydration",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "senior"
+    ],
+    "description": "노령견은 갈증을 덜 느껴 탈수되기 쉽습니다. 집 안 여러 곳에 물그릇을 두고, 습식 사료나 얼음 조각으로 수분 섭취를 늘릴 수 있습니다.",
+    "serving_guide": "물그릇 여러 곳 배치, 습식 사료 일부 혼합 가능",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "음수량을 관찰하고 급격한 변화가 있으면 동물병원 상담",
+      "신장·심장 질환이 있으면 식단 변경 전 수의사와 상의"
+    ],
+    "tags": [
+      "hydration",
+      "senior_ok"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Feeding Mature and Senior Dogs",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/feeding-mature-and-senior-dogs",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding Tips for Senior Dogs and Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/resources/senior/top-tips-for-feeding-your-senior-pet",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": ""
+  },
+  {
+    "item_id": "diet_dog_senior_meal_guide_01",
+    "name": "노령견 급여 가이드",
+    "category": "diet",
+    "subtype": "feeding_guide",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "senior"
+    ],
+    "description": "나이가 들면 필요 칼로리가 줄어 같은 양을 먹어도 살이 찌기 쉽습니다. 하루 양을 여러 번 소량으로 나누고, 체중과 근육 상태를 정기적으로 확인합니다. 아주 나이 든 개는 오히려 칼로리·단백질이 더 필요할 수 있습니다.",
+    "serving_guide": "하루 2~4회 소량으로 나눠 급여, 칼로리는 calc_daily_calories 결과와 체형으로 조정",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "식욕 감소는 질환 신호일 수 있음",
+      "성장기용 '전 연령' 사료는 노령견에 적합하지 않을 수 있음",
+      "신장 질환이 있으면 단백질·인 조절을 수의사와 상의",
+      "사료 변경은 서서히"
+    ],
+    "tags": [
+      "senior_ok",
+      "meal_frequency",
+      "portion_control"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Feeding Mature and Senior Dogs",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/feeding-mature-and-senior-dogs",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding Tips for Senior Dogs and Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/resources/senior/top-tips-for-feeding-your-senior-pet",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "VCA: 나이에 따라 에너지 요구량 12~13% 감소 가능, 대형견은 5~8세에 시니어로 분류. 원문 대조 필요."
+  },
+  {
+    "item_id": "diet_dog_senior_soft_food_01",
+    "name": "치아가 약한 노령견을 위한 부드러운 식사",
+    "category": "diet",
+    "subtype": "feeding_guide",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "senior"
+    ],
+    "description": "잇몸과 치아가 예민해진 노령견은 딱딱한 사료를 꺼려 식욕이 줄 수 있습니다. 습식 사료처럼 부드러운 식사가 더 먹기 편하고 기호성도 좋습니다.",
+    "serving_guide": "습식 사료로 일부 또는 전부 대체 (총 칼로리는 동일하게 유지)",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "식욕 저하·체중 감소가 계속되면 구강 검진 받기",
+      "습식 사료는 칼로리 밀도가 달라 급여량 재계산 필요"
+    ],
+    "tags": [
+      "senior_ok",
+      "dental",
+      "soft_food"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Feeding Tips for Senior Dogs and Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/resources/senior/top-tips-for-feeding-your-senior-pet",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": ""
+  },
+  {
+    "item_id": "diet_dog_weight_loss_plan_01",
+    "name": "체중 감량 급여 계획",
+    "category": "diet",
+    "subtype": "weight_management",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "adult",
+      "senior"
+    ],
+    "description": "과체중 개는 수의사와 목표 칼로리를 정한 뒤 사료를 저울로 계량해 천천히 감량합니다. 간식도 하루 칼로리 안에 포함하고 체형 점수(BCS)와 체중을 주기적으로 기록합니다.",
+    "serving_guide": "주당 체중의 0.5~2% 감량 목표, 사료는 계량컵보다 주방 저울로 계량, 2주마다 체중 확인",
+    "kcal_note": "저칼로리 간식 기준: 1개 15kcal 미만 (VCA)",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "감량 목표·칼로리는 수의사와 함께 결정",
+      "시판 일반 사료를 임의로 크게 줄이면 영양 결핍 위험",
+      "체중·BCS·사진으로 진행 상황 기록"
+    ],
+    "tags": [
+      "weight_loss",
+      "low_calorie",
+      "obesity_care"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Tips for Successful Weight Loss in Dogs and Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/tips-for-successful-weight-loss-in-dogs-and-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Global Nutrition Guidelines (Nutrition Toolkit)",
+        "publisher": "WSAVA",
+        "url": "https://wsava.org/global-guidelines/global-nutrition-guidelines/",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "감량 속도 0.5~2%/주, 2주 간격 확인은 VCA 원문 대조 필요."
+  },
+  {
+    "item_id": "diet_dog_chocolate_harmful_01",
+    "name": "초콜릿 (유해)",
+    "category": "diet",
+    "subtype": "harmful_food",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "초콜릿의 메틸잔틴(테오브로민·카페인)은 구토, 설사, 과호흡, 흥분, 부정맥, 떨림, 발작을 일으키고 심하면 사망에 이를 수 있습니다. 다크·제빵용 초콜릿과 코코아 가루가 가장 위험합니다.",
+    "serving_guide": "",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "섭취 시 즉시 동물병원에 연락하거나 내원하세요. 먹은 양과 시간을 기록해 두세요.",
+      "어떤 종류의 초콜릿도 급여 금지"
+    ],
+    "tags": [
+      "harmful",
+      "toxic",
+      "chocolate"
+    ],
+    "recommendable": false,
+    "sources": [
+      {
+        "title": "People Foods to Avoid Feeding Your Pets",
+        "publisher": "ASPCA Animal Poison Control Center",
+        "url": "https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding treats to your dog",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2025/11/WSAVA_GuidetoTreats_Dogs_251107.pdf",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": ""
+  },
+  {
+    "item_id": "diet_dog_grape_raisin_harmful_01",
+    "name": "포도·건포도 (유해)",
+    "category": "diet",
+    "subtype": "harmful_food",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "포도, 건포도, 커런트, 술타나는 개에게 신장 손상(신부전)을 일으킬 수 있습니다. 빵·과자에 든 건포도도 포함됩니다.",
+    "serving_guide": "",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "섭취 시 즉시 동물병원에 연락하거나 내원하세요. 먹은 양과 시간을 기록해 두세요.",
+      "소량이라도 급여 금지"
+    ],
+    "tags": [
+      "harmful",
+      "toxic",
+      "grape"
+    ],
+    "recommendable": false,
+    "sources": [
+      {
+        "title": "People Foods to Avoid Feeding Your Pets",
+        "publisher": "ASPCA Animal Poison Control Center",
+        "url": "https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding treats to your dog",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2025/11/WSAVA_GuidetoTreats_Dogs_251107.pdf",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Safe fruit and veg for dogs",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/puppies-dogs/safe-fruit-and-veg-for-dogs",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "ASPCA는 타타르산을 원인 물질로 추정. 원인 물질 표기는 검수 필요."
+  },
+  {
+    "item_id": "diet_dog_xylitol_harmful_01",
+    "name": "자일리톨 (유해)",
+    "category": "diet",
+    "subtype": "harmful_food",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "껌, 사탕, 제과, 치약, 일부 땅콩버터에 든 감미료 자일리톨은 개에게 저혈당과 간 손상을 일으킬 수 있습니다. 구토·무기력·비틀거림 후 발작으로 진행할 수 있습니다.",
+    "serving_guide": "",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "섭취 시 즉시 동물병원에 연락하거나 내원하세요. 먹은 양과 시간을 기록해 두세요.",
+      "땅콩버터 등 사람 음식은 성분표에서 자일리톨 확인",
+      "간 손상은 12~24시간 안에 나타날 수 있음"
+    ],
+    "tags": [
+      "harmful",
+      "toxic",
+      "xylitol"
+    ],
+    "recommendable": false,
+    "sources": [
+      {
+        "title": "People Foods to Avoid Feeding Your Pets",
+        "publisher": "ASPCA Animal Poison Control Center",
+        "url": "https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding treats to your dog",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2025/11/WSAVA_GuidetoTreats_Dogs_251107.pdf",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Sharing is Caring: Foods You Can Safely Share with Your Pet",
+        "publisher": "ASPCA",
+        "url": "https://www.aspca.org/news/sharing-caring-foods-you-can-safely-share-your-pet",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": ""
+  },
+  {
+    "item_id": "diet_dog_onion_garlic_harmful_01",
+    "name": "양파·마늘·파·부추류 (유해)",
+    "category": "diet",
+    "subtype": "harmful_food",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "양파, 마늘, 파, 부추, 샬롯 등 알리움 속 식물은 위장을 자극하고 적혈구를 손상시켜 빈혈을 일으킬 수 있습니다. 가루나 양념 형태도 위험합니다.",
+    "serving_guide": "",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "섭취 시 즉시 동물병원에 연락하거나 내원하세요. 먹은 양과 시간을 기록해 두세요.",
+      "양념한 사람 음식(국, 고기 양념 등)에 섞인 경우도 주의"
+    ],
+    "tags": [
+      "harmful",
+      "toxic",
+      "onion",
+      "garlic"
+    ],
+    "recommendable": false,
+    "sources": [
+      {
+        "title": "People Foods to Avoid Feeding Your Pets",
+        "publisher": "ASPCA Animal Poison Control Center",
+        "url": "https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding treats to your dog",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2025/11/WSAVA_GuidetoTreats_Dogs_251107.pdf",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Safe fruit and veg for dogs",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/puppies-dogs/safe-fruit-and-veg-for-dogs",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": ""
+  },
+  {
+    "item_id": "diet_dog_macadamia_harmful_01",
+    "name": "마카다미아 너트 (유해)",
+    "category": "diet",
+    "subtype": "harmful_food",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "마카다미아 너트는 개에게 무기력, 비틀거림, 구토, 떨림, 고체온을 일으킬 수 있습니다. 다른 견과류도 지방이 많아 구토·설사나 췌장염 위험이 있습니다.",
+    "serving_guide": "",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "섭취 시 즉시 동물병원에 연락하거나 내원하세요. 먹은 양과 시간을 기록해 두세요.",
+      "견과류가 든 과자·쿠키도 주지 않기"
+    ],
+    "tags": [
+      "harmful",
+      "toxic",
+      "nuts"
+    ],
+    "recommendable": false,
+    "sources": [
+      {
+        "title": "People Foods to Avoid Feeding Your Pets",
+        "publisher": "ASPCA Animal Poison Control Center",
+        "url": "https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding treats to your dog",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2025/11/WSAVA_GuidetoTreats_Dogs_251107.pdf",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "ASPCA: 증상은 보통 12시간 내 발생, 24~72시간 내 회복. 원문 대조 필요."
+  },
+  {
+    "item_id": "diet_dog_alcohol_harmful_01",
+    "name": "알코올 (유해)",
+    "category": "diet",
+    "subtype": "harmful_food",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "알코올은 빠르게 흡수되어 구토, 설사, 비틀거림, 호흡곤란, 떨림, 혼수를 일으키고 사망에 이를 수 있습니다.",
+    "serving_guide": "",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "섭취 시 즉시 동물병원에 연락하거나 내원하세요. 먹은 양과 시간을 기록해 두세요.",
+      "술이 든 음식·음료를 개가 닿는 곳에 두지 않기"
+    ],
+    "tags": [
+      "harmful",
+      "toxic",
+      "alcohol"
+    ],
+    "recommendable": false,
+    "sources": [
+      {
+        "title": "People Foods to Avoid Feeding Your Pets",
+        "publisher": "ASPCA Animal Poison Control Center",
+        "url": "https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding treats to your dog",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2025/11/WSAVA_GuidetoTreats_Dogs_251107.pdf",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": ""
+  },
+  {
+    "item_id": "diet_dog_raw_dough_harmful_01",
+    "name": "생 빵 반죽(이스트 반죽) (유해)",
+    "category": "diet",
+    "subtype": "harmful_food",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "발효 중인 생 반죽은 위 안에서 부풀어 심한 복부 팽만을 일으키고 위가 꼬이는 응급 상황으로 이어질 수 있습니다. 효모가 만든 알코올로 중독될 수도 있습니다.",
+    "serving_guide": "",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "섭취 시 즉시 동물병원에 연락하거나 내원하세요. 먹은 양과 시간을 기록해 두세요.",
+      "반죽을 발효시키는 동안 개가 접근하지 못하게 하기"
+    ],
+    "tags": [
+      "harmful",
+      "toxic",
+      "dough"
+    ],
+    "recommendable": false,
+    "sources": [
+      {
+        "title": "People Foods to Avoid Feeding Your Pets",
+        "publisher": "ASPCA Animal Poison Control Center",
+        "url": "https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding treats to your dog",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2025/11/WSAVA_GuidetoTreats_Dogs_251107.pdf",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": ""
+  },
+  {
+    "item_id": "diet_dog_caffeine_harmful_01",
+    "name": "커피·차·에너지 음료(카페인) (유해)",
+    "category": "diet",
+    "subtype": "harmful_food",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "카페인은 초콜릿과 같은 메틸잔틴 계열로 흥분, 빠른 심박, 떨림, 발작을 일으킬 수 있습니다. 커피 찌꺼기·원두·티백도 위험합니다.",
+    "serving_guide": "",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "섭취 시 즉시 동물병원에 연락하거나 내원하세요. 먹은 양과 시간을 기록해 두세요.",
+      "커피 찌꺼기, 티백, 에너지 음료를 개가 닿지 않는 곳에 보관"
+    ],
+    "tags": [
+      "harmful",
+      "toxic",
+      "caffeine"
+    ],
+    "recommendable": false,
+    "sources": [
+      {
+        "title": "People Foods to Avoid Feeding Your Pets",
+        "publisher": "ASPCA Animal Poison Control Center",
+        "url": "https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding treats to your dog",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2025/11/WSAVA_GuidetoTreats_Dogs_251107.pdf",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "'커피 찌꺼기·원두·티백' 예시는 일반 주의사항으로 추가. 원문은 coffee, tea, energy drinks 수준."
+  },
+  {
+    "item_id": "diet_dog_bones_harmful_01",
+    "name": "익힌 뼈·날뼈 (유해)",
+    "category": "diet",
+    "subtype": "harmful_food",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "익힌 뼈와 날뼈 모두 치아 골절, 식도·장 막힘, 변비를 일으킬 수 있고 수술이 필요할 수 있습니다. 뼈를 준다고 치주 질환이 예방되지도 않습니다.",
+    "serving_guide": "",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "섭취 시 즉시 동물병원에 연락하거나 내원하세요. 먹은 양과 시간을 기록해 두세요.",
+      "닭뼈·생선뼈 등 음식물 쓰레기 관리",
+      "구토, 침 흘림, 배변 곤란이 보이면 바로 내원"
+    ],
+    "tags": [
+      "harmful",
+      "toxic",
+      "bones"
+    ],
+    "recommendable": false,
+    "sources": [
+      {
+        "title": "Feeding treats to your dog",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2025/11/WSAVA_GuidetoTreats_Dogs_251107.pdf",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Raw Meat Based Diets for Pets",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2021/04/Raw-Meat-Based-Diets-for-Pets_WSAVA-Global-Nutrition-Toolkit.pdf",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "People Foods to Avoid Feeding Your Pets",
+        "publisher": "ASPCA Animal Poison Control Center",
+        "url": "https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": ""
+  },
+  {
+    "item_id": "diet_dog_salty_fatty_food_harmful_01",
+    "name": "짠 음식·기름진 사람 음식 (유해)",
+    "category": "diet",
+    "subtype": "harmful_food",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "소금이 많은 음식은 갈증·다뇨부터 심하면 떨림·발작까지 일으킬 수 있고, 기름지거나 단 사람 음식은 췌장염을 유발할 수 있습니다. 햄·베이컨 같은 가공육은 염분이 높습니다.",
+    "serving_guide": "",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "섭취 시 즉시 동물병원에 연락하거나 내원하세요. 먹은 양과 시간을 기록해 두세요.",
+      "식탁 음식·남은 음식 주지 않기",
+      "췌장염 이력이 있으면 특히 주의"
+    ],
+    "tags": [
+      "harmful",
+      "toxic",
+      "salt",
+      "high_fat"
+    ],
+    "recommendable": false,
+    "sources": [
+      {
+        "title": "People Foods to Avoid Feeding Your Pets",
+        "publisher": "ASPCA Animal Poison Control Center",
+        "url": "https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Sharing is Caring: Foods You Can Safely Share with Your Pet",
+        "publisher": "ASPCA",
+        "url": "https://www.aspca.org/news/sharing-caring-foods-you-can-safely-share-your-pet",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": ""
+  },
+  {
+    "item_id": "diet_cat_kitten_meal_guide_01",
+    "name": "새끼 고양이 하루 급여 횟수 가이드",
+    "category": "diet",
+    "subtype": "feeding_guide",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior"
+    ],
+    "description": "젖을 뗀 새끼 고양이는 위가 작아 하루에 여러 번 나눠 먹어야 합니다. 생후 6개월까지는 하루 3회(4개월 미만은 3~4회), 6개월~1세는 하루 2회 정도가 일반적입니다.",
+    "serving_guide": "4개월 미만 하루 3~4회, 6개월까지 하루 3회, 6~12개월 하루 2회 (성장기용 사료)",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "성장기(키튼)용 완전·균형 사료 급여",
+      "자율 급여 시 과식·체중 증가를 관찰"
+    ],
+    "tags": [
+      "kitten",
+      "meal_frequency"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "How often should you feed your cat?",
+        "publisher": "Cornell Feline Health Center",
+        "url": "https://www.vet.cornell.edu/departments/cornell-feline-health-center/health-information/feline-health-topics/how-often-should-you-feed-your-cat",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Proper Nutrition for Cats",
+        "publisher": "Merck Veterinary Manual (Cat Owners)",
+        "url": "https://www.merckvetmanual.com/cat-owners/selecting-and-providing-a-home-for-a-cat/proper-nutrition-for-cats",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "Cornell(6개월까지 3회)과 Merck(4개월 미만 3~4회) 수치를 합친 것. 원문 대조 필요."
+  },
+  {
+    "item_id": "diet_cat_kitten_growth_food_01",
+    "name": "새끼 고양이 성장기 사료 유지",
+    "category": "diet",
+    "subtype": "feeding_guide",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior"
+    ],
+    "description": "새끼 고양이는 성묘 사료가 아닌 성장기용 사료가 필요합니다. 이유는 보통 생후 3~4주에 시작해 8주 무렵 마치며, 약 9~12개월까지 성장기 사료를 유지합니다.",
+    "serving_guide": "생후 약 9~12개월까지 성장기 사료, 사료 변경은 약 2주에 걸쳐 서서히",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "습식·건식을 모두 경험시키면 나중에 식감 적응이 쉬움",
+      "사료를 갑자기 바꾸지 않기"
+    ],
+    "tags": [
+      "kitten",
+      "growth"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Proper Nutrition for Cats",
+        "publisher": "Merck Veterinary Manual (Cat Owners)",
+        "url": "https://www.merckvetmanual.com/cat-owners/selecting-and-providing-a-home-for-a-cat/proper-nutrition-for-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding your cat or kitten",
+        "publisher": "International Cat Care",
+        "url": "https://icatcare.org/articles/feeding-your-cat-or-kitten",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Nutrition - General Feeding Guidelines for Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/nutrition-feeding-guidelines-for-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "The best diet for your cat",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/kittens-cats/the-best-diet-for-your-cat-1",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "성묘 사료 전환 시기는 출처마다 다름(Merck 9~12개월, VCA 약 12개월). 검수 필요."
+  },
+  {
+    "item_id": "diet_cat_kitten_water_not_milk_01",
+    "name": "새끼 고양이는 우유 대신 깨끗한 물",
+    "category": "diet",
+    "subtype": "hydration",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior"
+    ],
+    "description": "이유한 새끼 고양이와 성묘는 우유가 필요하지 않습니다. 대부분 생후 약 12주 무렵 유당 소화 능력이 줄어 우유가 설사를 일으킬 수 있으니 깨끗한 물을 항상 줍니다.",
+    "serving_guide": "깨끗한 물 상시 제공, 우유·크림 대신 물",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "고양이용 무유당 우유도 칼로리가 높아 간식으로 계산",
+      "어미를 잃은 신생 고양이는 전용 대용유를 수의사 지도하에 사용"
+    ],
+    "tags": [
+      "kitten",
+      "hydration"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Nutrition - General Feeding Guidelines for Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/nutrition-feeding-guidelines-for-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "The best diet for your cat",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/kittens-cats/the-best-diet-for-your-cat-1",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "'약 12주'는 VCA 수치. 신생묘 대용유 문구는 일반 안내로 추가."
+  },
+  {
+    "item_id": "diet_cat_carnivore_basics_01",
+    "name": "고양이 기본 급여 원칙: 육식동물 맞춤 완전·균형 사료",
+    "category": "diet",
+    "subtype": "feeding_guide",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "고양이는 고기를 먹어야 하는 완전 육식동물로, 타우린·아라키돈산·비타민 A 등을 동물성 원료에서 얻어야 합니다. 타우린이 부족하면 실명과 심장 근육 약화가 생길 수 있어 채식 식단은 권장되지 않습니다.",
+    "serving_guide": "연령에 맞는 완전·균형 고양이 사료를 주식으로 급여",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "채식·비건 식단 금지",
+      "개 사료를 주식으로 주지 않기(타우린 등 필요 영양소가 다름)",
+      "수제식은 수의 영양 전문가 상담 후에만",
+      "생고기 식단은 세균·기생충 위험이 있음"
+    ],
+    "tags": [
+      "taurine",
+      "basics",
+      "complete_balanced"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Why Your Kitten Can't Be Vegan Or Vegetarian",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/pediatric/kitten/nutrition/can-cats-be-vegan-or-vegetarian",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Nutrition - General Feeding Guidelines for Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/nutrition-feeding-guidelines-for-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding your cat or kitten",
+        "publisher": "International Cat Care",
+        "url": "https://icatcare.org/articles/feeding-your-cat-or-kitten",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Nutritional Requirements of Small Animals",
+        "publisher": "Merck Veterinary Manual",
+        "url": "https://www.merckvetmanual.com/management-and-nutrition/nutrition-small-animals/nutritional-requirements-of-small-animals",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Proper Nutrition for Cats",
+        "publisher": "Merck Veterinary Manual (Cat Owners)",
+        "url": "https://www.merckvetmanual.com/cat-owners/selecting-and-providing-a-home-for-a-cat/proper-nutrition-for-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Raw Meat Based Diets for Pets",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2021/04/Raw-Meat-Based-Diets-for-Pets_WSAVA-Global-Nutrition-Toolkit.pdf",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "Merck: 성묘 사료 단백질 최소 26%(건물 기준). 필요 시 수치 추가 검토."
+  },
+  {
+    "item_id": "diet_cat_adult_meal_guide_01",
+    "name": "성묘 정량 소량 다회 급여",
+    "category": "diet",
+    "subtype": "feeding_guide",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "adult"
+    ],
+    "description": "고양이는 원래 하루에 여러 번 조금씩 먹는 습성이 있습니다. 하루 사료량을 아침에 계량해 두고 2회 이상, 가능하면 여러 번으로 나눠 주면 과식을 줄일 수 있습니다.",
+    "serving_guide": "하루 양을 계량해 최소 2회, 가능하면 여러 차례로 나눠 급여",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "자율 급여는 일부 고양이에서 과식·비만으로 이어질 수 있음",
+      "습식 사료는 오래 두면 상하므로 남은 것은 치우기"
+    ],
+    "tags": [
+      "meal_frequency",
+      "portion_control"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "How often should you feed your cat?",
+        "publisher": "Cornell Feline Health Center",
+        "url": "https://www.vet.cornell.edu/departments/cornell-feline-health-center/health-information/feline-health-topics/how-often-should-you-feed-your-cat",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Proper Nutrition for Cats",
+        "publisher": "Merck Veterinary Manual (Cat Owners)",
+        "url": "https://www.merckvetmanual.com/cat-owners/selecting-and-providing-a-home-for-a-cat/proper-nutrition-for-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding your cat or kitten",
+        "publisher": "International Cat Care",
+        "url": "https://icatcare.org/articles/feeding-your-cat-or-kitten",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "The best diet for your cat",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/kittens-cats/the-best-diet-for-your-cat-1",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "iCatCare는 하루 최소 5회 분할을 제안하고 Cornell·Merck는 1~2회도 무방하다고 함. 서비스 기본 문구 결정 필요."
+  },
+  {
+    "item_id": "diet_cat_puzzle_feeder_01",
+    "name": "퍼즐 피더·노즈워크 급여",
+    "category": "diet",
+    "subtype": "weight_management",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "adult",
+      "senior"
+    ],
+    "description": "퍼즐 피더나 스너플 매트에 하루 사료 일부를 넣어 주면 사냥하듯 먹으며 식사 시간이 길어지고 활동량이 늘어 체중 관리에 도움이 됩니다.",
+    "serving_guide": "하루 사료량 안에서 계량한 건사료 일부를 퍼즐 피더에 담기",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "처음에는 쉬운 단계로 시작해 스트레스를 주지 않기",
+      "총 급여량은 그대로 유지"
+    ],
+    "tags": [
+      "weight_loss",
+      "low_calorie",
+      "enrichment",
+      "senior_ok"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Feeding your cat or kitten",
+        "publisher": "International Cat Care",
+        "url": "https://icatcare.org/articles/feeding-your-cat-or-kitten",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Creating a Weight Reduction Plan for Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/creating-a-weight-reduction-plan-for-cats",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": ""
+  },
+  {
+    "item_id": "diet_cat_treat_rule_01",
+    "name": "고양이 간식 10% 규칙",
+    "category": "diet",
+    "subtype": "treat",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "간식과 사람 음식은 모두 하루 칼로리에 포함되며, 하루 칼로리의 10% 이내로 제한합니다. 고양이는 체구가 작아 사람 음식 한 입도 간식 허용량을 넘기 쉽습니다.",
+    "serving_guide": "하루 칼로리의 10% 이내 (간식 준 날은 주식 줄이기)",
+    "kcal_note": "WSAVA 기준 건강한 성묘 간식 허용량 예: 3kg 약 20kcal, 4kg 약 22kcal, 5kg 약 25kcal / 시판 고양이 간식은 1개 1~4kcal 정도 (VCA)",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "간식이 식사를 대신하면 안 됨",
+      "익히거나 날것인 뼈, 날 동물성 간식은 피하기",
+      "질환·처방식 중이면 수의사와 상의"
+    ],
+    "tags": [
+      "treat_budget",
+      "weight_management"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Feeding treats to your cat",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2025/11/WSAVA_GuidetoTreats_Cats_251107.pdf",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Tips for Successful Weight Loss in Dogs and Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/tips-for-successful-weight-loss-in-dogs-and-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Creating a Weight Reduction Plan for Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/creating-a-weight-reduction-plan-for-cats",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "WSAVA 체중별 간식 kcal 표(2.5kg 18 ~ 7kg 28kcal)는 PDF 텍스트 추출값이므로 원문 표와 대조 필요. PDSA는 10~15%로 표기해 출처 간 차이 있음."
+  },
+  {
+    "item_id": "diet_cat_chicken_topping_01",
+    "name": "삶은 닭가슴살 토핑",
+    "category": "diet",
+    "subtype": "topping",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "껍질과 뼈를 제거하고 양념 없이 익힌 닭가슴살은 고양이에게 줄 수 있는 건강한 간식입니다. 칼로리가 있으니 아주 소량만 줍니다.",
+    "serving_guide": "간식 허용량(하루 칼로리 10%) 안에서 몇 조각",
+    "kcal_note": "껍질 없는 익힌 닭가슴살 28g(1oz) 약 47kcal (WSAVA) — 많은 고양이의 하루 간식 허용량을 넘는 양",
+    "allergens": [
+      "chicken"
+    ],
+    "contraindications": [],
+    "cautions": [
+      "뼈·껍질·양념 제거",
+      "날고기로 주지 않기",
+      "닭고기 알레르기가 있으면 급여 금지"
+    ],
+    "tags": [
+      "lean_protein",
+      "topping"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Feeding treats to your cat",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2025/11/WSAVA_GuidetoTreats_Cats_251107.pdf",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "The best diet for your cat",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/kittens-cats/the-best-diet-for-your-cat-1",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": ""
+  },
+  {
+    "item_id": "diet_cat_cooked_fish_topping_01",
+    "name": "익힌 흰살생선·연어 토핑",
+    "category": "diet",
+    "subtype": "topping",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "adult",
+      "senior"
+    ],
+    "description": "뼈를 제거하고 양념 없이 익힌 흰살생선이나 연어는 고양이 간식으로 쓸 수 있습니다. 주식이 아니라 간식 허용량 안에서 가끔 줍니다.",
+    "serving_guide": "간식 허용량(하루 칼로리 10%) 안에서 소량, 가끔",
+    "kcal_note": "익힌 연어 28g 약 39kcal, 물에 담긴 참치 통조림 28g 약 36kcal (WSAVA)",
+    "allergens": [
+      "fish"
+    ],
+    "contraindications": [],
+    "cautions": [
+      "반드시 익혀서 급여(날 민물고기는 티아민 결핍 위험)",
+      "가시 제거",
+      "기름·소금에 절인 통조림은 피하기"
+    ],
+    "tags": [
+      "topping",
+      "protein"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Feeding treats to your cat",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2025/11/WSAVA_GuidetoTreats_Cats_251107.pdf",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "The best diet for your cat",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/kittens-cats/the-best-diet-for-your-cat-1",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Nutritional Requirements of Small Animals",
+        "publisher": "Merck Veterinary Manual",
+        "url": "https://www.merckvetmanual.com/management-and-nutrition/nutrition-small-animals/nutritional-requirements-of-small-animals",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "'기름·소금 절임 통조림 피하기'는 일반 주의로 추가(원문 문구 아님)."
+  },
+  {
+    "item_id": "diet_cat_wet_food_hydration_01",
+    "name": "습식 사료로 수분 보충",
+    "category": "diet",
+    "subtype": "hydration",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "습식 사료는 수분이 약 70~80%로 건사료보다 훨씬 많아 물을 잘 안 마시는 고양이의 수분 섭취를 늘려 줍니다. 건사료와 함께 주거나 대체할 수 있습니다.",
+    "serving_guide": "하루 칼로리 안에서 습식 일부 혼합 또는 대체, 사료 변경은 서서히",
+    "kcal_note": "습식은 g당 칼로리가 건사료보다 낮아 급여량(g) 재계산 필요",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "습식을 상온에 오래 두지 않기",
+      "건사료만 먹는 고양이는 특히 물을 항상 제공",
+      "하부 요로 질환 이력이 있으면 수의사와 상의"
+    ],
+    "tags": [
+      "hydration",
+      "urinary_health",
+      "senior_ok"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "How often should you feed your cat?",
+        "publisher": "Cornell Feline Health Center",
+        "url": "https://www.vet.cornell.edu/departments/cornell-feline-health-center/health-information/feline-health-topics/how-often-should-you-feed-your-cat",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Nutrition - General Feeding Guidelines for Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/nutrition-feeding-guidelines-for-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "The best diet for your cat",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/kittens-cats/the-best-diet-for-your-cat-1",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "수분 함량 70~80%는 Cornell 수치."
+  },
+  {
+    "item_id": "diet_cat_water_bowls_01",
+    "name": "고양이 물그릇 배치 팁",
+    "category": "diet",
+    "subtype": "hydration",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "고양이는 수염이 닿지 않는 넓고 얕은 유리·도자기 그릇을 가득 채워 주면 잘 마시는 편입니다. 물그릇은 고양이 수보다 하나 더, 층마다 두고 화장실과 밥그릇 바로 옆은 피합니다.",
+    "serving_guide": "물그릇 = 고양이 수 + 1개 이상, 층마다 1개, 매일 새 물로 교체·세척",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "금속 그릇은 소리·반사로 싫어할 수 있고 플라스틱은 흠집에 세균이 남기 쉬움",
+      "음수량이 갑자기 늘면 당뇨·신장병·갑상선 질환 신호일 수 있어 동물병원 상담",
+      "주사기로 억지로 물을 먹이지 않기"
+    ],
+    "tags": [
+      "hydration",
+      "urinary_health"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Encouraging your cat to drink: a guide for caregivers",
+        "publisher": "International Cat Care",
+        "url": "https://icatcare.org/resources/cat-carer-guide-encouraging-your-cat-to-drink.pdf",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Proper Nutrition for Cats",
+        "publisher": "Merck Veterinary Manual (Cat Owners)",
+        "url": "https://www.merckvetmanual.com/cat-owners/selecting-and-providing-a-home-for-a-cat/proper-nutrition-for-cats",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": ""
+  },
+  {
+    "item_id": "diet_cat_water_fountain_01",
+    "name": "흐르는 물(급수기) 활용",
+    "category": "diet",
+    "subtype": "hydration",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "adult",
+      "senior"
+    ],
+    "description": "흐르는 물을 좋아하는 고양이는 급수기(분수형 물그릇)를 두면 더 많이 마실 수 있습니다. 벽에서 떨어뜨려 주변을 볼 수 있게 놓으면 안심하고 마십니다.",
+    "serving_guide": "기존 물그릇과 함께 추가 설치, 필터·본체 정기 세척",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "처음엔 전원을 끈 채로 익숙해지게 한 뒤 작동",
+      "소음이 크면 고무 매트 등으로 진동 줄이기",
+      "세척을 소홀히 하면 세균 번식"
+    ],
+    "tags": [
+      "hydration",
+      "senior_ok"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Encouraging your cat to drink: a guide for caregivers",
+        "publisher": "International Cat Care",
+        "url": "https://icatcare.org/resources/cat-carer-guide-encouraging-your-cat-to-drink.pdf",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Proper Nutrition for Cats",
+        "publisher": "Merck Veterinary Manual (Cat Owners)",
+        "url": "https://www.merckvetmanual.com/cat-owners/selecting-and-providing-a-home-for-a-cat/proper-nutrition-for-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding Mature, Senior, and Geriatric Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/feeding-mature-senior-and-geriatric-cats",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "단계적 적응·고무 매트 팁은 검색 요약에서 확인한 iCatCare 내용. 원문 PDF 해당 쪽 대조 필요."
+  },
+  {
+    "item_id": "diet_cat_senior_meal_guide_01",
+    "name": "노령묘 급여 가이드",
+    "category": "diet",
+    "subtype": "feeding_guide",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "senior"
+    ],
+    "description": "노령묘는 초기에는 필요 칼로리가 줄지만 약 11세 이후에는 소화 효율이 떨어져 오히려 칼로리·단백질이 더 필요할 수 있습니다. 하루 양을 2~4회로 나눠 주며 체중과 근육량을 정기적으로 확인합니다.",
+    "serving_guide": "하루 2~4회 소량 급여, 체중·근육 상태로 칼로리 조정",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "체중 감소는 질환의 첫 신호일 수 있음",
+      "신장 질환 진단 후에는 수의사 처방에 따라 식단 조정",
+      "나트륨 과다 피하기"
+    ],
+    "tags": [
+      "senior_ok",
+      "meal_frequency"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Feeding Mature, Senior, and Geriatric Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/feeding-mature-senior-and-geriatric-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding Tips for Senior Dogs and Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/resources/senior/top-tips-for-feeding-your-senior-pet",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "VCA: 10세 이상 시니어 분류(서비스 기준 7세와 다름), 약 11세부터 에너지 요구량 증가. 원문 대조 필요."
+  },
+  {
+    "item_id": "diet_cat_senior_hydration_01",
+    "name": "노령묘 수분·식사 편의 관리",
+    "category": "diet",
+    "subtype": "hydration",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "senior"
+    ],
+    "description": "나이 든 고양이는 갈증을 덜 느껴 탈수되기 쉽습니다. 여러 곳에 물그릇을 두고 습식 사료를 늘리며, 관절이 불편한 고양이는 약간 높인 그릇이 편할 수 있습니다.",
+    "serving_guide": "물그릇 여러 곳 배치, 습식 비율 늘리기, 관절염 고양이는 높이 있는 그릇",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "치아가 아파 식욕이 줄 수 있으니 구강 검진",
+      "음수량·소변량 변화가 있으면 동물병원 상담"
+    ],
+    "tags": [
+      "hydration",
+      "senior_ok",
+      "soft_food"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Feeding Mature, Senior, and Geriatric Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/feeding-mature-senior-and-geriatric-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding Tips for Senior Dogs and Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/resources/senior/top-tips-for-feeding-your-senior-pet",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Encouraging your cat to drink: a guide for caregivers",
+        "publisher": "International Cat Care",
+        "url": "https://icatcare.org/resources/cat-carer-guide-encouraging-your-cat-to-drink.pdf",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": ""
+  },
+  {
+    "item_id": "diet_cat_weight_loss_plan_01",
+    "name": "고양이 체중 감량 급여 계획",
+    "category": "diet",
+    "subtype": "weight_management",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "adult",
+      "senior"
+    ],
+    "description": "비만 고양이는 수의사 감독 아래 천천히 감량해야 합니다. 너무 빨리 빼면 지방간(간 지질증)과 근육 손실 위험이 있어, 주당 초기 체중의 1~2% 정도를 목표로 합니다.",
+    "serving_guide": "주당 초기 체중의 1~2% 감량(고도 비만은 약 0.5%), 최소 2주마다 체중 확인",
+    "kcal_note": "시판 고양이 간식은 1개 1~3kcal 정도로 개수를 세어 관리 (VCA)",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "굶기거나 급격히 줄이지 않기(지방간 위험)",
+      "식욕이 하루 이상 없으면 즉시 동물병원",
+      "간식은 감량 계획의 10% 몫 안에서"
+    ],
+    "tags": [
+      "weight_loss",
+      "low_calorie",
+      "obesity_care"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Creating a Weight Reduction Plan for Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/creating-a-weight-reduction-plan-for-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Tips for Successful Weight Loss in Dogs and Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/tips-for-successful-weight-loss-in-dogs-and-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Global Nutrition Guidelines (Nutrition Toolkit)",
+        "publisher": "WSAVA",
+        "url": "https://wsava.org/global-guidelines/global-nutrition-guidelines/",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "'식욕이 하루 이상 없으면 즉시 내원'은 일반 안전 문구로 추가(출처 수치 아님). 감량 속도는 VCA 원문 대조 필요."
+  },
+  {
+    "item_id": "diet_cat_onion_garlic_harmful_01",
+    "name": "양파·마늘·파·부추류 (유해)",
+    "category": "diet",
+    "subtype": "harmful_food",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "양파, 마늘, 파, 부추, 샬롯 등 알리움 속 식물은 적혈구를 손상시켜 빈혈을 일으키며, 고양이는 개보다 더 민감합니다. 가루·양념 형태도 위험합니다.",
+    "serving_guide": "",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "섭취 시 즉시 동물병원에 연락하거나 내원하세요. 먹은 양과 시간을 기록해 두세요.",
+      "양념한 고기·국물 등 사람 음식 주지 않기"
+    ],
+    "tags": [
+      "harmful",
+      "toxic",
+      "onion",
+      "garlic"
+    ],
+    "recommendable": false,
+    "sources": [
+      {
+        "title": "People Foods to Avoid Feeding Your Pets",
+        "publisher": "ASPCA Animal Poison Control Center",
+        "url": "https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding treats to your cat",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2025/11/WSAVA_GuidetoTreats_Cats_251107.pdf",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "The best diet for your cat",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/kittens-cats/the-best-diet-for-your-cat-1",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": ""
+  },
+  {
+    "item_id": "diet_cat_chocolate_harmful_01",
+    "name": "초콜릿 (유해)",
+    "category": "diet",
+    "subtype": "harmful_food",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "초콜릿의 테오브로민·카페인은 구토, 설사, 부정맥, 떨림, 발작을 일으킬 수 있으며 다크·제빵용 초콜릿이 가장 위험합니다.",
+    "serving_guide": "",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "섭취 시 즉시 동물병원에 연락하거나 내원하세요. 먹은 양과 시간을 기록해 두세요.",
+      "초콜릿 간식·코코아 가루 보관 주의"
+    ],
+    "tags": [
+      "harmful",
+      "toxic",
+      "chocolate"
+    ],
+    "recommendable": false,
+    "sources": [
+      {
+        "title": "People Foods to Avoid Feeding Your Pets",
+        "publisher": "ASPCA Animal Poison Control Center",
+        "url": "https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding treats to your cat",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2025/11/WSAVA_GuidetoTreats_Cats_251107.pdf",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Poisons",
+        "publisher": "Cornell Feline Health Center",
+        "url": "https://www.vet.cornell.edu/departments-centers-and-institutes/cornell-feline-health-center/health-information/feline-health-topics/poisons",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": ""
+  },
+  {
+    "item_id": "diet_cat_caffeine_harmful_01",
+    "name": "커피·차·에너지 음료(카페인) (유해)",
+    "category": "diet",
+    "subtype": "harmful_food",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "카페인은 흥분, 과호흡, 부정맥, 떨림, 발작을 일으킬 수 있는 메틸잔틴 성분입니다.",
+    "serving_guide": "",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "섭취 시 즉시 동물병원에 연락하거나 내원하세요. 먹은 양과 시간을 기록해 두세요.",
+      "카페인 음료를 고양이가 닿는 곳에 두지 않기"
+    ],
+    "tags": [
+      "harmful",
+      "toxic",
+      "caffeine"
+    ],
+    "recommendable": false,
+    "sources": [
+      {
+        "title": "People Foods to Avoid Feeding Your Pets",
+        "publisher": "ASPCA Animal Poison Control Center",
+        "url": "https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding treats to your cat",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2025/11/WSAVA_GuidetoTreats_Cats_251107.pdf",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": ""
+  },
+  {
+    "item_id": "diet_cat_alcohol_harmful_01",
+    "name": "알코올 (유해)",
+    "category": "diet",
+    "subtype": "harmful_food",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "알코올은 소량으로도 구토, 비틀거림, 호흡곤란, 떨림, 혼수를 일으키고 사망에 이를 수 있습니다.",
+    "serving_guide": "",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "섭취 시 즉시 동물병원에 연락하거나 내원하세요. 먹은 양과 시간을 기록해 두세요.",
+      "술·알코올이 든 음식 보관 주의"
+    ],
+    "tags": [
+      "harmful",
+      "toxic",
+      "alcohol"
+    ],
+    "recommendable": false,
+    "sources": [
+      {
+        "title": "People Foods to Avoid Feeding Your Pets",
+        "publisher": "ASPCA Animal Poison Control Center",
+        "url": "https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding treats to your cat",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2025/11/WSAVA_GuidetoTreats_Cats_251107.pdf",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": ""
+  },
+  {
+    "item_id": "diet_cat_raw_dough_harmful_01",
+    "name": "생 빵 반죽(이스트 반죽) (유해)",
+    "category": "diet",
+    "subtype": "harmful_food",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "생 반죽은 위 속에서 부풀어 심한 팽만을 일으키고, 발효로 생긴 알코올이 중독을 일으킬 수 있습니다.",
+    "serving_guide": "",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "섭취 시 즉시 동물병원에 연락하거나 내원하세요. 먹은 양과 시간을 기록해 두세요.",
+      "발효 중인 반죽에 접근하지 못하게 하기"
+    ],
+    "tags": [
+      "harmful",
+      "toxic",
+      "dough"
+    ],
+    "recommendable": false,
+    "sources": [
+      {
+        "title": "People Foods to Avoid Feeding Your Pets",
+        "publisher": "ASPCA Animal Poison Control Center",
+        "url": "https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding treats to your cat",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2025/11/WSAVA_GuidetoTreats_Cats_251107.pdf",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": ""
+  },
+  {
+    "item_id": "diet_cat_grape_raisin_harmful_01",
+    "name": "포도·건포도 (유해)",
+    "category": "diet",
+    "subtype": "harmful_food",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "포도, 건포도, 커런트, 술타나는 고양이에게도 유해 식품으로 분류됩니다. 개에서는 신장 손상이 보고되어 있어 고양이도 급여하지 않습니다.",
+    "serving_guide": "",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "섭취 시 즉시 동물병원에 연락하거나 내원하세요. 먹은 양과 시간을 기록해 두세요.",
+      "건포도가 든 빵·과자도 주지 않기"
+    ],
+    "tags": [
+      "harmful",
+      "toxic",
+      "grape"
+    ],
+    "recommendable": false,
+    "sources": [
+      {
+        "title": "Feeding treats to your cat",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2025/11/WSAVA_GuidetoTreats_Cats_251107.pdf",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "The best diet for your cat",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/kittens-cats/the-best-diet-for-your-cat-1",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Poisons",
+        "publisher": "Cornell Feline Health Center",
+        "url": "https://www.vet.cornell.edu/departments-centers-and-institutes/cornell-feline-health-center/health-information/feline-health-topics/poisons",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "고양이에서의 구체적 독성 기전·증상은 출처에 상세하지 않음. 검수 시 고양이 근거 보강 권장."
+  },
+  {
+    "item_id": "diet_cat_xylitol_harmful_01",
+    "name": "자일리톨 (유해)",
+    "category": "diet",
+    "subtype": "harmful_food",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "껌·사탕·치약 등에 든 감미료 자일리톨은 고양이에게도 유해 성분으로 분류됩니다. 개에서는 저혈당과 간 손상을 일으킵니다.",
+    "serving_guide": "",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "섭취 시 즉시 동물병원에 연락하거나 내원하세요. 먹은 양과 시간을 기록해 두세요.",
+      "자일리톨 껌·제품 보관 주의"
+    ],
+    "tags": [
+      "harmful",
+      "toxic",
+      "xylitol"
+    ],
+    "recommendable": false,
+    "sources": [
+      {
+        "title": "Feeding treats to your cat",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2025/11/WSAVA_GuidetoTreats_Cats_251107.pdf",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Poisons",
+        "publisher": "Cornell Feline Health Center",
+        "url": "https://www.vet.cornell.edu/departments-centers-and-institutes/cornell-feline-health-center/health-information/feline-health-topics/poisons",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "People Foods to Avoid Feeding Your Pets",
+        "publisher": "ASPCA Animal Poison Control Center",
+        "url": "https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "저혈당·간 손상 근거는 주로 개 데이터(ASPCA). 고양이 독성 정도는 검수 필요."
+  },
+  {
+    "item_id": "diet_cat_milk_dairy_harmful_01",
+    "name": "우유·유제품 (유당불내증 주의)",
+    "category": "diet",
+    "subtype": "harmful_food",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "많은 고양이는 유당을 잘 소화하지 못해 우유나 유제품을 먹으면 설사 등 소화 장애가 생길 수 있습니다. 크림·치즈는 지방과 칼로리도 높습니다.",
+    "serving_guide": "",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "섭취 시 즉시 동물병원에 연락하거나 내원하세요. 먹은 양과 시간을 기록해 두세요.",
+      "우유를 간식으로 주지 않기",
+      "구토·설사가 지속되면 동물병원 상담"
+    ],
+    "tags": [
+      "harmful",
+      "toxic",
+      "dairy"
+    ],
+    "recommendable": false,
+    "sources": [
+      {
+        "title": "Feeding treats to your cat",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2025/11/WSAVA_GuidetoTreats_Cats_251107.pdf",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Proper Nutrition for Cats",
+        "publisher": "Merck Veterinary Manual (Cat Owners)",
+        "url": "https://www.merckvetmanual.com/cat-owners/selecting-and-providing-a-home-for-a-cat/proper-nutrition-for-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "The best diet for your cat",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/kittens-cats/the-best-diet-for-your-cat-1",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "People Foods to Avoid Feeding Your Pets",
+        "publisher": "ASPCA Animal Poison Control Center",
+        "url": "https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "중독성 독성이 아닌 소화 장애 위험. '섭취 시 즉시 동물병원' 문구 강도를 검수 시 조정 가능."
+  },
+  {
+    "item_id": "diet_cat_raw_fish_harmful_01",
+    "name": "날 민물고기·날생선 (유해)",
+    "category": "diet",
+    "subtype": "harmful_food",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "날 민물고기와 조개에는 티아민(비타민 B1)을 파괴하는 효소가 있어 계속 먹으면 티아민 결핍이 생길 수 있습니다. 날고기·날생선은 세균과 기생충 감염 위험도 있습니다.",
+    "serving_guide": "",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "섭취 시 즉시 동물병원에 연락하거나 내원하세요. 먹은 양과 시간을 기록해 두세요.",
+      "생선은 반드시 익혀서 급여",
+      "날 동물성 식품은 사람에게도 감염 위험"
+    ],
+    "tags": [
+      "harmful",
+      "toxic",
+      "raw_fish",
+      "raw_meat"
+    ],
+    "recommendable": false,
+    "sources": [
+      {
+        "title": "Nutritional Requirements of Small Animals",
+        "publisher": "Merck Veterinary Manual",
+        "url": "https://www.merckvetmanual.com/management-and-nutrition/nutrition-small-animals/nutritional-requirements-of-small-animals",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Raw Meat Based Diets for Pets",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2021/04/Raw-Meat-Based-Diets-for-Pets_WSAVA-Global-Nutrition-Toolkit.pdf",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Feeding treats to your cat",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2025/11/WSAVA_GuidetoTreats_Cats_251107.pdf",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": ""
+  },
+  {
+    "item_id": "diet_cat_bones_harmful_01",
+    "name": "익힌 뼈·날뼈 (유해)",
+    "category": "diet",
+    "subtype": "harmful_food",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "description": "익힌 뼈와 날뼈 모두 고양이의 입·식도·장에 상처를 내거나 막힘을 일으킬 수 있습니다.",
+    "serving_guide": "",
+    "kcal_note": "",
+    "allergens": [],
+    "contraindications": [],
+    "cautions": [
+      "섭취 시 즉시 동물병원에 연락하거나 내원하세요. 먹은 양과 시간을 기록해 두세요.",
+      "닭뼈·생선가시 음식물 쓰레기 관리",
+      "구토, 침 흘림, 식욕 저하가 보이면 바로 내원"
+    ],
+    "tags": [
+      "harmful",
+      "toxic",
+      "bones"
+    ],
+    "recommendable": false,
+    "sources": [
+      {
+        "title": "Feeding treats to your cat",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2025/11/WSAVA_GuidetoTreats_Cats_251107.pdf",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Raw Meat Based Diets for Pets",
+        "publisher": "WSAVA Global Nutrition Committee",
+        "url": "https://wsava.org/wp-content/uploads/2021/04/Raw-Meat-Based-Diets-for-Pets_WSAVA-Global-Nutrition-Toolkit.pdf",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": ""
+  }
+]

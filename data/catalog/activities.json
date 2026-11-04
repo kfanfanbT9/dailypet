@@ -1,0 +1,1594 @@
+[
+  {
+    "item_id": "act_dog_puppy_explore_walk_01",
+    "name": "퍼피 탐색 산책",
+    "category": "activity",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "junior"
+    ],
+    "intensity": "low",
+    "duration_min": {
+      "min": 5,
+      "max": 15
+    },
+    "frequency": "매일 1~2회",
+    "description": "예방접종을 마친 강아지가 새로운 소리·냄새·바닥 재질을 천천히 경험하도록 하는 짧은 산책입니다. 운동량보다 세상을 긍정적으로 알아가는 데 목적이 있으며, 강아지가 지치면 바로 쉬게 합니다.",
+    "cautions": [
+      "예방접종이 끝나기 전에는 공공장소 산책 대신 집·마당에서 놀게 한다",
+      "아스팔트·보도블록 같은 딱딱한 바닥보다 잔디 등 부드러운 바닥을 고른다",
+      "점프·급정지·미끄러짐 같은 충격 동작을 피한다",
+      "앉아 버리거나 따라오기 힘들어하면 즉시 쉬게 한다",
+      "식사 직후보다는 1시간 정도 지난 뒤 나간다"
+    ],
+    "contraindications": [],
+    "tags": [
+      "outdoor",
+      "social",
+      "mental",
+      "hot_weather_risk"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Exercising your puppy",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/puppies-dogs/exercising-your-puppy",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "How Much Exercise Does a Puppy Need? Mental and Physical Exercises",
+        "publisher": "American Kennel Club (AKC)",
+        "url": "https://www.akc.org/expert-advice/health/puppies-mental-physical-exercise/",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "시간: AKC는 '월령×5분, 하루 1~2회'를 제시하지만 PDSA는 이 규칙에 과학적 근거가 없다고 명시함 — 5~15분은 3개월령 기준 예시값이므로 검수 필요. 대형견은 성장 완료(18~24개월)까지 더 보수적으로 조정 필요."
+  },
+  {
+    "item_id": "act_dog_basic_training_01",
+    "name": "짧은 기본 훈련 (앉아·기다려·이리와)",
+    "category": "activity",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "intensity": "low",
+    "duration_min": {
+      "min": 5,
+      "max": 10
+    },
+    "frequency": "매일 2~3회",
+    "description": "간식이나 칭찬으로 보상하며 앉아, 기다려, 이리와 같은 신호를 짧게 연습합니다. 머리를 쓰는 활동이라 짧은 시간에도 피로감을 주며, 나이 든 개도 새로운 신호를 배울 수 있습니다.",
+    "cautions": [
+      "강압 없이 보상 기반으로 진행한다",
+      "집중력이 떨어지면 바로 끝내고 성공 경험으로 마무리한다",
+      "훈련 간식은 하루 사료량에서 일부 덜어 쓰거나 저칼로리 간식을 사용한다"
+    ],
+    "contraindications": [],
+    "tags": [
+      "indoor",
+      "mental",
+      "bonding",
+      "senior_ok",
+      "joint_friendly"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Exercising your puppy",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/puppies-dogs/exercising-your-puppy",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Exercise for dogs: our ultimate guide",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/puppies-dogs/how-much-exercise-does-your-dog-need",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "How Much Exercise Does a Puppy Need? Mental and Physical Exercises",
+        "publisher": "American Kennel Club (AKC)",
+        "url": "https://www.akc.org/expert-advice/health/puppies-mental-physical-exercise/",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Exercising your senior dog",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/puppies-dogs/exercising-your-senior-dog",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "세션 길이 5~10분은 AKC의 리드줄 훈련 권장(5~10분) 기준. 하루 2~3회 빈도는 출처 없음 — 일반 가이드 기준, 검수 필요."
+  },
+  {
+    "item_id": "act_dog_daily_walk_01",
+    "name": "일상 산책",
+    "category": "activity",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "adult"
+    ],
+    "intensity": "medium",
+    "duration_min": {
+      "min": 30,
+      "max": 60
+    },
+    "frequency": "매일 1~2회",
+    "description": "목줄을 하고 동네를 걷는 기본 운동으로, 빠르게 걸으면 에너지를 소모하고 천천히 걸으면 정신 건강에도 도움이 됩니다. 필요한 양은 견종·체력에 따라 크게 다릅니다.",
+    "cautions": [
+      "더운 날에는 이른 아침이나 저녁 등 서늘한 시간대에 걷고 물을 챙긴다",
+      "여름철 뜨거운 아스팔트는 발바닥 화상 위험이 있으니 피한다",
+      "단두종(퍼그·불독 등)은 더위에 특히 취약하므로 강도와 시간을 줄인다",
+      "외출 시 목줄·인식표를 착용한다"
+    ],
+    "contraindications": [],
+    "tags": [
+      "outdoor",
+      "weight_loss",
+      "social",
+      "bonding",
+      "hot_weather_risk"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Exercise for dogs: our ultimate guide",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/puppies-dogs/how-much-exercise-does-your-dog-need",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "How Much Exercise Does a Dog Need Every Day?",
+        "publisher": "American Kennel Club (AKC)",
+        "url": "https://www.akc.org/expert-advice/health/how-much-exercise-does-dog-need/",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Heatstroke in dogs",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/heatstroke-in-dogs",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "PDSA는 '대부분의 개는 하루 최소 1~2회 산책', 일부 견종은 하루 1~2시간 운동 필요라고만 하며 회당 분 수는 제시하지 않음. 30~60분/회는 출처 없음 — 일반 가이드 기준, 검수 필요."
+  },
+  {
+    "item_id": "act_dog_sniff_walk_01",
+    "name": "냄새 맡기 산책 (스니프 워크)",
+    "category": "activity",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "intensity": "low",
+    "duration_min": {
+      "min": 15,
+      "max": 30
+    },
+    "frequency": "주 3회 이상 또는 매일",
+    "description": "속도를 늦추고 개가 원하는 곳에서 충분히 냄새를 맡게 해 주는 산책입니다. 체력 부담은 적지만 후각을 쓰며 정신적 만족감을 주어 노령견이나 관절이 약한 개에게도 잘 맞습니다.",
+    "cautions": [
+      "주워 먹기 쉬운 이물질·쓰레기가 있는 곳에서는 주의한다",
+      "더운 날에는 서늘한 시간대를 고른다",
+      "어린 강아지는 접종 완료 후 진행한다"
+    ],
+    "contraindications": [],
+    "tags": [
+      "outdoor",
+      "mental",
+      "senior_ok",
+      "joint_friendly",
+      "hot_weather_risk"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Exercise for dogs: our ultimate guide",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/puppies-dogs/how-much-exercise-does-your-dog-need",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Canine DIY Enrichment",
+        "publisher": "ASPCA",
+        "url": "https://www.aspca.org/pet-care/dog-care/canine-diy-enrichment",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "How Much Exercise Does a Puppy Need? Mental and Physical Exercises",
+        "publisher": "American Kennel Club (AKC)",
+        "url": "https://www.akc.org/expert-advice/health/puppies-mental-physical-exercise/",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "시간·빈도 모두 출처 없음 — 일반 가이드 기준, 검수 필요. 원문은 '느린 냄새 맡기 산책이 정신 건강에 도움'이라는 정성적 내용만 있음."
+  },
+  {
+    "item_id": "act_dog_senior_short_walk_01",
+    "name": "노령견 짧고 잦은 산책",
+    "category": "activity",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "senior"
+    ],
+    "intensity": "low",
+    "duration_min": {
+      "min": 10,
+      "max": 20
+    },
+    "frequency": "매일 2~3회",
+    "description": "노령견에게는 가끔 길게 걷는 것보다 짧은 산책을 자주 하는 편이 관절이 굳지 않게 하는 데 좋습니다. 익숙한 코스를 잔디 같은 부드러운 바닥 위주로 걷고 중간중간 쉬어 줍니다.",
+    "cautions": [
+      "더위·추위에 약하므로 여름에는 서늘한 시간대, 겨울에는 옷을 고려한다",
+      "누워 버리거나 산책 후 뻣뻣해하면 다음 산책을 더 짧게 줄인다",
+      "시력·청력이 떨어진 개는 익숙한 길로 다니고 갑작스러운 자극에 놀라지 않게 한다",
+      "산책량이 줄면 발톱이 길어지니 정기적으로 확인한다"
+    ],
+    "contraindications": [],
+    "tags": [
+      "outdoor",
+      "senior_ok",
+      "joint_friendly",
+      "hot_weather_risk"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Exercising your senior dog",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/puppies-dogs/exercising-your-senior-dog",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "How to Provide Your Senior Dog With Proper Exercise",
+        "publisher": "American Kennel Club (AKC)",
+        "url": "https://www.akc.org/expert-advice/health/provide-senior-dog-proper-exercise",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "How Much Exercise Does a Dog Need Every Day?",
+        "publisher": "American Kennel Club (AKC)",
+        "url": "https://www.akc.org/expert-advice/health/how-much-exercise-does-dog-need/",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "'적게 자주(little and often)' 원칙은 PDSA 출처 있음. 10~20분/회, 하루 2~3회 수치는 출처 없음 — 일반 가이드 기준, 검수 필요."
+  },
+  {
+    "item_id": "act_dog_nosework_find_it_01",
+    "name": "노즈워크 '찾아' 게임",
+    "category": "activity",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "intensity": "low",
+    "duration_min": {
+      "min": 10,
+      "max": 15
+    },
+    "frequency": "매일 1회",
+    "description": "개가 보는 앞에서 간식을 가까이 던지며 '찾아'라고 말해 주고, 익숙해지면 집 안 여러 곳에 숨겨 난이도를 올립니다. 후각을 활용해 실내에서도 지루함을 덜어 주는 놀이입니다.",
+    "cautions": [
+      "간식 양은 하루 섭취 칼로리에 포함해 계산한다",
+      "개에게 독성이 있는 음식(초콜릿·포도·자일리톨 등)은 절대 쓰지 않는다",
+      "여러 마리가 있으면 간식 다툼이 없도록 따로 진행한다"
+    ],
+    "contraindications": [],
+    "tags": [
+      "indoor",
+      "mental",
+      "senior_ok",
+      "joint_friendly",
+      "bonding"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Canine DIY Enrichment",
+        "publisher": "ASPCA",
+        "url": "https://www.aspca.org/pet-care/dog-care/canine-diy-enrichment",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Exercising your senior dog",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/puppies-dogs/exercising-your-senior-dog",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Exercise for dogs: our ultimate guide",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/puppies-dogs/how-much-exercise-does-your-dog-need",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "시간·빈도 출처 없음 — 일반 가이드 기준, 검수 필요. 노령견에게 후각 게임 권장은 PDSA 출처 있음."
+  },
+  {
+    "item_id": "act_dog_snuffle_puzzle_01",
+    "name": "스너플 매트·퍼즐 급여",
+    "category": "activity",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "intensity": "low",
+    "duration_min": {
+      "min": 10,
+      "max": 20
+    },
+    "frequency": "매일 1회 (식사 일부 대체)",
+    "description": "털이 긴 매트나 머핀 틀, 접은 상자 등에 사료를 숨겨 개가 코와 발로 찾아 먹게 합니다. 먹는 속도를 늦추고 머리를 쓰게 해 실내 활동량이 적은 개에게 좋습니다.",
+    "cautions": [
+      "손으로 만든 퍼즐은 삼킬 수 있는 재료가 없는지 확인하고, 사용 중에는 반드시 지켜본다",
+      "개가 재료를 삼키려 하면 즉시 빼낸다",
+      "사료는 하루 급여량에서 덜어 쓴다",
+      "처음에는 쉬운 단계로 시작하고 필요하면 방법을 보여 준다"
+    ],
+    "contraindications": [],
+    "tags": [
+      "indoor",
+      "mental",
+      "weight_loss",
+      "senior_ok",
+      "joint_friendly"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Canine DIY Enrichment",
+        "publisher": "ASPCA",
+        "url": "https://www.aspca.org/pet-care/dog-care/canine-diy-enrichment",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Enriching Your Pet's Environment with Their Food",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/enriching-your-pets-environment-with-their-food",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "시간·빈도 출처 없음 — 일반 가이드 기준, 검수 필요."
+  },
+  {
+    "item_id": "act_dog_fetch_01",
+    "name": "공 던지기 (가져오기 놀이)",
+    "category": "activity",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "adult"
+    ],
+    "intensity": "high",
+    "duration_min": {
+      "min": 10,
+      "max": 20
+    },
+    "frequency": "주 3~5회",
+    "description": "장난감을 가까운 거리부터 던져 개가 쫓아가 물어 오게 하는 놀이입니다. 에너지가 많은 성견의 운동량을 채우기 좋고, '줘'·'놔' 같은 신호 연습과 함께 할 수 있습니다.",
+    "cautions": [
+      "나뭇가지는 입·목 부상 위험이 있어 던지지 않는다",
+      "급출발·급정지가 관절에 부담을 주므로 성장 중이거나 노령·관절질환·과체중인 개에게는 하지 않는다",
+      "젖거나 미끄러운 바닥, 울퉁불퉁한 곳에서는 피한다",
+      "공을 위로 높이 던져 점프하게 하지 않는다",
+      "더운 날에는 열사병 위험이 크므로 시간을 줄이고 그늘·물을 확보한다"
+    ],
+    "contraindications": [
+      "joint_disease",
+      "obesity_severe",
+      "post_surgery",
+      "brachycephalic"
+    ],
+    "tags": [
+      "outdoor",
+      "weight_loss",
+      "bonding",
+      "hot_weather_risk"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Exercise for dogs: our ultimate guide",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/puppies-dogs/how-much-exercise-does-your-dog-need",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Fun Exercises for Dogs & Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/resources/preventive-dog/weight-exercise/fun-exercises-for-pets",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Dog Behavior and Training - Play and Exercise",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/dog-behavior-and-training-play-and-exercise",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "How Much Exercise Does a Puppy Need? Mental and Physical Exercises",
+        "publisher": "American Kennel Club (AKC)",
+        "url": "https://www.akc.org/expert-advice/health/puppies-mental-physical-exercise/",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Heatstroke in dogs",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/heatstroke-in-dogs",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "시간·빈도 출처 없음 — 일반 가이드 기준, 검수 필요. brachycephalic 금기는 PDSA 열사병 자료(운동 중 발생, 단두종 고위험)에 근거한 보수적 판단이므로 '더운 날만 제한'으로 완화할지 검수 필요."
+  },
+  {
+    "item_id": "act_dog_tug_01",
+    "name": "터그 놀이 (줄다리기)",
+    "category": "activity",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "junior",
+      "adult"
+    ],
+    "intensity": "medium",
+    "duration_min": {
+      "min": 5,
+      "max": 10
+    },
+    "frequency": "매일 1회",
+    "description": "긴 터그 장난감을 잡고 옆으로·앞뒤로 부드럽게 당기는 놀이로, 근력과 유대감을 키웁니다. 한 번 당기기는 10~15초 정도로 짧게, 2~3번 한 뒤 차분한 활동과 간식으로 마무리합니다.",
+    "cautions": [
+      "시작 전에 '놔(drop)' 신호를 먼저 가르친다",
+      "위아래로 홱 잡아당기거나 발이 들리게 하지 않는다 (목·척추 부상 위험)",
+      "어린 강아지는 아주 약한 힘으로만 당긴다",
+      "이빨이 손이나 옷에 닿거나 지나치게 흥분하면 즉시 멈춘다",
+      "장난감을 물고 도망가도 쫓아가지 않는다"
+    ],
+    "contraindications": [
+      "post_surgery",
+      "joint_disease"
+    ],
+    "tags": [
+      "indoor",
+      "bonding",
+      "mental"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "How to Play Tug-of-War Safely With Your Dog",
+        "publisher": "American Kennel Club (AKC)",
+        "url": "https://www.akc.org/expert-advice/advice/is-tug-of-war-bad-for-dogs/",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Dog Behavior and Training - Play and Exercise",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/dog-behavior-and-training-play-and-exercise",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Fun Exercises for Dogs & Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/resources/preventive-dog/weight-exercise/fun-exercises-for-pets",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "1회 당기기 10~15초·2~3회는 AKC 출처 있음. 전체 세션 5~10분과 빈도는 출처 없음 — 일반 가이드 기준, 검수 필요. VCA는 3~4개월령부터 부드러운 터그 가능하다고 함 — junior 하한 월령 검수 필요."
+  },
+  {
+    "item_id": "act_dog_hide_and_seek_01",
+    "name": "숨바꼭질 놀이",
+    "category": "activity",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "intensity": "low",
+    "duration_min": {
+      "min": 5,
+      "max": 15
+    },
+    "frequency": "주 3~5회",
+    "description": "한 사람이 집 안에 숨고 다른 사람이 개에게 찾게 하는 놀이로, '이리와' 신호 연습도 함께 됩니다. 장난감이나 간식을 작은 상자·그릇에 숨겨 찾게 하는 방식으로 바꿀 수도 있습니다.",
+    "cautions": [
+      "계단이나 미끄러운 바닥을 급하게 달리지 않도록 숨는 장소를 고른다",
+      "찾으면 크게 칭찬해 성공 경험으로 끝낸다",
+      "숨이 차거나 자꾸 앉으려 하면 멈춘다"
+    ],
+    "contraindications": [],
+    "tags": [
+      "indoor",
+      "mental",
+      "bonding",
+      "senior_ok"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Dog Behavior and Training - Play and Exercise",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/dog-behavior-and-training-play-and-exercise",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Fun Exercises for Dogs & Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/resources/preventive-dog/weight-exercise/fun-exercises-for-pets",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "시간·빈도 출처 없음 — 일반 가이드 기준, 검수 필요."
+  },
+  {
+    "item_id": "act_dog_indoor_obstacle_01",
+    "name": "실내 장애물 코스 (홈 어질리티)",
+    "category": "activity",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "adult"
+    ],
+    "intensity": "medium",
+    "duration_min": {
+      "min": 10,
+      "max": 15
+    },
+    "frequency": "주 2~3회",
+    "description": "의자·쿠션·상자 같은 집 안 물건으로 낮은 장애물을 만들어 간식으로 유도하며 통과하게 합니다. 몸과 머리를 함께 써서 날씨가 나쁜 날 실내 운동으로 좋습니다.",
+    "cautions": [
+      "점프 높이는 낮게 유지하고 미끄럼 방지 매트를 깐다",
+      "넘어지거나 무너질 수 있는 물건은 쓰지 않는다",
+      "처음에는 한두 개 장애물로 시작해 천천히 늘린다",
+      "성장 중인 강아지는 반복 점프를 피한다"
+    ],
+    "contraindications": [
+      "joint_disease",
+      "post_surgery"
+    ],
+    "tags": [
+      "indoor",
+      "mental",
+      "bonding"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Canine DIY Enrichment",
+        "publisher": "ASPCA",
+        "url": "https://www.aspca.org/pet-care/dog-care/canine-diy-enrichment",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Fun Exercises for Dogs & Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/resources/preventive-dog/weight-exercise/fun-exercises-for-pets",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "How Much Exercise Does a Dog Need Every Day?",
+        "publisher": "American Kennel Club (AKC)",
+        "url": "https://www.akc.org/expert-advice/health/how-much-exercise-does-dog-need/",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "시간·빈도 출처 없음 — 일반 가이드 기준, 검수 필요."
+  },
+  {
+    "item_id": "act_dog_swimming_01",
+    "name": "수영·수중 운동",
+    "category": "activity",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "adult",
+      "senior"
+    ],
+    "intensity": "medium",
+    "duration_min": {
+      "min": 10,
+      "max": 20
+    },
+    "frequency": "주 1~2회",
+    "description": "물의 부력 덕분에 관절에 부담이 적으면서 전신을 쓰는 운동으로, 관절염이 있거나 체중 관리가 필요한 개에게 도움이 됩니다. 반려견 전용 수영장 등 안전한 곳에서 천천히 시작합니다.",
+    "cautions": [
+      "시작 전 수의사와 상담한다",
+      "깊은 물이나 수영이 서툰 개는 구명조끼를 입힌다",
+      "사람이 항상 가까이에서 지켜본다",
+      "수영장에서는 개가 스스로 나올 수 있는 계단이 있는지 확인한다",
+      "수술 부위가 완전히 아물고 봉합사를 제거하기 전에는 하지 않는다",
+      "피부병·열린 상처·귀 감염이 있으면 피한다",
+      "끝난 뒤 몸과 귀를 잘 말린다"
+    ],
+    "contraindications": [
+      "post_surgery",
+      "ear_infection",
+      "skin_disease"
+    ],
+    "tags": [
+      "outdoor",
+      "joint_friendly",
+      "senior_ok",
+      "weight_loss"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Is Swimming Therapeutic for Senior Dogs?",
+        "publisher": "American Kennel Club (AKC)",
+        "url": "https://www.akc.org/expert-advice/health/swimming-senior-dogs/",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "How to Provide Your Senior Dog With Proper Exercise",
+        "publisher": "American Kennel Club (AKC)",
+        "url": "https://www.akc.org/expert-advice/health/provide-senior-dog-proper-exercise",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Exercising your senior dog",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/puppies-dogs/exercising-your-senior-dog",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "How Much Exercise Does a Dog Need Every Day?",
+        "publisher": "American Kennel Club (AKC)",
+        "url": "https://www.akc.org/expert-advice/health/how-much-exercise-does-dog-need/",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "출처에 시간 제한 없음('천천히 시작해 반응을 보며 조절'). 10~20분, 주 1~2회는 출처 없음 — 일반 가이드 기준, 검수 필요. post_surgery는 '상처 치유 후 재활 목적이면 가능'이므로 금기 처리 범위 검수 필요."
+  },
+  {
+    "item_id": "act_dog_jogging_01",
+    "name": "보호자와 함께 조깅",
+    "category": "activity",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "adult"
+    ],
+    "intensity": "high",
+    "duration_min": {
+      "min": 20,
+      "max": 40
+    },
+    "frequency": "주 2~4회",
+    "description": "성장이 끝난 건강한 성견과 함께 달리는 고강도 유산소 운동입니다. 짧은 거리부터 점차 늘리고, 시작 전에 수의사와 상의합니다.",
+    "cautions": [
+      "성장판이 닫힌 뒤에 시작한다 (AKC 기준: 소형견 약 6~8개월, 중형견 12개월, 대형견 12~18개월, 초대형견 18~24개월 이후)",
+      "단두종은 호흡이 어려워 달리기가 위험할 수 있다",
+      "더운 날·뜨거운 노면에서는 하지 않고 물을 충분히 준다",
+      "숨이 차거나 뒤처지면 즉시 멈춘다"
+    ],
+    "contraindications": [
+      "brachycephalic",
+      "heart_disease",
+      "joint_disease",
+      "obesity_severe",
+      "post_surgery"
+    ],
+    "tags": [
+      "outdoor",
+      "weight_loss",
+      "hot_weather_risk"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "How Much Exercise Does a Puppy Need? Mental and Physical Exercises",
+        "publisher": "American Kennel Club (AKC)",
+        "url": "https://www.akc.org/expert-advice/health/puppies-mental-physical-exercise/",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Dog Behavior and Training - Play and Exercise",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/dog-behavior-and-training-play-and-exercise",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Walking or running with your dog",
+        "publisher": "American Veterinary Medical Association (AVMA)",
+        "url": "https://www.avma.org/resources-tools/pet-owners/petcare/walking-your-pet",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Heatstroke in dogs",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/heatstroke-in-dogs",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "견종 크기별 시작 월령은 AKC 출처 있으나 AKC 내 다른 글은 14~18개월 미만 조깅 비권장이라 상충 — 검수 필요. AVMA 페이지는 본문 전체를 확인하지 못함(검색 요약만 확인). 20~40분, 주 2~4회는 출처 없음 — 일반 가이드 기준, 검수 필요."
+  },
+  {
+    "item_id": "act_dog_senior_gentle_play_01",
+    "name": "노령견 저충격 실내 놀이",
+    "category": "activity",
+    "species": [
+      "dog"
+    ],
+    "age_groups": [
+      "senior"
+    ],
+    "intensity": "low",
+    "duration_min": {
+      "min": 5,
+      "max": 10
+    },
+    "frequency": "매일 1~2회",
+    "description": "점프나 몸을 비트는 동작 없이 바닥에서 장난감을 천천히 굴려 주거나 퍼즐 장난감·간단한 트릭으로 몸과 머리를 가볍게 쓰게 합니다. 관절이 약해진 노령견의 근력과 인지 기능 유지에 도움이 됩니다.",
+    "cautions": [
+      "미끄러운 바닥에는 러그·미끄럼 방지 매트를 깐다",
+      "장난감을 쫓다 멈추거나 누우면 그만한다",
+      "관절염·심장병·치매 등 질환이 있으면 수의사와 운동 수준을 상의한다",
+      "추격·점프·미끄러짐이 생기는 놀이는 피한다"
+    ],
+    "contraindications": [],
+    "tags": [
+      "indoor",
+      "senior_ok",
+      "joint_friendly",
+      "mental"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Exercising your senior dog",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/puppies-dogs/exercising-your-senior-dog",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Exercise for dogs: our ultimate guide",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/puppies-dogs/how-much-exercise-does-your-dog-need",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "How to Play Tug-of-War Safely With Your Dog",
+        "publisher": "American Kennel Club (AKC)",
+        "url": "https://www.akc.org/expert-advice/advice/is-tug-of-war-bad-for-dogs/",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "시간·빈도 출처 없음 — 일반 가이드 기준, 검수 필요."
+  },
+  {
+    "item_id": "act_cat_wand_hunt_01",
+    "name": "낚싯대 장난감 사냥 놀이",
+    "category": "activity",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "intensity": "medium",
+    "duration_min": {
+      "min": 5,
+      "max": 15
+    },
+    "frequency": "매일 2~3회",
+    "description": "깃털이나 작은 쥐 인형이 달린 낚싯대를 먹잇감처럼 불규칙하게 움직여 고양이가 탐색·잠복·추격·덮치기·잡기를 모두 하도록 합니다. 마지막에는 꼭 장난감을 잡게 해 만족감을 줍니다.",
+    "cautions": [
+      "줄 달린 장난감은 삼키면 장이 꼬이는 응급 상황이 생길 수 있으니 놀이 후 반드시 치워 둔다",
+      "손이나 발을 장난감으로 쓰지 않는다",
+      "새벽·저녁처럼 고양이가 활발한 시간에 하면 효과적이다",
+      "노령묘는 바닥 높이에서 천천히 움직여 준다"
+    ],
+    "contraindications": [],
+    "tags": [
+      "indoor",
+      "mental",
+      "bonding",
+      "weight_loss"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Playing with your cat",
+        "publisher": "International Cat Care",
+        "url": "https://icatcare.org/articles/playing-with-your-cat",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Cat Behavior and Training - Play and Play Toys",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/cat-behavior-and-training---play-and-play-toys",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Exercising your Cat",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/kittens-cats/exercise-for-your-cat",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Fun Exercises for Dogs & Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/resources/preventive-dog/weight-exercise/fun-exercises-for-pets",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Cat Behavior and Training - Enrichment for Indoor Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/cat-behavior-and-training---enrichment-for-indoor-cats",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "출처 간 수치 상이: PDSA 하루 2회·회당 15~20분 / VCA 하루 여러 번 10분 / VCA(운동 페이지) 몇 시간마다 5~10분 / ICC 약 1분의 강한 놀이도 충분. 5~15분, 하루 2~3회로 절충했으므로 검수 필요."
+  },
+  {
+    "item_id": "act_cat_kitten_short_play_01",
+    "name": "아기고양이 짧은 놀이",
+    "category": "activity",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior"
+    ],
+    "intensity": "medium",
+    "duration_min": {
+      "min": 2,
+      "max": 10
+    },
+    "frequency": "매일 3~4회",
+    "description": "아기고양이는 금방 지치므로 몇 분 정도의 짧은 놀이를 자주 해 줍니다. 놀이를 끝낼 때는 서서히 움직임을 줄이고 밥으로 관심을 옮겨 사람 발목을 덮치는 행동을 예방합니다.",
+    "cautions": [
+      "손·발로 놀아 주면 커서 사람을 공격하는 습관이 생길 수 있으니 반드시 장난감을 쓴다",
+      "털실·리본·끈·모루 같은 장난감은 삼킬 위험이 있어 피한다",
+      "3개월 미만은 캣닢에 반응하지 않는 경우가 많다"
+    ],
+    "contraindications": [],
+    "tags": [
+      "indoor",
+      "bonding",
+      "mental"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Playing with your cat",
+        "publisher": "International Cat Care",
+        "url": "https://icatcare.org/articles/playing-with-your-cat",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Cat Behavior and Training - Play and Play Toys",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/cat-behavior-and-training---play-and-play-toys",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Exercising your Cat",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/kittens-cats/exercise-for-your-cat",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "'몇 분'이라는 표현만 출처 있음. 2~10분, 하루 3~4회는 출처 없음 — 일반 가이드 기준, 검수 필요."
+  },
+  {
+    "item_id": "act_cat_puzzle_feeder_01",
+    "name": "퍼즐 피더 급여",
+    "category": "activity",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "intensity": "low",
+    "duration_min": {
+      "min": 10,
+      "max": 20
+    },
+    "frequency": "매일 1~2회 (식사 일부 대체)",
+    "description": "하루 사료 일부를 퍼즐 피더나 구멍 낸 페트병, 달걀판, 휴지심에 넣어 꺼내 먹게 합니다. 먹는 속도를 늦추고 사냥 본능을 채워 활동량이 적은 실내 고양이에게 특히 좋습니다.",
+    "cautions": [
+      "처음에는 뚜껑 없는 달걀판처럼 아주 쉬운 단계로 시작한다 (약 12주령부터)",
+      "너무 어려워서 하루 필요량을 못 먹는 일이 없도록 섭취량을 확인한다",
+      "직접 만든 퍼즐은 안전한지 수의사와 상의한다"
+    ],
+    "contraindications": [],
+    "tags": [
+      "indoor",
+      "mental",
+      "weight_loss",
+      "senior_ok",
+      "joint_friendly"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Playing with your cat",
+        "publisher": "International Cat Care",
+        "url": "https://icatcare.org/articles/playing-with-your-cat",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Special considerations for senior cats",
+        "publisher": "International Cat Care",
+        "url": "https://icatcare.org/articles/special-considerations-for-senior-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Enriching Your Pet's Environment with Their Food",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/enriching-your-pets-environment-with-their-food",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Cat Behavior and Training - Enrichment for Indoor Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/cat-behavior-and-training---enrichment-for-indoor-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Exercising your Cat",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/kittens-cats/exercise-for-your-cat",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "시작 월령(약 12주)은 ICC 출처 있음. 시간·빈도는 출처 없음 — 일반 가이드 기준, 검수 필요."
+  },
+  {
+    "item_id": "act_cat_kibble_chase_01",
+    "name": "사료 던져 쫓기·숨겨 찾기",
+    "category": "activity",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "adult",
+      "senior"
+    ],
+    "intensity": "low",
+    "duration_min": {
+      "min": 5,
+      "max": 10
+    },
+    "frequency": "매일 1~2회",
+    "description": "사료를 한 알씩 바닥에 굴려 쫓게 하거나 집 안 여러 곳에 조금씩 숨겨 찾아 먹게 합니다. 노령묘도 부담 없이 할 수 있는 가벼운 사냥 놀이이며, 활동량이 적은 고양이의 움직임을 늘려 줍니다.",
+    "cautions": [
+      "사료는 하루 급여량에서 덜어 쓴다",
+      "하루 필요한 양을 다 먹었는지 확인한다",
+      "계단 등 오르기 힘든 곳에는 숨기지 않는다 (노령묘)"
+    ],
+    "contraindications": [],
+    "tags": [
+      "indoor",
+      "senior_ok",
+      "joint_friendly",
+      "weight_loss",
+      "mental"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Loving Care for Older Cats",
+        "publisher": "Cornell Feline Health Center",
+        "url": "https://www.vet.cornell.edu/departments-centers-and-institutes/cornell-feline-health-center/health-information/feline-health-topics/loving-care-older-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Cat Behavior and Training - Enrichment for Indoor Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/cat-behavior-and-training---enrichment-for-indoor-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Enriching Your Pet's Environment with Their Food",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/enriching-your-pets-environment-with-their-food",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "시간·빈도 출처 없음 — 일반 가이드 기준, 검수 필요."
+  },
+  {
+    "item_id": "act_cat_cat_tree_climb_01",
+    "name": "캣타워·벽 선반 오르기",
+    "category": "activity",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior",
+      "adult"
+    ],
+    "intensity": "medium",
+    "duration_min": {
+      "min": 5,
+      "max": 15
+    },
+    "frequency": "매일 (자유 이용 + 유도 놀이 1회)",
+    "description": "캣타워나 벽 선반 같은 수직 공간을 오르내리며 운동량을 늘리고, 높은 곳에서 쉬며 스트레스를 줄입니다. 높은 단에 간식·장난감을 숨겨 두면 사냥하듯 오르게 유도할 수 있습니다.",
+    "cautions": [
+      "높은 캣타워는 넘어지지 않도록 벽에 고정한다",
+      "선반·창가 해먹은 허용 무게를 확인하고, 여러 마리면 함께 올라가도 견딜 수 있는지 본다",
+      "관절이 불편한 고양이는 높은 점프 대신 계단·경사로를 마련한다"
+    ],
+    "contraindications": [
+      "joint_disease"
+    ],
+    "tags": [
+      "indoor",
+      "weight_loss",
+      "mental"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "How To Make Vertical Space For Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/pediatric/kitten/prep-supplies/how-to-make-vertical-space-for-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "How To Exercise Your Cat",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/resources/preventive-cat/weight-exercise/you-can-exercise-your-cat-too",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Cat Behavior and Training - Enrichment for Indoor Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/cat-behavior-and-training---enrichment-for-indoor-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Exercising your Cat",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/kittens-cats/exercise-for-your-cat",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "스스로 이용하는 환경 풍부화라 시간 개념이 약함. 5~15분은 유도 놀이 기준 출처 없음 — 일반 가이드 기준, 검수 필요."
+  },
+  {
+    "item_id": "act_cat_box_explore_01",
+    "name": "종이상자·종이봉투 탐색 놀이",
+    "category": "activity",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "intensity": "low",
+    "duration_min": {
+      "min": 10,
+      "max": 30
+    },
+    "frequency": "주 2~3회 새 상자 제공",
+    "description": "새 종이상자나 종이봉투를 놓아 주면 숨고, 탐색하고, 잠복하는 놀이를 스스로 즐깁니다. 상자를 옆으로 눕히거나 입구를 내 주면 점프가 힘든 노령묘도 쉽게 드나들 수 있습니다.",
+    "cautions": [
+      "비닐봉지는 질식 위험이 있으니 쓰지 않는다",
+      "종이봉투의 손잡이 끈은 목에 걸릴 수 있으니 제거한다",
+      "테이프·스테이플러 심을 제거한다"
+    ],
+    "contraindications": [],
+    "tags": [
+      "indoor",
+      "mental",
+      "senior_ok",
+      "joint_friendly"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Playing with your cat",
+        "publisher": "International Cat Care",
+        "url": "https://icatcare.org/articles/playing-with-your-cat",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Special considerations for senior cats",
+        "publisher": "International Cat Care",
+        "url": "https://icatcare.org/articles/special-considerations-for-senior-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Exercising your Cat",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/kittens-cats/exercise-for-your-cat",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "'주 2~3회 새 상자'는 ICC 출처 있음. 10~30분은 출처 없음 — 일반 가이드 기준, 검수 필요. 비닐봉지·손잡이 끈 주의사항은 출처에 직접 없는 일반 안전 수칙 — 검수 필요."
+  },
+  {
+    "item_id": "act_cat_ball_chase_01",
+    "name": "탁구공·종이공 쫓기",
+    "category": "activity",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior",
+      "adult"
+    ],
+    "intensity": "medium",
+    "duration_min": {
+      "min": 5,
+      "max": 10
+    },
+    "frequency": "매일 1~2회",
+    "description": "가벼운 탁구공이나 구겨 만든 종이공을 굴려 쫓고 툭툭 치며 놀게 합니다. 공 레일 장난감에 넣어 두면 보호자가 없을 때 혼자 놀기에도 좋습니다. 물어 오기를 좋아하는 고양이는 가져오기 놀이로 발전시킬 수 있습니다.",
+    "cautions": [
+      "삼킬 수 없는 크기의 공을 쓴다",
+      "물어뜯어 부서지는 장난감은 치운다"
+    ],
+    "contraindications": [],
+    "tags": [
+      "indoor",
+      "weight_loss",
+      "bonding"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Playing with your cat",
+        "publisher": "International Cat Care",
+        "url": "https://icatcare.org/articles/playing-with-your-cat",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Cat Behavior and Training - Play and Play Toys",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/cat-behavior-and-training---play-and-play-toys",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Exercising your Cat",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/kittens-cats/exercise-for-your-cat",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "How To Exercise Your Cat",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/resources/preventive-cat/weight-exercise/you-can-exercise-your-cat-too",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "시간·빈도 출처 없음 — 일반 가이드 기준, 검수 필요."
+  },
+  {
+    "item_id": "act_cat_clicker_training_01",
+    "name": "클리커 트릭 훈련",
+    "category": "activity",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "intensity": "low",
+    "duration_min": {
+      "min": 3,
+      "max": 5
+    },
+    "frequency": "매일 1~2회",
+    "description": "클릭 소리 뒤에 바로 간식을 주어 소리와 보상을 연결한 뒤, 하이파이브·의자 위에 올라가기·이동장 들어가기 같은 행동을 가르칩니다. 머리를 쓰는 운동이자 보호자와의 교감 시간이 됩니다.",
+    "cautions": [
+      "보상 간식은 아주 작게 주고 하루 칼로리에 포함한다",
+      "고양이가 흥미를 잃으면 억지로 이어가지 않는다",
+      "노령묘는 점프 없는 동작(손 터치 등) 위주로 가르친다"
+    ],
+    "contraindications": [],
+    "tags": [
+      "indoor",
+      "mental",
+      "bonding",
+      "senior_ok"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Clicker Training Has Cats Jumping Through Hoops",
+        "publisher": "ASPCA",
+        "url": "https://www.aspca.org/news/clicker-training-has-cats-jumping-through-hoops",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Cat Behavior and Training - Play and Play Toys",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/cat-behavior-and-training---play-and-play-toys",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "시간·빈도 모두 출처 없음 — 일반 가이드 기준, 검수 필요 (ASPCA 글에 세션 길이 언급 없음)."
+  },
+  {
+    "item_id": "act_cat_window_watch_01",
+    "name": "창가 해먹에서 바깥 구경",
+    "category": "activity",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "intensity": "low",
+    "duration_min": {
+      "min": 10,
+      "max": 30
+    },
+    "frequency": "매일 (자유 이용)",
+    "description": "햇볕이 드는 창가에 해먹이나 쉼터를 두어 새나 나무 등 바깥 풍경을 구경하게 합니다. 움직임은 적지만 실내 고양이에게 시각적 자극과 휴식 공간을 함께 줍니다.",
+    "cautions": [
+      "창문 방충망이 튼튼한지, 창이 잠겨 있는지 확인한다",
+      "해먹이 고양이 체중을 버티는지 확인한다",
+      "노령묘가 오르기 어려우면 계단이나 경사로를 둔다"
+    ],
+    "contraindications": [],
+    "tags": [
+      "indoor",
+      "mental",
+      "senior_ok",
+      "joint_friendly"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Cat Behavior and Training - Enrichment for Indoor Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/cat-behavior-and-training---enrichment-for-indoor-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "How To Make Vertical Space For Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/pediatric/kitten/prep-supplies/how-to-make-vertical-space-for-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Loving Care for Older Cats",
+        "publisher": "Cornell Feline Health Center",
+        "url": "https://www.vet.cornell.edu/departments-centers-and-institutes/cornell-feline-health-center/health-information/feline-health-topics/loving-care-older-cats",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "자유 이용 환경 풍부화로 시간 수치 출처 없음 — 일반 가이드 기준, 검수 필요. 방충망·창 잠금 주의는 출처에 직접 없는 일반 안전 수칙 — 검수 필요."
+  },
+  {
+    "item_id": "act_cat_senior_floor_play_01",
+    "name": "노령묘 바닥 놀이",
+    "category": "activity",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "senior"
+    ],
+    "intensity": "low",
+    "duration_min": {
+      "min": 3,
+      "max": 10
+    },
+    "frequency": "매일 1~2회",
+    "description": "카펫이나 러그 위에서 긴 낚싯대 장난감을 천천히 움직여 노령묘가 누운 채로도 앞발을 뻗을 수 있게 합니다. 짧고 부드러운 놀이를 꾸준히 하면 근육과 관절 유연성 유지, 정서 안정에 도움이 됩니다.",
+    "cautions": [
+      "높이 점프하게 하지 않는다",
+      "고양이가 그만두려 하면 바로 멈춘다",
+      "다리를 절거나 점프를 어려워하면 관절염일 수 있으니 진료를 받는다",
+      "새끼고양이를 들여 노령묘를 '활기차게' 하려는 시도는 권하지 않는다"
+    ],
+    "contraindications": [],
+    "tags": [
+      "indoor",
+      "senior_ok",
+      "joint_friendly",
+      "bonding"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Playing with your cat",
+        "publisher": "International Cat Care",
+        "url": "https://icatcare.org/articles/playing-with-your-cat",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Special considerations for senior cats",
+        "publisher": "International Cat Care",
+        "url": "https://icatcare.org/articles/special-considerations-for-senior-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Loving Care for Older Cats",
+        "publisher": "Cornell Feline Health Center",
+        "url": "https://www.vet.cornell.edu/departments-centers-and-institutes/cornell-feline-health-center/health-information/feline-health-topics/loving-care-older-cats",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "시간·빈도 출처 없음 — 일반 가이드 기준, 검수 필요."
+  },
+  {
+    "item_id": "act_cat_kick_toy_01",
+    "name": "킥 토이 (뒷발 차기 인형)",
+    "category": "activity",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "adult",
+      "senior"
+    ],
+    "intensity": "low",
+    "duration_min": {
+      "min": 5,
+      "max": 15
+    },
+    "frequency": "매일 자유 이용",
+    "description": "고양이가 끌어안고 뒷발로 찰 수 있는 큰 인형을 줍니다. 뒷다리 근육을 쓰게 해 다리가 뻣뻣해진 노령묘에게 좋고, 거친 놀이 에너지를 사람 대신 인형에 풀게 할 수 있습니다.",
+    "cautions": [
+      "솜·부속이 터져 나오면 삼키지 않도록 바로 치운다",
+      "캣닢을 넣은 경우 흥분해 공격적이 되면 사용을 줄인다"
+    ],
+    "contraindications": [],
+    "tags": [
+      "indoor",
+      "senior_ok",
+      "joint_friendly"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Special considerations for senior cats",
+        "publisher": "International Cat Care",
+        "url": "https://icatcare.org/articles/special-considerations-for-senior-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Playing with your cat",
+        "publisher": "International Cat Care",
+        "url": "https://icatcare.org/articles/playing-with-your-cat",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Cat Behavior and Training - Play and Play Toys",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/cat-behavior-and-training---play-and-play-toys",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "시간·빈도 출처 없음 — 일반 가이드 기준, 검수 필요."
+  },
+  {
+    "item_id": "act_cat_harness_walk_01",
+    "name": "하네스 산책",
+    "category": "activity",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "adult"
+    ],
+    "intensity": "low",
+    "duration_min": {
+      "min": 10,
+      "max": 20
+    },
+    "frequency": "주 2~3회",
+    "description": "실내에서 하네스에 충분히 익숙해진 고양이를 마당처럼 조용한 곳으로 데리고 나가 천천히 탐색하게 합니다. 걷기보다 냄새 맡고 구경하는 시간이 많지만 새로운 자극과 가벼운 활동이 됩니다.",
+    "cautions": [
+      "반드시 고양이 전용 하네스를 쓰고 실내에서 간식·놀이로 천천히 적응시킨다",
+      "시끄러운 차량이나 개 등 겁을 줄 수 있는 곳은 피한다",
+      "겁이 많은 고양이에게는 억지로 시키지 않는다"
+    ],
+    "contraindications": [],
+    "tags": [
+      "outdoor",
+      "mental",
+      "bonding"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Cat Behavior and Training - Enrichment for Indoor Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/cat-behavior-and-training---enrichment-for-indoor-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "How To Exercise Your Cat",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/resources/preventive-cat/weight-exercise/you-can-exercise-your-cat-too",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Fun Exercises for Dogs & Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/resources/preventive-dog/weight-exercise/fun-exercises-for-pets",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "시간·빈도 출처 없음 — 일반 가이드 기준, 검수 필요. 한국 도심 환경(차량·소음)에서 권장 범위를 어디까지 둘지 검수 필요."
+  },
+  {
+    "item_id": "act_cat_toy_rotation_01",
+    "name": "장난감 돌려가며 혼자 놀기",
+    "category": "activity",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "intensity": "low",
+    "duration_min": {
+      "min": 10,
+      "max": 30
+    },
+    "frequency": "주 1회 장난감 교체",
+    "description": "장난감 여러 개를 모아 두고 몇 개씩만 꺼내 주며 주기적으로 바꿔 새로움을 유지합니다. 보호자가 없을 때 혼자 굴리고 잡을 수 있는 작은 장난감이나 먹이 넣는 공을 활용합니다.",
+    "cautions": [
+      "끈·줄 달린 장난감은 혼자 있을 때 두지 않는다",
+      "삼킬 수 있는 작은 부품이 있는 장난감은 피한다",
+      "특별히 아끼는 장난감은 교체 대상에서 뺀다"
+    ],
+    "contraindications": [],
+    "tags": [
+      "indoor",
+      "mental",
+      "senior_ok"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Toys - Cats - Indoor Pet Initiative",
+        "publisher": "The Ohio State University College of Veterinary Medicine",
+        "url": "https://indoorpet.osu.edu/cats/basic-indoor-cat-needs/toys",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Cat Behavior and Training - Play and Play Toys",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/cat-behavior-and-training---play-and-play-toys",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Playing with your cat",
+        "publisher": "International Cat Care",
+        "url": "https://icatcare.org/articles/playing-with-your-cat",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "VCA는 장난감 약 20개 중 4~5개를 주 단위로 교체, PDSA·ICC는 며칠 단위 교체를 권함 — 주기 검수 필요. 시간은 출처 없음 — 일반 가이드 기준, 검수 필요."
+  },
+  {
+    "item_id": "act_cat_scratching_stretch_01",
+    "name": "스크래처 긁기·스트레칭",
+    "category": "activity",
+    "species": [
+      "cat"
+    ],
+    "age_groups": [
+      "junior",
+      "adult",
+      "senior"
+    ],
+    "intensity": "low",
+    "duration_min": {
+      "min": 5,
+      "max": 10
+    },
+    "frequency": "매일 (자유 이용)",
+    "description": "몸을 쭉 뻗을 수 있을 만큼 크고 안정된 스크래처를 두어 발톱 관리와 함께 몸 전체를 스트레칭하게 합니다. 관절이 불편한 노령묘에게는 세로형보다 가로형 스크래처가 편합니다.",
+    "cautions": [
+      "고양이가 좋아하는 재질을 고른다",
+      "쓰러지지 않도록 바닥이 무거운 제품을 쓴다",
+      "발톱이 지나치게 길면 관절염 등 질환 신호일 수 있어 수의사와 상의한다"
+    ],
+    "contraindications": [],
+    "tags": [
+      "indoor",
+      "senior_ok",
+      "joint_friendly"
+    ],
+    "recommendable": true,
+    "sources": [
+      {
+        "title": "Cat Behavior and Training - Enrichment for Indoor Cats",
+        "publisher": "VCA Animal Hospitals",
+        "url": "https://vcahospitals.com/know-your-pet/cat-behavior-and-training---enrichment-for-indoor-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Special considerations for senior cats",
+        "publisher": "International Cat Care",
+        "url": "https://icatcare.org/articles/special-considerations-for-senior-cats",
+        "accessed": "2026-11-04"
+      },
+      {
+        "title": "Exercising your Cat",
+        "publisher": "PDSA",
+        "url": "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/kittens-cats/exercise-for-your-cat",
+        "accessed": "2026-11-04"
+      }
+    ],
+    "reviewed": false,
+    "review_notes": "시간 수치 출처 없음 — 일반 가이드 기준, 검수 필요."
+  }
+]
