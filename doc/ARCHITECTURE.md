@@ -99,13 +99,14 @@ def common_middleware(extra: list | None = None) -> list:
     return [
         injection_guard,                      # 1 커스텀 @before_model: 입력 가드레일
         *pii_middlewares(),                   # 2 PIIMiddleware: 입력/출력/도구결과 마스킹
-        SummarizationMiddleware(model=model, max_tokens_before_summary=4000),  # 3
+        SummarizationMiddleware(model=model, trigger=("tokens", 4000), keep=("messages", 20)),  # 3
         ModelCallLimitMiddleware(run_limit=8),                                 # 4
         ToolCallLimitMiddleware(run_limit=10),                                 # 5
         ModelRetryMiddleware(max_retries=2),                                   # 6
         ToolRetryMiddleware(max_retries=2),                                    # 6
         *(extra or []),                       # 7 HITL(health) / 웹 검색 가드(general)
         output_guard,                         # 8 커스텀 @after_model: 출력 가드레일
+        context_wrap,                         # 9 커스텀 @wrap_tool_call: 검색·추천 결과를 <context>로 감쌈
     ]
 
 COMMON_TOOLS = [tools.get_pet_profile, tools.list_my_pets, tools.get_preferences,
@@ -167,7 +168,7 @@ graph = create_supervisor(
 # 비대화형 할 일 생성: LLM 없이 tools.generate_daily_plan()을 직접 호출 (4.1.2)
 ```
 
-> 미들웨어 클래스명과 파라미터는 구현 시점의 LangChain v1 / langgraph-supervisor 문서로 다시 확인한다.
+> 미들웨어 클래스명과 파라미터는 설치 버전(langchain 1.4.8, langgraph-supervisor 0.0.31)으로 확인했다 (`src/tests/test_library_smoke.py`). `SummarizationMiddleware`는 `max_tokens_before_summary` 대신 `trigger`/`keep`를 쓴다. 하위 Agent는 `context_schema=AgentContext`로 만들고, 도구는 `ToolRuntime.context`에서 `user_id`·`pet_id`를 읽는다.
 
 ### 3.3 Agent별 역할과 프롬프트 요지
 
@@ -191,11 +192,11 @@ graph = create_supervisor(
 
 | 도구 | 입력 | 출력 | 비고 |
 |------|------|------|------|
-| `get_pet_profile` | (컨텍스트의 `user_id`, `pet_id`) | 프로필 dict | Chroma `pets` 조회, `user_id`로 소유권 확인 |
-| `calc_daily_calories` | 종, 체중, 나이, 중성화, 활동량 | RER/DER kcal, 끼니별 가이드 | RER = 70 × 체중(kg)^0.75, DER = RER × 계수 |
+| `get_pet_profile` | `pet_id`(선택, 기본은 컨텍스트의 현재 반려동물) | 프로필 dict (`age_months`, `age_group` 포함) | Chroma `pets` 조회, `user_id`로 소유권 확인 |
+| `calc_daily_calories` | 종, 체중, 나이(개월), 중성화, 활동량, `goal`(maintain/weight_loss), `target_weight_kg`(선택) | RER/DER kcal, 계수, 끼니 수·끼니별 kcal | RER = 70 × 체중(kg)^0.75, DER = RER × Merck 계수. 감량은 목표 체중 RER × 1.0(앱 기본값) |
 | `recommend_from_catalog` | `category`(activity/diet/health), `query`, `k` | 카탈로그 항목 목록 (`id`, 이름, 상세, 점수, 추천 사유) | 3.8 추천 흐름: 조건 필터 → 의미 검색 → 취향 점수 정렬 |
 | `get_preferences` | (컨텍스트의 `pet_id`) | 좋아함/싫어함/제약 요약 | Chroma `preferences` |
-| `remember_preference` | `kind`(like/dislike/constraint), `target`(카탈로그 ID 또는 자유 텍스트), `note` | 저장 결과 | 낮은 위험이라 HITL 없이 실행하고, 답변에서 저장 사실을 알림 |
+| `remember_preference` | `kind`(like/dislike/constraint), `target`(카탈로그 ID·자유 텍스트·3.8 constraint 형식), `note`, `scope`(pet/all_pets) | 저장 결과 | 낮은 위험이라 HITL 없이 실행하고, 답변에서 저장 사실을 알림 |
 | `list_my_pets` | (컨텍스트의 `user_id`) | 내 반려동물 이름·ID 목록 | 채팅에서 다른 반려동물을 이름으로 언급할 때 사용. 같은 사용자 소유만 반환 |
 | `web_search` | `query`(PII 제거된 일반 질의), `max_results`(기본 5) | `[{title, url, snippet}]` | **General Agent 전용.** DuckDuckGo(키 없음). 차단 도메인을 빼고 신뢰 도메인을 앞으로 정렬한다 (3.7). 결과 snippet은 `contexts`에 들어감. 실패하면 빈 목록과 오류 표시를 돌려줌 |
 | `get_health_schedule` | `pet_id` | 전체 건강 일정 목록 | Chroma `health_events` |
@@ -206,6 +207,7 @@ graph = create_supervisor(
 | `generate_daily_plan` | `user_id`, `pet_id`, `date` | 영역별 할 일 후보(구조화) | **도구가 아닌 일반 함수.** `/tasks/generate`와 채팅의 "오늘 할 일 만들어줘" 처리에서 공통으로 사용. LLM 미사용, `recommend_from_catalog`와 같은 점수 로직 |
 
 > 결정적 계산(칼로리, 날짜)은 LLM이 아닌 **도구**에서 수행해 환각을 줄인다.
+> 도구 실패(권한 없음, 종 불일치, 지난 날짜 등)는 예외 대신 `{"error": "..."}`를 돌려주고 Agent가 사용자에게 설명한다. `recommend_from_catalog`·`search_pet_knowledge`·`web_search`는 `contexts` 수집용 artifact를 함께 돌려준다 (`response_format="content_and_artifact"`).
 > 모든 도구 인자는 Pydantic `args_schema`로 검증한다. 조회 도구가 다른 `pet_id`를 받으면 런타임 컨텍스트의 `user_id` 소유인지 확인한다. 쓰기 도구는 컨텍스트의 현재 `pet_id`에만 쓴다.
 > ✋ 표시는 쓰기 도구이며, 삭제 도구는 MVP에서 Agent에 주지 않는다 (웹앱 UI에서만 삭제 가능).
 
@@ -213,7 +215,7 @@ graph = create_supervisor(
 
 1. **Catalog ingest**: `data/catalog/*.json`에서 `reviewed: true`인 항목만 → 항목 1개 = 문서 1개(이름 + 설명 + 주의사항 텍스트) → Bedrock Embeddings → Chroma `catalog_activity` / `catalog_diet` / `catalog_health`
    - 메타데이터: `item_id`, `species`, `age_groups`(junior/adult/senior), `intensity`, `subtype`, `allergens`, `contraindications`, `tags`, `recommendable`, `source_url`
-   - Chroma 메타데이터는 리스트를 지원하지 않을 수 있으므로, 리스트 필드는 `age_junior: true`처럼 불리언 플래그로 펼치거나 `|a|b|` 문자열로 저장한다.
+   - 리스트 필드(`species`, `age_groups`, `allergens`, `contraindications`, `tags`)는 Chroma 메타데이터 **리스트 그대로** 저장하고 `$contains` / `$not_contains`로 거른다 (Chroma 1.5 이상, 5.1 저장 형식). 빈 리스트는 키를 뺀다.
 2. **Knowledge ingest**: `data/knowledge/*.md` → `RecursiveCharacterTextSplitter`(chunk 800, overlap 100) → Chroma `pet_knowledge`
    - 메타데이터: `source`, `species`(dog/cat/all), `category`(diet/activity/health/general)
 3. **Retrieve**: `similarity_search(query, k, filter={"$and": [{"species": {"$in": [species, "all"]}}, ...]})`
@@ -244,9 +246,10 @@ graph = create_supervisor(
 | 5 | `ToolCallLimitMiddleware` | 내장 | `wrap_tool_call` | 도구 남용 방지 |
 | 6 | `ModelRetryMiddleware` / `ToolRetryMiddleware` | 내장 | wrap | 일시 오류 재시도 |
 | 7 | Agent별 추가: `HumanInTheLoopMiddleware` (health_agent) / `ToolCallLimitMiddleware(web_search, 3)`·`web_query_pii_guard`·`web_result_guard` (general_agent) | 내장 / 커스텀 | `after_model` / `wrap_tool_call` | HITL은 쓰기 도구 호출 전 사용자 승인 (`interrupt`). 웹 검색 가드는 3.7 참고 |
-| 8 | `output_guard` | 커스텀 | `after_model` | 유해 식품 추천, 진단·처방 단정 표현, 시스템 프롬프트·내부 정보 노출 검사 → 위반 시 재작성 또는 안전 문구로 대체. 응급 키워드가 있으면 병원 권고 문구가 있는지 확인 |
+| 9 | `context_wrap` | 커스텀 | `wrap_tool_call` | `search_pet_knowledge`·`recommend_from_catalog`·`get_preferences` 결과를 `<context>…</context>`로 감싼다 (데이터로만 취급, 4.7). 도구 실행을 직접 감싸므로 목록 맨 끝(가장 안쪽) |
+| 8 | `output_guard` | 커스텀 | `after_model` | 유해 식품 추천, 진단 단정, 약·용량 처방, 구토 유도 방법, 시스템 프롬프트·내부 이름 노출, 카탈로그에 없는 ID 검사 → 위반 **문장을 지우고** 안내 문구를 붙인다 (모두 지워지면 안전 문구로 대체, LLM 재작성 없음 — 결정적·비용 0). 응급 신호(호흡곤란·경련·지속 구토·유해 식품 섭취 등)가 있는데 병원 권고가 없으면 병원 권고 문구를 붙인다 |
 
-- **입력 가드레일 판정**: 1단계는 규칙 기반(정규식·키워드)으로 빠르게 거른다. 애매하면 2단계로 LLM 분류기(`with_structured_output` → `{is_injection, is_out_of_scope, reason}`)를 쓴다. 분류기는 메인 모델(`AWS_MODEL`, `temperature=0`)을 재사용한다 (10장).
+- **입력 가드레일 판정**: 1단계는 규칙 기반(정규식·키워드)으로 빠르게 거른다. NFKC 정규화·폭 없는 문자 제거 후 검사하고, base64 덩어리는 풀어서 다시 검사한다. 차단 사유는 `injection`(지시 무시·역할 변경), `prompt_leak`(도구·설정·프롬프트 요구), `unsupported_species`(개·고양이 없이 다른 동물만), `out_of_scope`(반려동물 단어 없이 주식·코인 등), `too_long`(1,000자 초과)이다. 애매하면 2단계로 LLM 분류기(`with_structured_output` → `{is_injection, is_out_of_scope, reason}`)를 쓴다. 분류기는 메인 모델(`AWS_MODEL`, `temperature=0`)을 재사용한다 (10장).
 - **도메인 밖 요청**: 차단 사유를 `trace`에 `{"type":"guardrail","stage":"input","reason":"out_of_scope"}` 형태로 남긴다.
 - **trace의 guardrail stage**: `input`(입력 가드레일) · `output`(출력 가드레일) · `tool_result`(도구 결과를 거른 경우, 예: `web_result_guard`가 주입 snippet을 버림). `tool_result`는 답변을 막지 않고 정상 답변을 계속한다.
 - **Bedrock Guardrails**: Version 1에서는 쓰지 않는다 (10장). 위 다층 가드레일로 방어하고, 필요하면 Version 2에서 `ChatBedrockConverse`의 `guardrails` 설정으로 추가한다.
@@ -273,16 +276,21 @@ graph = create_supervisor(
 | 자원 고갈 | 입력 길이 제한, 모델/도구 호출 제한, 레이트 리밋, 타임아웃 |
 
 #### PII 마스킹
-| 유형 | 탐지 | 전략 | 예시 |
-|------|------|------|------|
-| 이메일 | 내장 `email` | `mask` | `ab***@naver.com` |
-| 카드번호 | 내장 `credit_card` | `mask` | `****-****-****-1234` |
-| IP / URL | 내장 `ip`, `url` | `redact` | `[REDACTED_IP]` |
-| 전화번호 | 커스텀 정규식 `01[016-9]-?\d{3,4}-?\d{4}` | `mask` | `010-****-5678` |
-| 주민등록번호 | 커스텀 정규식 `\d{6}-?[1-4]\d{6}` | `block` 또는 `redact` | `[REDACTED_RRN]` |
-| 계좌번호 | 커스텀 정규식 (은행별 패턴) | `redact` | `[REDACTED_ACCOUNT]` |
-| 상세 주소 | 커스텀 (도로명·지번 패턴) | `redact` | `[REDACTED_ADDRESS]` |
+`src/agent.py`의 `PII_RULES` 한 목록으로 내장 `PIIMiddleware`(유형별 1개)와 API·로그용 `mask_pii`를 함께 만든다. 아래 순서대로 적용한다.
 
+| 순서 | 유형 | 탐지 | 전략 | 결과 예시 |
+|------|------|------|------|-----------|
+| 1 | 주민등록번호 | 정규식 `\d{6}-?[1-4]\d{6}` | `redact` | `[REDACTED_RRN]` |
+| 2 | 카드번호 | 정규식 (16자리, 공백·하이픈) | `mask` | `****-****-****-1111` |
+| 3 | 전화번호 | 정규식 `01[016-9]-?\d{3,4}-?\d{4}` | `mask` | `****5678` |
+| 4 | 이메일 | 정규식 | `redact` | `[REDACTED_EMAIL]` |
+| 5 | 계좌번호 | 정규식 (숫자 10~14자리 하이픈 묶음, 날짜·전화 모양 제외) | `redact` | `[REDACTED_ACCOUNT]` |
+| 6 | 상세 주소 | 정규식 (시·군·구 + 도로명·길 + 번호, 동·리 + 번지) | `redact` | `[REDACTED_ADDRESS]` |
+| 7 | IP | 정규식 (IPv4) | `redact` | `[REDACTED_IP]` |
+
+- **탐지기는 직접 만든다**: 내장 `detect_email`·`detect_credit_card`·`detect_ip`는 `` 경계를 써서, 한국어 조사가 바로 붙으면(`a@b.com으로`, `…1111로`) 놓친다. 그래서 영숫자 기준 경계로 탐지하고, 마스킹 형식은 내장 `apply_strategy`를 그대로 쓴다.
+- **이메일은 `redact`**: 내장 `mask`는 아이디 부분(`seojun.test@****.com`)을 남겨 식별이 가능하므로 쓰지 않는다.
+- **URL은 PII로 보지 않는다**: 웹 검색 답변에 출처 URL을 보여 줘야 하기 때문이다. URL 안의 이메일·전화번호는 위 규칙이 잡는다.
 - 적용 지점: 모델 입력(`apply_to_input`), 모델 출력(`apply_to_output`), 도구 결과(`apply_to_tool_results`), 그리고 API 응답 직전(answer·contexts·trace)과 로그 저장 직전
 - 마스킹 함수는 `src/agent.py` 한 곳에 두고 Node 백엔드 로그에는 마스킹된 결과만 전달한다. 백엔드는 PII 원문을 다시 만들지 않는다.
 - 사용자 계정 이메일은 Agent에 넘기지 않는다. Agent는 불투명한 `user_id`만 받는다.
@@ -322,10 +330,15 @@ graph = create_supervisor(
 | 👎 싫어요 `dislike` | 제외 (표시한 날 포함 7일: 신호일 ~ 신호일+6일) → 이후 −3 | 하드 필터. 예: 11/08 표시 → 11/14까지 제외, 11/15부터 후보 |
 | 완료 체크 `complete` | +1 | 누적 3회 이상이면 "단골" → 상위 3개 보장 (아래) |
 | 바꾸기 `swap` / 삭제 `remove` | −1 | 연속 2회 이상이면 −2 |
-| 직접 추가 `custom` | +2 | 비슷한 카탈로그 항목에 연결해서 반영 |
+| 직접 추가 `custom` | +2 | `catalog_item_id`가 있을 때만 그 항목에 반영. 자유 입력 할 일을 비슷한 항목에 연결하는 기능은 Version 2 |
 | 대화 진술 (`remember_preference`) | like +3 / dislike 제외 / constraint 필터 (완화 4단계에서만 해제) | 예: "저녁만 가능" → 시간대 제약 |
 
-- 시간 감쇠: 반감기 30일
+- 시간 감쇠: 반감기 30일 (`0.5 ** (경과일 / 30)`, 기준일은 KST 오늘)
+- **👎 기준**: 제외 여부와 −3은 `preferences`의 dislike 행(`excluded_until`)으로 판단한다. 사용자가 "내 취향"에서 싫어요를 지우면 바로 후보로 돌아오고 −3도 없어진다. `interactions`의 `dislike`는 원본 기록이다.
+- **👍 기준**: `like` 신호와 `preferences`의 like는 같은 진술이므로 한 항목에 +3을 한 번만 준다.
+- **최근 반복 패널티**: 최근 3일(오늘 제외) 동안 자동 생성된 할 일에 들어간 횟수 × −1.
+- **바꾸기·삭제 연속**: 같은 항목의 바로 앞 신호도 `swap`/`remove`이면 이번 신호를 −2로 센다.
+- **강도 상한** (안전 필터, 완화하지 않음): 시니어는 `low`까지, 어린 동물과 `activity_level=low`는 `medium`까지(`high` 제외). 그 밖에는 제한 없음. 질환별 금지는 `contraindications`로 따로 거른다.
 - **단골 보장** (SERVICE F9 "3회 이상 완료한 항목은 상위 3개 안"): 점수로 정렬한 뒤, 후보 필터를 통과한 단골 항목을 상위 3개 안으로 끌어올린다. 단골이 3개를 넘으면 점수 순으로 3개만 보장한다. 다양성 슬롯은 단골 항목을 밀어내지 않는다.
   - 적용 우선순위: 안전 필터 > 👎 제외 > 단골 보장 > 다양성. 👎 표시한 단골 항목은 제외 기간 동안 보장하지 않는다.
   - 완료 횟수는 "내 취향 초기화" 전까지 누적한다 (시간 감쇠는 점수에만 적용).
@@ -334,7 +347,7 @@ graph = create_supervisor(
 
 | 단계 | 완화 대상 | 비고 |
 |------|-----------|------|
-| 0 | — | 🔒 절대 유지: `recommendable`, 종, 알레르기, 유해 식품, 연령 금기, 질환 금기 |
+| 0 | — | 🔒 절대 유지: `recommendable`, 종, 알레르기, 유해 식품, 연령 금기, 질환 금기, 강도 상한, 크기 전용 항목(`large_breed` 태그는 `size=large` 개만) |
 | 1 | 다양성 슬롯 | 새 항목 섞기 생략 |
 | 2 | 최근 반복 패널티 | 최근 항목도 허용 |
 | 3 | 👎 7일 제외 | 허용하되 결과에 `relaxed: ["dislike"]` 표시 → 화면에 "싫어요 표시한 항목" 배지 |
@@ -342,9 +355,18 @@ graph = create_supervisor(
 
 - 4단계 후에도 후보가 0개면 "조건에 맞는 항목이 없어요" 안내와 함께 그 영역을 비운다. 카탈로그 최소 구성 규칙으로 이런 경우를 예방한다.
 - 연령 판정: 어린 동물 < 12개월, 시니어 ≥ 7세(대형견 ≥ 6세, 품종 크기는 카탈로그나 프로필 `size` 필드로 판정). 기준일은 KST "오늘"이다.
-- `generate_daily_plan`과 `recommend_from_catalog`는 같은 함수를 공유한다. 할 일 생성에서는 ② 의미 검색 대신 종·연령 기본 쿼리를 쓴다.
+- `generate_daily_plan`과 `recommend_from_catalog`는 같은 함수를 공유한다. 할 일 생성에서는 ② 의미 검색 대신 **기본 우선순위**(1 미만의 사전 점수)를 쓴다: 식단은 급여 가이드 > 체중 관리 > 수분 > 간식 > 토핑, 그리고 반려동물 연령대 전용 항목(`age_groups`가 하나)에 가산. 임베딩 호출 없이 결정적이고, 취향 신호(±1 이상)가 있으면 신호가 우선한다.
+- **단골 보장 위치**: 보장 대상 단골은 맨 앞에 둔다 (k가 3보다 작아도 빠지지 않게). 완화로 다시 넣은 항목은 원래 후보 뒤에 둔다.
+- **다양성은 2개 이상 고를 때만** 적용한다. 식단처럼 1개만 고르는 영역이 매일 바뀌지 않게 하기 위해서다.
+- **최소 개수**: 채팅 추천은 요청한 개수 `k`(기본 3), 할 일 생성은 식단 1개·활동 1개다. 할 일 생성의 목표 개수는 식단 1개·활동 2개이고, 목표를 채우려고 완화하지는 않는다 (최소 개수를 못 채울 때만 완화).
+- 1·2단계(다양성·반복 패널티)는 후보 수를 바꾸지 않으므로 항목별 `relaxed`에는 `dislike`·`constraint`만 남긴다. 적용한 단계 전체는 결과의 `relaxation`(trace용)에 남긴다.
+- **constraint 형식** (`remember_preference`가 정규화해 `preferences.target`에 저장):
+  - `activity_time_after:HH:MM` / `activity_time_before:HH:MM`: 활동 할 일의 시간대. 후보를 거르지 않고 시간 배정에만 쓴다.
+  - `exclude_tag:<tag>`: 그 태그가 있는 항목 제외 (예: `exclude_tag:outdoor`). 완화 4단계에서 해제
+  - `max_duration_min:<n>`: 최소 시간이 n분을 넘는 활동 제외. 완화 4단계에서 해제
+  - 그 밖의 자유 텍스트: 저장만 하고 추천 필터에는 쓰지 않는다 (Agent가 대화에서 참고)
 - 가중치와 반감기는 `src/tools.py`의 상수로 관리하고, 평가 결과를 보고 조정한다.
-- "내 취향 초기화"를 하면 해당 반려동물의 `preferences`와 `interactions` 점수를 지운다 (기록 자체는 통계용으로 익명화해 남길지 오픈 이슈).
+- "내 취향 초기화"를 하면 해당 반려동물의 `preferences`와 `interactions`를 삭제한다 (완료 횟수도 0이 된다. 회원 탈퇴와 같은 완전 삭제 원칙, 10장).
 
 ## 4. API 계약
 
@@ -421,7 +443,10 @@ Response는 `/query`와 같은 `{answer, contexts, trace}` 형식이다. 요청�
 - LLM을 호출하지 않는다 (`generate_daily_plan` 실행). p95 1초 이내를 목표로 한다.
 - `rank`: 영역 안에서 취향 점수로 정한 순위(1부터). 개인화 반영을 테스트에서 관측하는 데 쓴다.
 - 항목 교체(`category` + `exclude_item_ids` + `limit:1`)일 때는 최소 개수 규칙을 적용하지 않고, 후보가 없으면 빈 `tasks`를 돌려준다.
-- 영역별 최소 개수: 식단 1개, 활동 1개 이상 + 7일 이내(D-7 포함) 건강 일정 전부
+- 영역별 최소 개수: 식단 1개, 활동 1개 이상 + 7일 이내(D-7 포함) 건강 일정 전부 (목표는 식단 1개·활동 2개, 3.8)
+- 건강 일정 할 일: `scheduled`는 D-0 ~ D-7, `overdue`는 날짜와 관계없이 넣는다. **`needs_history` 일정은 할 일에 넣지 않는다** (알림과 같은 규칙, 6장).
+- 시간 배정: 식단은 `default_times.meal`의 첫 시각(없으면 08:00), 활동은 `default_times.walk`(없으면 18:00·19:30)를 쓰고, `activity_time_after/before` 제약에 맞춰 옮긴다. 건강 일정 할 일은 시간이 없다.
+- `keep_item_ids`의 항목은 응답에 다시 넣지 않고(Backend가 기존 할 일을 유지), 그 영역의 목표 개수에서 뺀다.
 
 ### 4.2 Backend REST API (초안)
 
@@ -462,6 +487,21 @@ Response는 `/query`와 같은 `{answer, contexts, trace}` 형식이다. 요청�
 > 엔터티 관계도는 [ERD.md](ERD.md)를 참조한다.
 
 Chroma는 문서 + 메타데이터 저장소이므로, 앱 데이터는 **`documents`에 JSON 문자열, `metadatas`에 필터용 필드**를 둔다.
+
+### 5.1 저장 형식 (Python Agent ↔ Node Backend 공통 계약)
+
+| 규칙 | 내용 |
+|------|------|
+| 컬렉션 이름 | 아래 표 그대로 (`users`, `pets`, `tasks`, `health_events`, `weight_logs`, `interactions`, `preferences`, `chat_logs`) |
+| id | 엔터티 id (`pet_bori`, `int_xxx` …) |
+| `documents` | 엔터티 전체를 담은 JSON 문자열 (`data/seed/*.json`의 한 행과 같은 모양). 읽을 때는 이 JSON을 원본으로 쓴다 |
+| `metadatas` | 필터용 값만 둔다: 문자열·숫자·불리언 스칼라와 **비어 있지 않은 문자열 리스트**. 중첩 객체(`default_times`, `trace`)와 긴 텍스트(`question`, `answer`, `memo`, `password_hash`)는 넣지 않는다 |
+| null · 빈 리스트 | 메타데이터에서는 키를 뺀다 (Chroma는 `null`·빈 리스트를 거부). `$not_contains`는 키가 없는 행도 포함한다 |
+| 시각 비교 | `created_at`·`updated_at`이 있으면 epoch 초 `created_ts`·`updated_ts`를 함께 넣는다 (`due_ts`와 같은 방식) |
+| 임베딩 | 앱 데이터 컬렉션은 의미 검색을 하지 않는다. 길이 1인 더미 벡터 `[0.0]`을 넣고, 컬렉션의 `embedding_function`은 쓰지 않는다 |
+
+- 구현: Python은 `src/retriever.py`의 `encode_app_record` / `decode_app_record`, Node는 B-1 저장소 모듈. 두 쪽은 `data/seed/` 적재 결과가 같은지로 확인한다.
+
 
 | 컬렉션 | id | 주요 metadata | 용도 |
 |--------|----|---------------|------|

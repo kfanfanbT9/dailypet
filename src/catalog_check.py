@@ -27,6 +27,7 @@ import json
 import re
 import sys
 from collections import defaultdict
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -221,8 +222,22 @@ def check_composition(items_by_area: dict[str, list[dict[str, Any]]], rep: Repor
     return lines
 
 
-def run(catalog_dir: Path, require_reviewed: bool) -> int:
-    """검사를 모두 실행하고 결과를 출력한다. 오류가 있으면 1을 돌려준다."""
+@dataclass
+class ValidationResult:
+    """검사 결과. 적재 코드(src/retriever.py)가 출력 없이 재사용한다."""
+
+    report: Report
+    items_by_area: dict[str, list[dict[str, Any]]]
+    table: list[str]
+    unreviewed: list[str]
+
+    @property
+    def ok(self) -> bool:
+        return not self.report.errors
+
+
+def validate(catalog_dir: Path, require_reviewed: bool) -> ValidationResult:
+    """검사를 모두 실행하고 결과를 돌려준다 (출력하지 않는다)."""
     rep = Report()
     items_by_area: dict[str, list[dict[str, Any]]] = {}
     seen: dict[str, str] = {}
@@ -259,6 +274,14 @@ def run(catalog_dir: Path, require_reviewed: bool) -> int:
         rep.error("검수", f"reviewed: false 항목 {len(unreviewed)}개 — 적재할 수 없음 "
                           f"(예: {', '.join(unreviewed[:5])})")
 
+    return ValidationResult(rep, items_by_area, table, unreviewed)
+
+
+def run(catalog_dir: Path, require_reviewed: bool) -> int:
+    """검사를 모두 실행하고 결과를 출력한다. 오류가 있으면 1을 돌려준다."""
+    result = validate(catalog_dir, require_reviewed)
+    rep, items_by_area, table, unreviewed = (
+        result.report, result.items_by_area, result.table, result.unreviewed)
     total = sum(len(v) for v in items_by_area.values())
     print(f"카탈로그 검증: {catalog_dir} — 항목 {total}개 "
           + ", ".join(f"{a} {len(v)}" for a, v in items_by_area.items()))

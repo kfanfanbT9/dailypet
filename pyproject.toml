@@ -1,0 +1,10 @@
+[tool.pytest.ini_options]
+testpaths = ["src/tests"]
+addopts = "-ra"
+markers = [
+    "llm: Amazon Bedrock 모델·임베딩을 실제로 호출한다 (비용 발생, 기본 실행에서 제외 권장)",
+    "chroma: localhost:8001 Chroma 서버가 필요하다",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]

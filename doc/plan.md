@@ -218,79 +218,81 @@ ARCHITECTURE.md 8장의 배분대로 50문항을 만든다.
 
 ## Phase 1 · Agent (Python)
 
+> 세부 작업(파일·함수·테스트·순서)은 [phase1_task.md](phase1_task.md)를 따른다.
+
 ### A-1. 설정·날짜 공통 모듈
 
 **의존성**
-- [ ] P0-8 프로젝트 기반 설정
+- [x] P0-8 프로젝트 기반 설정
 
 **완료 조건**
-- [ ] `.env`에서 설정을 읽는다 (모델 ID·키 하드코딩 없음)
-- [ ] KST 기준 "오늘" 함수가 `TODAY_OVERRIDE`를 따른다
-- [ ] 연령 구간 판정: 어린 12개월 미만 / 시니어 7세 이상 / 대형견 6세 이상 (경계값 단위 테스트)
-- [ ] D-day 계산이 경계일을 포함한다 (D-7 포함, 단위 테스트)
+- [x] `.env`에서 설정을 읽는다 (모델 ID·키 하드코딩 없음)
+- [x] KST 기준 "오늘" 함수가 `TODAY_OVERRIDE`를 따른다
+- [x] 연령 구간 판정: 어린 12개월 미만 / 시니어 7세 이상 / 대형견 6세 이상 (경계값 단위 테스트)
+- [x] D-day 계산이 경계일을 포함한다 (D-7 포함, 단위 테스트)
 
 ### A-2. Chroma 접근·적재 (`src/retriever.py`)
 
 **의존성**
-- [ ] A-1 설정·날짜 공통 모듈
-- [ ] P0-4 카탈로그 사람 검수
-- [ ] P0-5 RAG 지식 문서
+- [x] A-1 설정·날짜 공통 모듈
+- [x] P0-4 카탈로그 사람 검수
+- [x] P0-5 RAG 지식 문서
 
 **완료 조건**
-- [ ] `python -m src.retriever --ingest`가 `catalog_*`, `pet_knowledge` 컬렉션을 만든다
-- [ ] `reviewed: true`가 아닌 항목은 적재를 거부한다
-- [ ] 리스트 필드를 불리언 플래그(`age_junior` 등) 또는 `|a|b|` 문자열로 펼친다
-- [ ] 지식 문서 적재 전에 주입 패턴을 검사하고, 걸린 문서는 적재하지 않고 경고한다
-- [ ] 카탈로그 검색 함수, 지식 검색 함수(`search_pet_knowledge`용)가 있다
-- [ ] 다시 적재해도 중복이 생기지 않는다
+- [x] `python -m src.retriever --ingest`가 `catalog_*`, `pet_knowledge` 컬렉션을 만든다
+- [x] `reviewed: true`가 아닌 항목은 적재를 거부한다
+- [x] 리스트 필드를 Chroma 리스트 메타데이터로 저장해 `$contains`로 거른다 (ARCHITECTURE.md 5.1, A-0 결정)
+- [x] 지식 문서 적재 전에 주입 패턴을 검사하고, 걸린 문서는 적재하지 않고 경고한다
+- [x] 카탈로그 검색 함수, 지식 검색 함수(`search_pet_knowledge`용)가 있다
+- [x] 다시 적재해도 중복이 생기지 않는다
 
 ### A-3. 추천 엔진 (`generate_daily_plan`, `recommend_from_catalog` 로직)
 LLM 없이 결정적으로 동작하는 순수 함수. `/tasks/generate`와 채팅 추천이 같은 로직을 쓴다.
 
 **의존성**
-- [ ] A-1 설정·날짜 공통 모듈
-- [ ] A-2 Chroma 접근·적재
+- [x] A-1 설정·날짜 공통 모듈
+- [x] A-2 Chroma 접근·적재
 
 **완료 조건**
-- [ ] 후보 필터: `recommendable`·종·연령·강도·알레르기·질환 금기 (ARCHITECTURE.md 3.8)
-- [ ] 취향 점수: 👍·완료 가산, 👎(`excluded_until`) 제외, 반복 패널티, 다양성
-- [ ] 후보가 부족하면 안전 필터는 유지하고 다양성 → 반복 패널티 → 👎 제외 순서로 완화하며, 👎 완화 사실을 결과에 표시한다
-- [ ] `keep_item_ids`, `exclude_item_ids`, `limit`, `category` 교체 모드를 지원한다
-- [ ] 같은 입력이면 같은 결과가 나온다 (단위 테스트)
-- [ ] 단골 보장: 3회 이상 완료 항목이 상위 3개 안에 있고, 다양성 슬롯(최근 14일 미추천)이 단골을 밀어내지 않는다
-- [ ] 시드 기준 단위 테스트 통과: 보리에게 닭고기 항목 0건, 모카에게 `act_cat_wand_hunt_01` 0건, 호두에게 `joint_disease` 금기 항목 0건, 보리 활동 상위 3개에 `act_dog_nosework_find_it_01`
+- [x] 후보 필터: `recommendable`·종·연령·강도·알레르기·질환 금기 (ARCHITECTURE.md 3.8)
+- [x] 취향 점수: 👍·완료 가산, 👎(`excluded_until`) 제외, 반복 패널티, 다양성
+- [x] 후보가 부족하면 안전 필터는 유지하고 다양성 → 반복 패널티 → 👎 제외 순서로 완화하며, 👎 완화 사실을 결과에 표시한다
+- [x] `keep_item_ids`, `exclude_item_ids`, `limit`, `category` 교체 모드를 지원한다
+- [x] 같은 입력이면 같은 결과가 나온다 (단위 테스트)
+- [x] 단골 보장: 3회 이상 완료 항목이 상위 3개 안에 있고, 다양성 슬롯(최근 14일 미추천)이 단골을 밀어내지 않는다
+- [x] 시드 기준 단위 테스트 통과: 보리에게 닭고기 항목 0건, 모카에게 `act_cat_wand_hunt_01` 0건, 호두에게 `joint_disease` 금기 항목 0건, 보리 활동 상위 3개에 `act_dog_nosework_find_it_01`
 
 ### A-4. 도구 (`src/tools.py`)
 
 **의존성**
-- [ ] A-3 추천 엔진
+- [x] A-3 추천 엔진
 
 **완료 조건**
-- [ ] ARCHITECTURE.md 3.4의 도구가 모두 `@tool` + Pydantic `args_schema`로 있다
-- [ ] `user_id`·현재 `pet_id`는 LLM 인자가 아니라 `ToolRuntime.context`에서 읽는다
-- [ ] 모든 Chroma 조회 `where`에 `user_id`가 강제로 들어간다 (다른 사용자 `pet_id`로 조회하면 거부, 단위 테스트)
-- [ ] 칼로리·급여량 계산 도구가 공식 기반이다
-- [ ] 쓰기 도구(`create_health_event`, `update_health_event`)는 현재 `pet_id`에만 쓴다
-- [ ] `web_search`는 질의 PII 마스킹, 차단 도메인 필터, 요청당 3회 제한, `<web_result>` 감싸기, `WEB_SEARCH_MOCK`을 지원한다
-- [ ] 도구 docstring이 LLM이 읽기에 명확하다
+- [x] ARCHITECTURE.md 3.4의 도구가 모두 `@tool` + Pydantic `args_schema`로 있다
+- [x] `user_id`·현재 `pet_id`는 LLM 인자가 아니라 `ToolRuntime.context`에서 읽는다
+- [x] 모든 Chroma 조회 `where`에 `user_id`가 강제로 들어간다 (다른 사용자 `pet_id`로 조회하면 거부, 단위 테스트)
+- [x] 칼로리·급여량 계산 도구가 공식 기반이다
+- [x] 쓰기 도구(`create_health_event`, `update_health_event`)는 현재 `pet_id`에만 쓴다
+- [ ] `web_search`는 질의 PII 마스킹, 차단 도메인 필터, 요청당 3회 제한, `<web_result>` 감싸기, `WEB_SEARCH_MOCK`을 지원한다 — 차단 도메인·신뢰 도메인 정렬·`WEB_SEARCH_MOCK`은 A-4 완료, 질의 PII·3회 제한·감싸기는 A-7 미들웨어
+- [x] 도구 docstring이 LLM이 읽기에 명확하다
 
 ### A-5. 가드레일·PII 미들웨어
 
 **의존성**
-- [ ] A-1 설정·날짜 공통 모듈
+- [x] A-1 설정·날짜 공통 모듈
 
 **완료 조건**
-- [ ] 입력 가드레일: 주입 탐지(규칙 + 2단계 분류기), 도메인 밖 요청 차단, 길이 제한 1,000자
-- [ ] 출력 가드레일: 유해 식품 추천, 진단·처방 표현, 시스템 프롬프트 노출 검사, 응급 시 병원 권고 문구 확인
-- [ ] 출력의 카탈로그 ID가 실제로 있는지 검증한다
-- [ ] PII 마스킹(이메일, 전화번호, 주민번호, 카드, 계좌, IP, 상세 주소)이 입력·출력·`contexts`·`trace`에 적용된다
-- [ ] 각 가드레일에 단위 테스트가 있다 (평가셋 `injection`·`pii` 문항 문장 포함)
+- [x] 입력 가드레일: 주입 탐지(규칙 + 2단계 분류기), 도메인 밖 요청 차단, 길이 제한 1,000자
+- [x] 출력 가드레일: 유해 식품 추천, 진단·처방 표현, 시스템 프롬프트 노출 검사, 응급 시 병원 권고 문구 확인
+- [x] 출력의 카탈로그 ID가 실제로 있는지 검증한다
+- [x] PII 마스킹(이메일, 전화번호, 주민번호, 카드, 계좌, IP, 상세 주소)이 입력·출력·`contexts`·`trace`에 적용된다
+- [x] 각 가드레일에 단위 테스트가 있다 (평가셋 `injection`·`pii` 문항 문장 포함)
 
 ### A-6. 전문 Agent 3종 (식단·운동·건강)
 
 **의존성**
-- [ ] A-4 도구
-- [ ] A-5 가드레일·PII 미들웨어
+- [x] A-4 도구
+- [x] A-5 가드레일·PII 미들웨어
 
 **완료 조건**
 - [ ] `create_agent`로 만들고, Agent별로 필요한 도구만 준다 (웹 검색 없음)
@@ -302,8 +304,8 @@ LLM 없이 결정적으로 동작하는 순수 함수. `/tasks/generate`와 채�
 ### A-7. General Agent
 
 **의존성**
-- [ ] A-4 도구
-- [ ] A-5 가드레일·PII 미들웨어
+- [x] A-4 도구
+- [x] A-5 가드레일·PII 미들웨어
 
 **완료 조건**
 - [ ] 조회 도구와 `web_search`만 갖는다 (쓰기·추천 도구 없음)
@@ -327,7 +329,7 @@ LLM 없이 결정적으로 동작하는 순수 함수. `/tasks/generate`와 채�
 
 **의존성**
 - [ ] A-8 Supervisor·그래프
-- [ ] A-3 추천 엔진 (`/tasks/generate`)
+- [x] A-3 추천 엔진 (`/tasks/generate`)
 
 **완료 조건**
 - [ ] `POST /query`가 `question`을 읽고 `answer`·`contexts`·`trace`를 돌려준다 (계약 테스트)
@@ -346,13 +348,13 @@ LLM 없이 결정적으로 동작하는 순수 함수. `/tasks/generate`와 채�
 ### B-1. 골격·Chroma 저장소 계층
 
 **의존성**
-- [ ] P0-8 프로젝트 기반 설정
+- [x] P0-8 프로젝트 기반 설정
 
 **완료 조건**
 - [ ] `src/backend/package.json`, ESLint + Prettier, `npm run dev`(:3000)
-- [ ] 컬렉션별 저장소 모듈이 `documents`(JSON)·`metadatas`(필터 필드)를 다룬다
+- [ ] 컬렉션별 저장소 모듈이 `documents`(JSON)·`metadatas`(필터 필드)를 다룬다 (ARCHITECTURE.md 5.1 저장 형식, Python `encode_app_record`와 같은 결과)
 - [ ] 모든 조회 함수가 `user_id`를 필수 인자로 받는다
-- [ ] KST 날짜 유틸이 Python(A-1)과 같은 결과를 낸다 (같은 테스트 케이스로 확인)
+- [ ] KST 날짜 유틸이 Python(A-1)과 같은 결과를 낸다 (`src/tests/fixtures/date_cases.json` 사례를 그대로 읽어 확인)
 - [ ] 저장 전에 `database/schema.md`의 제약(enum, 날짜 형식, 참조 규칙)을 검증한다
 
 ### B-2. 인증 (F0)

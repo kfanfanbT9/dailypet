@@ -1,0 +1,28 @@
+{
+  "_comment": "날짜 규칙 기준 사례 (CLAUDE.md 4.5.3). Python src/tests/test_config.py와 Node Backend(B-1) 테스트가 같은 파일을 쓴다.",
+  "age_group": [
+    {"species": "dog", "size": "small",  "birth": "2025-11-11", "on": "2026-11-10", "months": 11, "group": "junior", "note": "12개월 하루 전"},
+    {"species": "dog", "size": "small",  "birth": "2025-11-10", "on": "2026-11-10", "months": 12, "group": "adult",  "note": "12개월 당일부터 성체"},
+    {"species": "cat", "size": null,     "birth": "2019-11-11", "on": "2026-11-10", "months": 83, "group": "adult",  "note": "7세 하루 전"},
+    {"species": "cat", "size": null,     "birth": "2019-11-10", "on": "2026-11-10", "months": 84, "group": "senior", "note": "고양이 7세 당일"},
+    {"species": "cat", "size": "large",  "birth": "2020-11-10", "on": "2026-11-10", "months": 72, "group": "adult",  "note": "고양이는 크기와 관계없이 7세"},
+    {"species": "dog", "size": "large",  "birth": "2020-11-11", "on": "2026-11-10", "months": 71, "group": "adult",  "note": "대형견 6세 하루 전"},
+    {"species": "dog", "size": "large",  "birth": "2020-11-10", "on": "2026-11-10", "months": 72, "group": "senior", "note": "대형견 6세 당일"},
+    {"species": "dog", "size": "medium", "birth": "2020-11-10", "on": "2026-11-10", "months": 72, "group": "adult",  "note": "중형견 6세는 성체"},
+    {"species": "dog", "size": "small",  "birth": "2019-11-10", "on": "2026-11-10", "months": 84, "group": "senior", "note": "소형견 7세 당일"},
+    {"species": "dog", "size": null,     "birth": "2020-11-10", "on": "2026-11-10", "months": 72, "group": "adult",  "note": "크기 미상은 대형견 아님"},
+    {"species": "dog", "size": "small",  "birth": "2024-02-29", "on": "2025-02-28", "months": 12, "group": "adult",  "note": "2/29 생일은 평년 2/28에 한 살"},
+    {"species": "dog", "size": "small",  "birth": "2024-02-29", "on": "2025-02-27", "months": 11, "group": "junior", "note": "2/29 생일, 평년 2/27"},
+    {"species": "cat", "size": null,     "birth": "2026-01-31", "on": "2026-02-28", "months": 1,  "group": "junior", "note": "31일생은 짧은 달 말일에 한 달"},
+    {"species": "cat", "size": null,     "birth": "2026-01-31", "on": "2026-02-27", "months": 0,  "group": "junior", "note": "말일 하루 전"},
+    {"species": "dog", "size": "small",  "birth": "2026-11-10", "on": "2026-11-10", "months": 0,  "group": "junior", "note": "태어난 날"}
+  ],
+  "d_day": [
+    {"due": "2026-11-17", "today": "2026-11-10", "d_day": 7,  "within_7": true,  "note": "D-7 포함"},
+    {"due": "2026-11-18", "today": "2026-11-10", "d_day": 8,  "within_7": false, "note": "D-8 제외"},
+    {"due": "2026-11-10", "today": "2026-11-10", "d_day": 0,  "within_7": true,  "note": "오늘"},
+    {"due": "2026-11-09", "today": "2026-11-10", "d_day": -1, "within_7": false, "note": "지난 일정 (지연됨, 알림 대상은 별도 규칙)"},
+    {"due": "2026-11-13", "today": "2026-11-10", "d_day": 3,  "within_7": true,  "note": "콩이 DHPP 3차"},
+    {"due": "2027-01-02", "today": "2026-12-28", "d_day": 5,  "within_7": true,  "note": "연도 경계"}
+  ]
+}
