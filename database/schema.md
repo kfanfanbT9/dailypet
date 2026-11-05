@@ -180,6 +180,9 @@ CREATE TABLE tasks (
     health_event_id  TEXT    REFERENCES health_events (id) ON DELETE CASCADE,
     title            TEXT    NOT NULL,
     done             INTEGER NOT NULL DEFAULT 0 CHECK (done IN (0, 1)),
+    reason           TEXT,                                              -- 추천 사유 (자동 생성 항목, 화면 표시)
+    rank             INTEGER CHECK (rank IS NULL OR rank >= 1),         -- 영역 안 취향 순위
+    relaxed          TEXT    NOT NULL DEFAULT '[]' CHECK (json_valid(relaxed)),  -- 완화한 규칙 (예: ["dislike"] → 👎 완화 배지)
     -- 영역별 참조 규칙: diet/activity → 카탈로그, health → 건강 일정, custom → 참조 없음
     CHECK (
         (category IN ('diet', 'activity') AND catalog_item_id IS NOT NULL AND health_event_id IS NULL) OR

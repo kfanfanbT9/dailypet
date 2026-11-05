@@ -524,7 +524,7 @@ Response는 `/query`와 같은 `{answer, contexts, trace}` 형식이다. 요청�
 | GET / DELETE | `/api/pets/:id/preferences` | 내 취향 보기 (dislike에는 `excluded_until` 포함) / 전체 초기화 |
 | DELETE | `/api/pets/:id/preferences/:prefId` | 취향 항목 하나 삭제 |
 | GET | `/api/catalog?category=&species=` | 카탈로그 조회 (직접 추가할 할 일 선택용) |
-| POST | `/api/chat` | `{ question, petId, threadId? }` → Agent `POST /query` 프록시 |
+| POST | `/api/chat` | `{ question, petId, threadId? }` → Agent `POST /query` 프록시. 응답은 Agent의 `{ answer, contexts, trace }`에 `thread_id`를 더한 것. `thread_id`는 trace의 마지막 `final` 또는 `interrupt` 이벤트(`status: "cancelled"` 제외)에서 꺼낸다 (4.1 표) |
 | POST | `/api/chat/resume` | `{ threadId, decisions }` → Agent `POST /query/resume` 프록시 (HITL 승인) |
 
 ## 5. 데이터 모델 (Chroma 컬렉션)
@@ -565,12 +565,12 @@ Chroma는 문서 + 메타데이터 저장소이므로, 앱 데이터는 **`docum
 |--------|----|---------------|------|
 | `users` | `usr_xxx` | `email`(소문자, 유일), `password_hash`, `nickname`, `created_at` | 계정 (Backend만 접근) |
 | `pets` | `pet_xxx` | `user_id`, `name`, `species`(dog/cat), `breed`, `sex`(male/female), `size`(small/medium/large), `birth_date`, `weight_kg`, `neutered`, `activity_level`(low/normal/high), `allergies`(예: chicken), `conditions`(질환 태그, 예: joint_disease), `memo`, `default_times`(JSON: 급여·산책 시간대) | 프로필 |
-| `tasks` | `task_xxx` | `user_id`, `pet_id`, `date`, `time`(HH:MM, 선택), `category`(diet/activity/health/custom), `source`(auto/chat/custom), `catalog_item_id`(diet/activity), `health_event_id`(health), `title`, `done` | 오늘의 할 일 |
+| `tasks` | `task_xxx` | `user_id`, `pet_id`, `date`, `time`(HH:MM, 선택), `category`(diet/activity/health/custom), `source`(auto/chat/custom), `catalog_item_id`(diet/activity), `health_event_id`(health), `title`, `done`, 선택 `reason`·`rank`·`relaxed`(Agent 추천 결과 — 사유·취향 순위·완화 규칙. `relaxed`에 `dislike`가 있으면 화면에 👎 완화 표시, CLAUDE.md 4.5.1) | 오늘의 할 일 |
 | `health_events` | `evt_xxx` | `user_id`, `pet_id`, `catalog_item_id`, `type`(vaccine/checkup/deworming/heartworm/external_parasite/dental/other), `dose_no`, `due_date`, `due_ts`(비교용 epoch), `status`(scheduled/done/overdue/needs_history), `completed_date` | 건강 일정 |
 | `weight_logs` | `wt_xxx` | `user_id`, `pet_id`, `date`, `weight_kg` | 체중 기록 |
 | `interactions` | `int_xxx` | `user_id`, `pet_id`, `catalog_item_id`(`custom`이면 null 가능), `signal`(like/dislike/complete/swap/remove/custom), `created_at` | 취향 신호 원본 기록 |
 | `preferences` | `pref_xxx` | `user_id`, `pet_id`(사용자 공통이면 null), `kind`(like/dislike/constraint), `target`(카탈로그 ID 또는 자유 텍스트), `note`, `score`, `excluded_until`(dislike 제외 기한), `updated_at` | 취향 요약 (추천에 사용) |
-| `chat_logs` | `log_xxx` | `user_id`, `pet_id`, `thread_id`, `created_at` | 대화 기록 (PII 마스킹된 answer/trace) |
+| `chat_logs` | `log_xxx` | `user_id`, `pet_id`, `thread_id`, `created_at` | 대화 기록 (PII 마스킹된 question/answer/trace). **Agent만 쓴다** (`/query`·`/query/resume` 처리 끝, 마스킹 규칙을 Python 한 곳에 두기 위해). Backend는 읽기·삭제만 한다 |
 | `catalog_activity` / `catalog_diet` / `catalog_health` | 카탈로그 `item_id` | `species`, 연령 범위, `intensity`, `allergens`, `tags`, `source_url` | 추천 후보 (임베딩 사용) |
 | `pet_knowledge` | 자동 | `source`, `species`(dog/cat/all), `category`(activity/diet/health/general) | RAG 지식 (임베딩 사용) |
 

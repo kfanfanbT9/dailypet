@@ -427,48 +427,48 @@ repos.users.getById(userId) / getByEmail(email) / create(row) / remove(userId)  
 **할 일 저장 필드 추가 (D7)**: Agent 응답의 `reason`, `rank`, `relaxed`를 화면에 보여야 한다 (👎 완화 배지는 CLAUDE.md 4.5.1 필수). 지금 `tasks` 스키마에는 없으므로 ARCHITECTURE.md 5장·ERD.md·`database/schema.md`에 선택 필드로 먼저 추가한다.
 
 **작업**
-- [ ] `agentClient.generateTasks(body)`: `POST {AGENT_URL}/tasks/generate`, 헤더 `X-Agent-Api-Key`, 타임아웃 5초(LLM 없음, p95 1초 목표). 연결 실패·타임아웃·5xx → `AgentUnavailable`
-- [ ] `GET /api/pets/:id/tasks?date=YYYY-MM-DD` (기본 오늘)
+- [x] `agentClient.generateTasks(body)`: `POST {AGENT_URL}/tasks/generate`, 헤더 `X-Agent-Api-Key`, 타임아웃 5초(LLM 없음, p95 1초 목표). 연결 실패·타임아웃·5xx → `AgentUnavailable`
+- [x] `GET /api/pets/:id/tasks?date=YYYY-MM-DD` (기본 오늘)
   - 그 날짜 할 일이 있으면 그대로 돌려준다 (같은 날 다시 열어도 새로 만들지 않음, S03)
   - **오늘**이고 목록이 없으면 Agent를 불러 만든다. 과거·미래 날짜는 만들지 않는다
   - 같은 반려동물에 대한 동시 요청이 두 번 만들지 않게 반려동물별 진행 중 Promise를 공유한다 (프로세스 안 잠금)
   - Agent 장애: 200 `{ date, tasks: [], notice: "추천을 불러오지 못했어요", retryable: true }` (S22 3단계). 기존 목록이 있으면 Agent를 부르지 않으므로 영향 없음 (S22 1단계)
   - 정렬: `time` 오름차순, 시간 없는 항목(건강)은 맨 아래 (wireframe W05)
-- [ ] 생성 결과 저장 규칙
+- [x] 생성 결과 저장 규칙
   - diet/activity: `source=auto`, `catalog_item_id`, `title`, `time`, `reason`, `rank`, `relaxed`
   - health: `health_event_id`, `title`, 시간 없음. 같은 `health_event_id`의 할 일이 이미 있으면 새로 만들지 않는다
-- [ ] `POST /api/pets/:id/tasks/generate` `{ confirm: true }` (다시 생성, 오늘만)
+- [x] `POST /api/pets/:id/tasks/generate` `{ confirm: true }` (다시 생성, 오늘만)
   - 남길 것: `done: true` 항목, `source=custom` 항목, health 항목 → 이 중 카탈로그 ID를 `keep_item_ids`로 보낸다
   - 지울 것: 미완료 `source=auto` diet/activity 항목. **Agent 응답을 받은 뒤에** 지우고 새 항목을 넣는다 (Agent 장애 시 기존 목록 유지, 503)
   - `confirm`이 없으면 400
-- [ ] `POST /api/pets/:id/tasks` (직접 추가)
+- [x] `POST /api/pets/:id/tasks` (직접 추가)
   - `{ title, time? }` → `category=custom`, `source=custom`
   - `{ catalog_item_id, time? }` → 카탈로그 영역(diet/activity), `source=custom`, 제목은 카탈로그 이름, `custom` 신호 기록
   - 오늘 이후 날짜만 (기본 오늘)
-- [ ] `PATCH /api/tasks/:taskId` `{ done?, time?, title? }`
+- [x] `PATCH /api/tasks/:taskId` `{ done?, time?, title? }`
   - `done` false → true: 카탈로그 항목이면 `complete` 신호
   - `done` true → false: 같은 날 그 항목의 마지막 `complete` 신호를 지운다 (실수 체크 되돌리기)
   - `title`은 `custom` 영역만 수정 가능
-- [ ] `DELETE /api/tasks/:taskId`: `source=auto`이면 `remove` 신호. health 할 일은 삭제할 수 없다 (일정 화면에서 처리, 400)
-- [ ] `POST /api/tasks/:taskId/swap`: diet/activity 자동 항목만
+- [x] `DELETE /api/tasks/:taskId`: `source=auto`이면 `remove` 신호. health 할 일은 삭제할 수 없다 (일정 화면에서 처리, 400)
+- [x] `POST /api/tasks/:taskId/swap`: diet/activity 자동 항목만
   - Agent `{ category, exclude_item_ids: [현재 항목 + 오늘 같은 영역 항목 전부], limit: 1, keep_item_ids: [] }`
   - 결과가 있으면 기존 할 일을 지우고 새 항목을 같은 `time`으로 넣는다. `swap` 신호(이전 항목)
   - 결과가 없으면 200 `{ swapped: false, notice: "더 추천할 항목이 없어요" }`, 기존 항목 유지, 신호 기록 안 함
-- [ ] `GET /api/catalog?category=&species=`: 직접 추가용. `recommendable: false`(유해 식품 등)는 빼고, 이름·영역·ID·요약만
+- [x] `GET /api/catalog?category=&species=`: 직접 추가용. `recommendable: false`(유해 식품 등)는 빼고, 이름·영역·ID·요약만
 
 **테스트** (`test/tasks.test.js`, 가짜 Agent)
-- [ ] S03: 콩이 11/10 첫 조회 → Agent 1회 호출, 다시 조회 → 호출 0회·개수 같음
-- [ ] 동시 요청 2개 → Agent 1회 호출
-- [ ] Agent 요청 본문에 `user_id`가 JWT 사용자, 헤더에 `X-Agent-Api-Key`가 있다
-- [ ] 재생성(S04 6단계): 완료 항목·직접 추가 "빗질"은 남고 `keep_item_ids`에 완료 항목 ID가 들어간다. `confirm` 없으면 400
-- [ ] 재생성 중 Agent 장애 → 503, 기존 목록 그대로
-- [ ] 교체(S04 2단계): 요청의 `exclude_item_ids`에 현재 항목 포함, `limit: 1`, `swap` 신호 1건. 빈 결과 → `swapped: false`, 기존 항목 유지
-- [ ] 완료 → `complete` 신호 1건, 되돌리기 → 0건. 자동 항목 삭제 → `remove` 1건, 직접 추가 항목 삭제 → 신호 없음
-- [ ] 👎 완화 결과(`relaxed: ["dislike"]`)가 저장되고 조회 응답에 나온다
-- [ ] S22: Agent 중지 + 오늘 목록 있음 → 정상 / 목록 없음 → `tasks: []`, `notice`
-- [ ] mallory로 보리 할 일 PATCH/DELETE/swap → 404
-- [ ] `/api/catalog?category=diet&species=dog`에 `harmful_food` 없음
-- [ ] (`test:agent`, A-9 이후) 실제 Agent로 보리 11/10 생성 → 식단 1개 이상·활동 1개 이상, 활동 상위 3개에 `act_dog_nosework_find_it_01`, 응답 1초 이내
+- [x] S03: 콩이 11/10 첫 조회 → Agent 1회 호출, 다시 조회 → 호출 0회·개수 같음
+- [x] 동시 요청 2개 → Agent 1회 호출
+- [x] Agent 요청 본문에 `user_id`가 JWT 사용자, 헤더에 `X-Agent-Api-Key`가 있다
+- [x] 재생성(S04 6단계): 완료 항목·직접 추가 "빗질"은 남고 `keep_item_ids`에 완료 항목 ID가 들어간다. `confirm` 없으면 400
+- [x] 재생성 중 Agent 장애 → 503, 기존 목록 그대로
+- [x] 교체(S04 2단계): 요청의 `exclude_item_ids`에 현재 항목 포함, `limit: 1`, `swap` 신호 1건. 빈 결과 → `swapped: false`, 기존 항목 유지
+- [x] 완료 → `complete` 신호 1건, 되돌리기 → 0건. 자동 항목 삭제 → `remove` 1건, 직접 추가 항목 삭제 → 신호 없음
+- [x] 👎 완화 결과(`relaxed: ["dislike"]`)가 저장되고 조회 응답에 나온다
+- [x] S22: Agent 중지 + 오늘 목록 있음 → 정상 / 목록 없음 → `tasks: []`, `notice`
+- [x] mallory로 보리 할 일 PATCH/DELETE/swap → 404
+- [x] `/api/catalog?category=diet&species=dog`에 `harmful_food` 없음
+- [x] (`test:agent`, A-9 이후) 실제 Agent로 보리 11/10 생성 → 식단 1개 이상·활동 1개 이상, 활동 상위 3개에 `act_dog_nosework_find_it_01`, 응답 1초 이내
 
 ---
 
@@ -479,32 +479,32 @@ repos.users.getById(userId) / getByEmail(email) / create(row) / remove(userId)  
 **`chat_logs`를 누가 쓰는가 (D8)**: phase1_task.md A-9는 Agent가 `/query` 처리 끝에 마스킹된 `chat_logs`를 저장한다고 정했다. Backend는 **읽기·삭제만** 하고 직접 쓰지 않는다 (마스킹 규칙을 Python 한 곳에 두기 위해). plan.md B-8의 "`chat_logs`에 마스킹된 값만 저장한다"는 "Agent가 저장한 마스킹된 값만 읽어 보여준다"로 문구를 고친다.
 
 **작업**
-- [ ] `POST /api/chat` `{ question, petId, threadId? }`
+- [x] `POST /api/chat` `{ question, petId, threadId? }`
   - `petId`는 내 반려동물이어야 한다 (404)
   - `threadId`가 있으면 `thr_{userId}_{petId}_` 접두사인지 확인한다 (아니면 404). 반려동물을 바꾸면 Frontend가 새 thread로 시작한다
   - 길이 1,000자 초과 400 (Agent 입력 가드레일과 같은 값, 미리 거름)
   - Agent `POST /query` `{ question, user_id, pet_id, thread_id }`, 헤더 `X-Agent-Api-Key`, 타임아웃 60초
   - 응답 `{ answer, contexts, trace, thread_id }`를 그대로 넘긴다 (`thread_id`는 trace 또는 응답에서 꺼냄 — A-9 응답 형식에 맞춘다)
   - Agent 장애·타임아웃 → **503** `{ error: { code: "agent_unavailable", message: "잠시 후 다시 시도해 주세요" } }` (S22 2단계)
-- [ ] `POST /api/chat/resume` `{ threadId, decisions }`
+- [x] `POST /api/chat/resume` `{ threadId, decisions }`
   - `threadId` 접두사가 내 `user_id`가 아니면 **403** (isolation-04, ARCHITECTURE.md 4.2)
   - `decisions`는 `approve | edit(+edited_action) | reject(+message)`만 허용 (zod)
   - Agent `POST /query/resume`. Agent가 403·404를 돌려주면 같은 코드로 넘긴다
-- [ ] `GET /api/pets/:id/threads`: `chat_logs`를 `thread_id`로 묶어 `{ thread_id, started_at, last_at, title(첫 질문 앞 30자, 마스킹된 값), count }`를 최근 순으로
-- [ ] `GET /api/threads/:threadId`: 소유자 확인(접두사 + `chat_logs.user_id`) 후 시간순 `{ question, answer, trace, created_at }`
-- [ ] `DELETE /api/threads/:threadId`: 그 thread의 `chat_logs` + checkpoint 삭제 (`checkpoints.deleteThreads`). 이후 같은 thread로 resume하면 Agent가 404 (S16 4단계)
-- [ ] Backend 로그에는 질문·답변을 남기지 않는다 (경로·상태·소요 시간만). `lib/mask.js`는 예외 메시지에 사용자 입력이 섞일 때만 쓴다
+- [x] `GET /api/pets/:id/threads`: `chat_logs`를 `thread_id`로 묶어 `{ thread_id, started_at, last_at, title(첫 질문 앞 30자, 마스킹된 값), count }`를 최근 순으로
+- [x] `GET /api/threads/:threadId`: 소유자 확인(접두사 + `chat_logs.user_id`) 후 시간순 `{ question, answer, trace, created_at }`
+- [x] `DELETE /api/threads/:threadId`: 그 thread의 `chat_logs` + checkpoint 삭제 (`checkpoints.deleteThreads`). 이후 같은 thread로 resume하면 Agent가 404 (S16 4단계)
+- [x] Backend 로그에는 질문·답변을 남기지 않는다 (경로·상태·소요 시간만). `lib/mask.js`는 예외 메시지에 사용자 입력이 섞일 때만 쓴다
 
 **테스트** (`test/chat.test.js`, 가짜 Agent)
-- [ ] Agent에 전달된 `user_id`가 JWT 값이다. 본문에 `user_id: "usr_69d308a849e0"`을 넣어 보내도 무시된다
-- [ ] 다른 사용자 `petId` → 404, Agent 호출 0회
-- [ ] 다른 사용자 thread로 resume → 403, Agent 호출 0회 (isolation-04)
-- [ ] 가짜 Agent 중지 → `/api/chat` 503, `/api/pets`는 정상 (S22)
-- [ ] 가짜 Agent 응답 지연 61초 → 503 (타이머를 가짜로 돌려 빠르게)
-- [ ] 코코 시드 대화 1건이 `GET /api/pets/pet_coco/threads`에 나오고, 나비 목록에는 보리 대화가 없다 (S16)
-- [ ] thread 삭제 → `chat_logs` 0건, checkpoint 테이블에 그 `thread_id` 행 0건 (임시 SQLite 파일로 확인)
-- [ ] 로그 캡처에 질문 문자열, 쿠키, `AGENT_API_KEY` 값이 없다
-- [ ] (`test:agent`, A-9 이후) 실제 Agent로 S06 대화 → 같은 thread로 이어서 질문 → 대화 목록에 1개 thread
+- [x] Agent에 전달된 `user_id`가 JWT 값이다. 본문에 `user_id: "usr_69d308a849e0"`을 넣어 보내도 무시된다
+- [x] 다른 사용자 `petId` → 404, Agent 호출 0회
+- [x] 다른 사용자 thread로 resume → 403, Agent 호출 0회 (isolation-04)
+- [x] 가짜 Agent 중지 → `/api/chat` 503, `/api/pets`는 정상 (S22)
+- [x] 가짜 Agent 응답 지연 61초 → 503 — 가짜 타이머 대신 테스트용 타임아웃을 100ms로 줄이고 400ms 지연으로 재현
+- [x] 코코 시드 대화 1건이 `GET /api/pets/pet_coco/threads`에 나오고, 나비 목록에는 보리 대화가 없다 (S16)
+- [x] thread 삭제 → `chat_logs` 0건, checkpoint 테이블에 그 `thread_id` 행 0건 (임시 SQLite 파일로 확인)
+- [x] 로그 캡처에 질문 문자열, 쿠키, `AGENT_API_KEY` 값이 없다
+- [x] (`test:agent`, A-9 이후) 실제 Agent로 S06 대화 → 같은 thread로 이어서 질문 → 대화 목록에 1개 thread
 
 ---
 
@@ -520,10 +520,10 @@ CLAUDE.md 2장 규칙에 따라, 아래 항목은 **코드보다 문서를 먼�
 | D4 ✅ | 가입 입력 규칙 (비밀번호 8자 이상, 닉네임 1~20자) | SERVICE.md F0 | B-2 |
 | D5 ✅ | 건강 초기 일정표 규칙 (8장 표), 시드와 맞는지 확인 결과 | ARCHITECTURE.md 6장, 필요하면 USER_SCENARIO.md 2.3 | B-5 |
 | D6 ✅ | 완료·교체·삭제 신호는 할 일 API가 기록, `/feedback`은 👍/👎(+직접 신호)용 | ARCHITECTURE.md 4.2 | B-7 |
-| D7 | `tasks`에 선택 필드 `reason`, `rank`, `relaxed` 추가 | ARCHITECTURE.md 5장, ERD.md, `database/schema.md` | B-6 |
-| D8 | `chat_logs`는 Agent만 쓰고 Backend는 읽기·삭제만 | ARCHITECTURE.md 5장, plan.md B-8 문구 | B-8 |
-| D9 | 응답 필드 `tasks_outdated`, 할 일 `notice`·`retryable`, 교체 `swapped`, 오류 본문 형식 | ARCHITECTURE.md 4.2 | B-4·B-6 |
-| D10 | `/api/chat` 응답에 `thread_id`를 어디서 꺼내는지 (A-9 확정 후) | ARCHITECTURE.md 4.1, 4.2 | B-8 |
+| D7 ✅ | `tasks`에 선택 필드 `reason`, `rank`, `relaxed` 추가 | ARCHITECTURE.md 5장, ERD.md, `database/schema.md` | B-6 |
+| D8 ✅ | `chat_logs`는 Agent만 쓰고 Backend는 읽기·삭제만 | ARCHITECTURE.md 5장, plan.md B-8 문구 | B-8 |
+| D9 ✅ | 응답 필드 `tasks_outdated`, 할 일 `notice`·`retryable`, 교체 `swapped`, 오류 본문 형식 | ARCHITECTURE.md 4.2 | B-4·B-6 |
+| D10 ✅ | `/api/chat` 응답에 `thread_id`를 어디서 꺼내는지 (A-9 확정 후) | ARCHITECTURE.md 4.1, 4.2 | B-8 |
 
 ---
 
@@ -544,17 +544,17 @@ CLAUDE.md 2장 규칙에 따라, 아래 항목은 **코드보다 문서를 먼�
 
 ## 14. Phase 2 완료 점검
 
-- [ ] `npm test` 전체 통과 (네트워크 없이 20초 이내), `npm run lint` 통과
-- [ ] `npm run test:chroma` 통과 (Chroma 서버 실행 상태)
-- [ ] `npm run seed:reset`이 기본 시드와 변형 3종을 적재하고, 두 번 실행해도 결과가 같다
-- [ ] `npm run dev`(:3000)로 뜨고, 시작 시 고아 정리·overdue 갱신이 돈다
-- [ ] S01·S03·S04·S05·S11·S19(isolation-01·04)·S20·S21·S22 체크리스트 중 Backend 담당(🔌) 항목을 API 테스트로 통과
-- [ ] 일반 API 20회 호출 p95 ≤ 500ms (S22 4단계, 로컬 Chroma)
-- [ ] (A-9 이후) `npm run test:agent` 통과: 할 일 생성·교체, 채팅·resume·대화 기록
-- [ ] 12장 문서 수정 D1~D10이 반영되어 있다
-- [ ] plan.md B-1 ~ B-8 완료 조건이 모두 체크되어 있다
-- [ ] 로그·응답에 비밀번호 원문, 키 값, 마스킹되지 않은 PII가 없다 (로그 캡처 검색으로 확인)
-- [ ] 산출물을 커밋했다 (`feat:` / `test:`), `.env`·`node_modules/`·`data/chroma/`·`data/checkpoints/` 제외
+- [x] `npm test` 전체 통과 (네트워크 없이 20초 이내), `npm run lint` 통과 — 133개, 약 4초
+- [x] `npm run test:chroma` 통과 (Chroma 서버 실행 상태)
+- [x] `npm run seed:reset`이 기본 시드와 변형 3종을 적재하고, 두 번 실행해도 결과가 같다
+- [x] `npm run dev`(:3000)로 뜨고, 시작 시 고아 정리·overdue 갱신이 돈다 — 2026-11-05 확인 (정리 대상이 없어 로그 없음). ⚠️ `.env`에 `JWT_SECRET`이 아직 없어 확인 때는 환경변수로 임시 값을 넘김
+- [x] S01·S03·S04·S05·S11·S19(isolation-01·04)·S20·S21·S22 체크리스트 중 Backend 담당(🔌) 항목을 API 테스트로 통과
+- [x] 일반 API 20회 호출 p95 ≤ 500ms (S22 4단계, 로컬 Chroma) — 5개 API × 20회, p95 12.7ms
+- [x] (A-9 이후) `npm run test:agent` 통과: 할 일 생성·교체, 채팅·resume·대화 기록 — 4개 통과 (실제 Agent·Bedrock, 할 일 생성 1초 이내)
+- [x] 12장 문서 수정 D1~D10이 반영되어 있다
+- [x] plan.md B-1 ~ B-8 완료 조건이 모두 체크되어 있다
+- [x] 로그·응답에 비밀번호 원문, 키 값, 마스킹되지 않은 PII가 없다 (로그 캡처 검색으로 확인) — 테스트 로그 캡처 + 실제 dev 서버 로그 108줄 검색
+- [x] 산출물을 커밋했다 (`feat:` / `test:`), `.env`·`node_modules/`·`data/chroma/`·`data/checkpoints/` 제외
 
 ## 15. 진행 현황
 
@@ -566,6 +566,6 @@ CLAUDE.md 2장 규칙에 따라, 아래 항목은 **코드보다 문서를 먼�
 | B-3 시드 리셋 | ✅ | 2026-11-05 · checkpoint는 테이블 비우기. 실제 `data/chroma`에 기본 시드 적재 확인. **발견: Chroma upsert가 metadata를 합침 → Python·Node 모두 delete→add로 수정** |
 | B-4 반려동물·연쇄 삭제 | ✅ | 2026-11-05 · 연쇄 삭제는 반려동물 행을 마지막에, 멱등 재실행·고아 정리. checkpoint thread 삭제 확인 |
 | B-5 건강 일정·알림 | ✅ | 2026-11-05 · 규칙은 ARCHITECTURE.md 6.1. 회차 모르는 이력은 완료 주령으로 추정(콩이 구충 → 6차 11/22). 시드는 규칙 재현분·사용자 조정분을 문서에 구분 |
-| B-6 할 일 | ⬜ | 가짜 Agent로 먼저, A-9 후 통합 |
+| B-6 할 일 | ✅ | 2026-11-05 · 가짜 Agent 테스트 + 실제 Agent 통합. 직접 추가도 recommendable:false(유해 식품) 거부 |
 | B-7 체중·취향 | ✅ | 2026-11-05 · prefId가 Python과 같아 채팅 취향·버튼 👍/👎가 한 행 |
-| B-8 채팅·기록 | ⬜ | 가짜 Agent로 먼저, A-9 후 통합 |
+| B-8 채팅·기록 | ✅ | 2026-11-05 · thread_id는 trace의 final·interrupt에서. 실제 Agent로 이어 묻기·HITL resume 확인 |

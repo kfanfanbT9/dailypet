@@ -6,9 +6,11 @@ import { healthRouter } from "./health.js";
 import { meRouter } from "./me.js";
 import { petsRouter } from "./pets.js";
 import { prefsRouter } from "./prefs.js";
+import { tasksRouter } from "./tasks.js";
+import { chatRouter } from "./chat.js";
 
 /** 인증이 필요한 하위 라우터들 */
-export const PROTECTED = [meRouter, petsRouter, healthRouter, prefsRouter];
+export const PROTECTED = [meRouter, petsRouter, healthRouter, prefsRouter, tasksRouter, chatRouter];
 
 export function apiRouter(deps) {
   const r = express.Router();

@@ -73,6 +73,9 @@ erDiagram
         string health_event_id FK "HEALTH_EVENTS.id, health일 때"
         string title
         boolean done
+        string reason "선택, 추천 사유 (Agent /tasks/generate)"
+        int rank "선택, 영역 안 취향 순위 (1부터)"
+        string relaxed "선택, 완화한 규칙 목록 (예: dislike)"
     }
 
     HEALTH_EVENTS {

@@ -53,6 +53,8 @@ export async function startFakeAgent() {
     }),
   };
 
+  const defaults = { tasksGenerate: state.tasksGenerate, query: state.query, resume: state.resume };
+
   const app = express();
   app.use(express.json());
   app.use(async (req, res, next) => {
@@ -85,7 +87,9 @@ export async function startFakeAgent() {
   return {
     state,
     url: `http://127.0.0.1:${port}`,
+    /** 모드·지연·기록과 함께 바꾼 응답 함수도 기본값으로 되돌린다 (테스트 간 누수 방지) */
     reset() {
+      Object.assign(state, defaults);
       state.mode = "ok";
       state.delayMs = 0;
       state.requests.length = 0;

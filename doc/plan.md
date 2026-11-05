@@ -353,90 +353,90 @@ LLM 없이 결정적으로 동작하는 순수 함수. `/tasks/generate`와 채�
 - [x] P0-8 프로젝트 기반 설정
 
 **완료 조건**
-- [ ] `src/backend/package.json`, ESLint + Prettier, `npm run dev`(:3000)
-- [ ] 컬렉션별 저장소 모듈이 `documents`(JSON)·`metadatas`(필터 필드)를 다룬다 (ARCHITECTURE.md 5.1 저장 형식, Python `encode_app_record`와 같은 결과)
-- [ ] 모든 조회 함수가 `user_id`를 필수 인자로 받는다
-- [ ] KST 날짜 유틸이 Python(A-1)과 같은 결과를 낸다 (`src/tests/fixtures/date_cases.json` 사례를 그대로 읽어 확인)
-- [ ] 저장 전에 `database/schema.md`의 제약(enum, 날짜 형식, 참조 규칙)을 검증한다
+- [x] `src/backend/package.json`, ESLint + Prettier, `npm run dev`(:3000)
+- [x] 컬렉션별 저장소 모듈이 `documents`(JSON)·`metadatas`(필터 필드)를 다룬다 (ARCHITECTURE.md 5.1 저장 형식, Python `encode_app_record`와 같은 결과)
+- [x] 모든 조회 함수가 `user_id`를 필수 인자로 받는다
+- [x] KST 날짜 유틸이 Python(A-1)과 같은 결과를 낸다 (`src/tests/fixtures/date_cases.json` 사례를 그대로 읽어 확인)
+- [x] 저장 전에 `database/schema.md`의 제약(enum, 날짜 형식, 참조 규칙)을 검증한다
 
 ### B-2. 인증 (F0)
 
 **의존성**
-- [ ] B-1 골격·Chroma 저장소 계층
+- [x] B-1 골격·Chroma 저장소 계층
 
 **완료 조건**
-- [ ] 가입: 소문자 이메일 → `usr_` + sha256 앞 12자리 ID, 중복 가입 거부
-- [ ] 비밀번호 해시 저장 (원문은 어디에도 남지 않음)
-- [ ] 로그인 → JWT 발급, 모든 `/api/*`에서 JWT의 `user_id`를 꺼낸다
+- [x] 가입: 소문자 이메일 → `usr_` + sha256 앞 12자리 ID, 중복 가입 거부
+- [x] 비밀번호 해시 저장 (원문은 어디에도 남지 않음)
+- [x] 로그인 → JWT 발급, 모든 `/api/*`에서 JWT의 `user_id`를 꺼낸다
 
 ### B-3. 시드 리셋 (`npm run seed:reset`)
 
 **의존성**
-- [ ] B-1 골격·Chroma 저장소 계층
-- [ ] P0-6 시드 데이터
+- [x] B-1 골격·Chroma 저장소 계층
+- [x] P0-6 시드 데이터
 
 **완료 조건**
-- [ ] 앱 데이터 컬렉션과 `data/checkpoints/`를 비우고 `data/seed/*.json`을 적재한다
-- [ ] 카탈로그·지식 컬렉션은 건드리지 않는다
-- [ ] `--variant <이름>`이 동작한다
-- [ ] 두 번 연속 실행해도 결과가 같다
+- [x] 앱 데이터 컬렉션과 `data/checkpoints/`를 비우고 `data/seed/*.json`을 적재한다
+- [x] 카탈로그·지식 컬렉션은 건드리지 않는다
+- [x] `--variant <이름>`이 동작한다
+- [x] 두 번 연속 실행해도 결과가 같다
 
 ### B-4. 반려동물 API·연쇄 삭제 (F1)
 
 **의존성**
-- [ ] B-2 인증
+- [x] B-2 인증
 
 **완료 조건**
-- [ ] CRUD가 소유권(`pet_id`가 JWT 사용자 소유)을 확인한다. 다른 사용자 반려동물은 404
-- [ ] 개·고양이만 등록된다
-- [ ] 삭제 시 ARCHITECTURE.md 5장 순서로 연쇄 삭제한다 (checkpoint 포함)
-- [ ] 회원 탈퇴 시 모든 반려동물에 연쇄 삭제를 적용한 뒤 `users`를 지운다
-- [ ] 시작 시 참조가 끊긴 데이터를 정리한다
+- [x] CRUD가 소유권(`pet_id`가 JWT 사용자 소유)을 확인한다. 다른 사용자 반려동물은 404
+- [x] 개·고양이만 등록된다
+- [x] 삭제 시 ARCHITECTURE.md 5장 순서로 연쇄 삭제한다 (checkpoint 포함)
+- [x] 회원 탈퇴 시 모든 반려동물에 연쇄 삭제를 적용한 뒤 `users`를 지운다
+- [x] 시작 시 참조가 끊긴 데이터를 정리한다
 
 ### B-5. 건강 일정·알림 (F5)
 
 **의존성**
-- [ ] B-4 반려동물 API
+- [x] B-4 반려동물 API
 
 **완료 조건**
-- [ ] 반려동물 등록 시 카탈로그 기준 초기 일정을 만든다 (이력 없이 지난 일정은 `needs_history`)
-- [ ] 완료 처리 시 `completed_date` + 간격으로 다음 일정을 만든다
-- [ ] `node-cron` 매일 KST 00:05에 `overdue`로 바꾼다
-- [ ] `/api/notifications`가 D-7·D-1·D-day·지연만 돌려준다 (S03 체크리스트 통과)
+- [x] 반려동물 등록 시 카탈로그 기준 초기 일정을 만든다 (이력 없이 지난 일정은 `needs_history`)
+- [x] 완료 처리 시 `completed_date` + 간격으로 다음 일정을 만든다
+- [x] `node-cron` 매일 KST 00:05에 `overdue`로 바꾼다
+- [x] `/api/notifications`가 D-7·D-1·D-day·지연만 돌려준다 (S03 체크리스트 통과)
 
 ### B-6. 할 일 API (F2, F13)
 
 **의존성**
-- [ ] B-4 반려동물 API
-- [ ] A-9 FastAPI 엔드포인트 (`/tasks/generate`)
+- [x] B-4 반려동물 API
+- [x] A-9 FastAPI 엔드포인트 (`/tasks/generate`)
 
 **완료 조건**
-- [ ] 오늘 할 일이 없으면 Agent `/tasks/generate`를 호출해 만든다 (JS로 추천 로직을 다시 구현하지 않음)
-- [ ] 다시 생성할 때 완료·직접 추가 항목을 `keep_item_ids`로 남긴다
-- [ ] 완료, 시간 설정, 직접 추가, 삭제, 교체(`swap`)가 동작하고 취향 신호를 기록한다
-- [ ] Agent 서버 장애 시 기존 할 일과 안내 문구를 돌려준다 (S22)
+- [x] 오늘 할 일이 없으면 Agent `/tasks/generate`를 호출해 만든다 (JS로 추천 로직을 다시 구현하지 않음)
+- [x] 다시 생성할 때 완료·직접 추가 항목을 `keep_item_ids`로 남긴다
+- [x] 완료, 시간 설정, 직접 추가, 삭제, 교체(`swap`)가 동작하고 취향 신호를 기록한다
+- [x] Agent 서버 장애 시 기존 할 일과 안내 문구를 돌려준다 (S22)
 
 ### B-7. 체중·취향 API (F9, F11, F12)
 
 **의존성**
-- [ ] B-4 반려동물 API
+- [x] B-4 반려동물 API
 
 **완료 조건**
-- [ ] 체중 기록(하루 1건)과 프로필 `weight_kg` 갱신
-- [ ] `/api/pets/:id/feedback`이 `interactions`에 기록하고 `preferences`를 갱신한다
-- [ ] 취향 조회(`excluded_until` 포함), 개별 삭제, 전체 초기화
+- [x] 체중 기록(하루 1건)과 프로필 `weight_kg` 갱신
+- [x] `/api/pets/:id/feedback`이 `interactions`에 기록하고 `preferences`를 갱신한다
+- [x] 취향 조회(`excluded_until` 포함), 개별 삭제, 전체 초기화
 
 ### B-8. 채팅 프록시·대화 기록 (F6, F14)
 
 **의존성**
-- [ ] B-4 반려동물 API
-- [ ] A-9 FastAPI 엔드포인트
+- [x] B-4 반려동물 API
+- [x] A-9 FastAPI 엔드포인트
 
 **완료 조건**
-- [ ] `/api/chat`, `/api/chat/resume`이 인증된 `user_id`·`pet_id`를 붙여 Agent에 전달한다 (`AGENT_API_KEY` 사용)
-- [ ] `chat_logs`에 마스킹된 값만 저장한다
-- [ ] 대화 기록 조회 시 thread 소유자를 확인한다
-- [ ] Agent 타임아웃·오류 시 사용자 안내 문구를 돌려준다
+- [x] `/api/chat`, `/api/chat/resume`이 인증된 `user_id`·`pet_id`를 붙여 Agent에 전달한다 (`AGENT_API_KEY` 사용)
+- [x] Agent가 저장한 마스킹된 `chat_logs`만 읽어 보여준다 (Backend는 `chat_logs`를 쓰지 않고 읽기·삭제만, ARCHITECTURE.md 5장)
+- [x] 대화 기록 조회 시 thread 소유자를 확인한다
+- [x] Agent 타임아웃·오류 시 사용자 안내 문구를 돌려준다
 
 ---
 
