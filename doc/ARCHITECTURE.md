@@ -106,6 +106,7 @@ def common_middleware(extra: list | None = None) -> list:
         SummarizationMiddleware(model=model, trigger=("tokens", 4000), keep=("messages", 20)),  # 3
         ModelCallLimitMiddleware(run_limit=8),                                 # 4
         ToolCallLimitMiddleware(run_limit=10),                                 # 5
+        *([ModelFallbackMiddleware(fallback_model)] if fallback_model else []),  # 5.9 예비 모델 (AWS_FALLBACK_MODEL)
         ModelRetryMiddleware(max_retries=2, retry_on=not_bedrock_error, on_failure="error"),  # 6 (Bedrock 오류는 botocore가 재시도)
         ToolRetryMiddleware(max_retries=2),                                    # 6
         today_prompt,                         # 6.5 내장 @dynamic_prompt: 시스템 프롬프트에 오늘(KST) 날짜 추가
@@ -168,12 +169,21 @@ graph = create_supervisor(
     pre_model_hook=supervisor_input_guard,    # Supervisor 입력 가드레일 + PII 마스킹
     post_model_hook=supervisor_output_guard,  # Supervisor 출력 가드레일
     output_mode="last_message",
+    include_agent_name="inline",              # Bedrock(Claude)은 message.name을 모델에 전달하지 않는다 (아래 주)
+    tools=[create_forward_message_tool("supervisor")],  # 도우미 1명의 답은 그대로 전달 (아래 주)
 ).compile(checkpointer=SqliteSaver(           # HITL interrupt/resume + 대화 유지, 재시작 후에도 보존
     sqlite3.connect(os.getenv("CHECKPOINT_PATH", "data/checkpoints/checkpoints.sqlite"),
                     check_same_thread=False)))
 
 # 비대화형 할 일 생성: LLM 없이 tools.generate_daily_plan()을 직접 호출 (4.1.2)
 ```
+
+> **`include_agent_name="inline"` (Phase 4 E-2b, 2026-11-05)**: 기본값(None)은 하위 Agent 이름을 `AIMessage.name`으로만 전달하는데, 이 필드는 OpenAI만 모델에 보낸다. Bedrock Converse에서는 하위 Agent의 답이 Supervisor 자신의 이전 발화로 보여, Supervisor가 빈 답을 내거나(이미 답했다고 판단) 같은 Agent에 다시 위임해 반복했다(평가 1차 실행 diet-01·multi-03·personalization-01). `inline`은 `<name>…</name><content>…</content>`로 내용에 이름을 넣어 보내는 라이브러리 기능이다.
+> **예비 모델 (Supervisor)**: `AWS_FALLBACK_MODEL`이 있으면 Supervisor 모델은 `기본.with_fallbacks([예비], exceptions_to_handle=Bedrock 오류)`다. `with_fallbacks` 결과는 `bind_tools` 대상이 아니라 `include_agent_name="inline"` 래퍼 안에서 라이브러리가 도구를 묶지 못하므로, Supervisor 도구(handoff 4종 + `forward_message`)를 기본 모델 형식으로 미리 묶은 `RunnableBinding`으로 넘긴다 (라이브러리가 이름이 같으면 다시 묶지 않음).
+> **`forward_message` (Phase 4 E-2b)**: 도우미 한 명의 답으로 충분하면 Supervisor는 답을 다시 쓰지 않고 라이브러리 도구 `forward_message(from_agent)`로 그대로 전달한다. 질문에 여러 영역(식단+운동 등)이 있으면 쓰지 않고 해당 도우미를 모두 부른다 (4차 실행 multi-01: 식단 도우미 답만 전달돼 운동 도우미를 부르지 않음). 전문 도우미는 자기 영역 카테고리로만 `recommend_from_catalog`를 부른다. 자기 영역이 아닌 내용(취향 진술 포함)은 답에서 다루지 않고 `remember_preference`로 저장하지도 않으며(같은 취향을 두 도우미가 중복 저장하지 않게), "다른 도우미에게 말해 달라"고 안내하지도 않는다 (최종 점검 S21: 운동 도우미가 연어 취향을 식단 도우미에게 미뤄 합친 답이 어긋남). 다시 쓰면서 안내 문구·ID가 빠지는 문제(general-02)와 같은 긴 답을 두 번 생성하는 지연(2차 실행 p95 31.6초)을 줄인다. 여러 도우미의 답을 합칠 때만 직접 쓴다. trace에는 `tool_call`(`agent: supervisor`, `tool: forward_message`)로 남는다.
+> **날짜 해석**: 모델 입력 끝에 오늘 날짜·요일과 이번 주·다음 주의 날짜 범위(월~일)를 붙인다. 범위는 "다음 주 금요일" 같은 **특정 날짜 변환**에만 쓰고, "이번 주에 할 건강관리"처럼 기간을 묻는 질문은 알림 기준과 같은 오늘부터 7일 이내(D-7 포함, CLAUDE.md 4.5.3)로 본다. 건강 도우미 프롬프트에도 "기간 질문은 `get_upcoming_events`의 `days`를 줄이지 말고 기본 7"을 적는다 (4차 실행 health-02: 날짜 프롬프트만으로는 `days=5`를 씀).
+> **응급 질문 표시**: Supervisor `pre_model_hook`은 마지막 사용자 질문이 `is_emergency`(호흡곤란·경련·지속 구토·유해 식품 섭취 등)이면 "위임하지 말고 직접 위험 경고 + 즉시 동물병원" 지시를 모델 입력에 덧붙인다 (3.3 규칙 5를 결정적으로 보강, 그래프 상태는 바꾸지 않음).
+> **최종 답변 선택**: `answer`는 Supervisor 마지막 메시지다. 그 메시지가 비어 있으면(모델이 빈 응답) 이번 질문 이후 하위 Agent가 낸 마지막 답(Agent별 최신 1개, 호출 순서대로 합침)을 쓴다. 둘 다 없으면 안전 문구를 쓴다. 라이브러리에 같은 보장이 없어 `run_turn`에서 결정적으로 처리한다.
 
 > 미들웨어 클래스명과 파라미터는 설치 버전(langchain 1.4.8, langgraph-supervisor 0.0.31)으로 확인했다 (`src/tests/test_library_smoke.py`). `SummarizationMiddleware`는 `max_tokens_before_summary` 대신 `trigger`/`keep`를 쓴다. `HumanInTheLoopMiddleware`는 `description_prefix`로 승인 안내 문구를 한국어로 바꾼다. 하위 Agent는 `context_schema=AgentContext`로 만들고, 도구는 `ToolRuntime.context`에서 `user_id`·`pet_id`를 읽는다.
 
@@ -192,6 +202,11 @@ graph = create_supervisor(
 2. 개·고양이 관련이지만 1에 해당하지 않는 질문 → `general_agent`
 3. 전문 Agent가 `INSUFFICIENT_INFO`(답할 정보 없음)를 돌려주면 → 같은 질문을 `general_agent`에 한 번만 다시 보냄 (반복 금지)
 4. 반려동물과 무관한 질문, 개·고양이 외 동물, 진단 요청 → `general_agent`에 보내지 않고 Supervisor가 거절·병원 권고
+5. 유해 식품을 **이미 먹었거나** 응급 증상(호흡곤란·경련·계속되는 구토 등)이 있으면 → 위임하지 않고 Supervisor가 직접 "위험" 경고 + 즉시 동물병원 권고 (구토 유도 방법은 안내하지 않음). "줘도 돼?"처럼 급여 가능 여부를 묻는 질문은 `diet_agent`
+6. 다른 보호자의 반려동물이나 `pet_id`를 지정해 조회하는 요청 → 위임하지 않고 "찾을 수 없어요. 내 반려동물 정보만 볼 수 있어요"로 답함 (데이터 조회는 하위 Agent 도구가 `user_id`로 막지만, 위임 자체를 하지 않는다)
+7. 그 밖의 반려동물 질문에 Supervisor가 직접 답하지 않는다 (개인정보가 섞인 질문도 개인정보는 무시하고 1·2에 따라 위임). 각 도우미는 한 질문에 한 번만 부르고, 필요한 답이 모두 오면 바로 합쳐 답한다
+- 경계 예: 영양제·우유 등 급여 가능 여부, 물·수분 섭취량 → `diet_agent` / 산책 매너·펫티켓·병원 예약 준비, 반려동물 용어·스포츠의 **뜻을 묻는** 질문("어질리티가 뭐야?") → `general_agent`, 그 활동을 **추천·계획해 달라는** 요청("어질리티 훈련 프로그램 만들어줘") → `exercise_agent`. 반려동물 관련인지 애매한 용어 질문은 범위 밖으로 거절하지 않고 반려동물 질문으로 본다 (최종 점검 S13: 3/3회 범위 밖으로 거절 → 고친 뒤 8차 catalog-02가 general로 가는 회귀 → 뜻/추천으로 구분)
+- 취향·제약 진술: 질문 없이 취향·제약만 말해도("연어를 좋아해", "수영은 싫어해", "저녁에만 산책할 수 있어") Supervisor가 직접 답하지 않고 `remember_preference`로 저장하도록 영역 도우미에게 넘긴다 — 음식·간식 → `diet_agent`, 운동·놀이·산책 → `exercise_agent`, 둘 다면 각각 한 번씩 (S21, 2026-11-05 최종 점검에서 발견)
 
 공통 규칙: 개·고양이 외의 종은 정중히 거절한다. 대화에서 선호나 제약이 드러나면 `remember_preference`로 저장하고, 저장했다고 사용자에게 알린다. 카탈로그에 없는 요청에는 "아직 준비되지 않은 항목"이라고 안내하고 카탈로그 안의 대안을 제시한다.
 
@@ -251,6 +266,7 @@ graph = create_supervisor(
 | 3 | `SummarizationMiddleware` | 내장 | `before_model` | 긴 대화 요약으로 컨텍스트 초과 방지 |
 | 4 | `ModelCallLimitMiddleware` | 내장 | `before_model` | 무한 루프·비용 폭주 방지 |
 | 5 | `ToolCallLimitMiddleware` | 내장 | `wrap_tool_call` | 도구 남용 방지 |
+| 5.9 | `ModelFallbackMiddleware` *(선택)* | 내장 | `wrap_model_call` | `AWS_FALLBACK_MODEL`이 있을 때만 넣는다. Retry보다 바깥이라, 기본 모델(`AWS_MODEL`)이 botocore 재시도·미들웨어 재시도까지 모두 실패하면(한도 초과·스로틀·장애) 예비 모델로 같은 요청을 한 번 더 보낸다. 예비 모델도 실패하면 9장대로 503. 키가 없거나 `AWS_MODEL`과 같으면 넣지 않는다 (동작 변화 없음) |
 | 6 | `ModelRetryMiddleware` / `ToolRetryMiddleware` | 내장 | wrap | 일시 오류 재시도. 모델 재시도는 `on_failure="error"`로 둔다 (기본값 `continue`는 오류 문구를 AI 메시지로 바꿔 답변에 내보낸다). Bedrock(botocore) 오류는 botocore `Config`가 이미 2회 재시도하므로 미들웨어는 그 밖의 오류만 재시도한다 (9장) |
 | 6.5 | `today_prompt` | 내장 `@dynamic_prompt` | `wrap_model_call` | 시스템 프롬프트 끝에 오늘 날짜(KST, `TODAY_OVERRIDE` 반영)와 요일을 붙인다. 연도 없는 날짜("12월 15일")를 오늘 이후 가장 가까운 날짜로 해석하게 한다 (모델이 학습 시점 연도로 해석해 지난 날짜를 만드는 문제 방지) |
 | 6.6 | `user_input_wrap` | 커스텀 | `wrap_model_call` | 모델에 보내는 요청에서만 사용자 메시지(`HumanMessage`)를 `<user_input>…</user_input>`으로 감싼다 (4.7). 대화 상태·기록에 저장되는 원문은 바꾸지 않는다 |
@@ -279,7 +295,7 @@ graph = create_supervisor(
 | 직접 주입 (사용자 입력) | ① API 1차 탐지 → ② `injection_guard` → 시스템 프롬프트의 "지시 우선순위" 규칙 |
 | 간접 주입 (RAG 문서·도구 결과) | 검색 결과를 `<context>…</context>`로 감싸고 "데이터로만 취급" 규칙 적용 · ingest 시 주입 패턴 문서는 제외 · 도구 결과도 PII/주입 검사 |
 | 간접 주입 (웹 검색 결과) | `web_result_guard`가 결과를 `<web_result>`로 감싸고, 주입 패턴이 있는 snippet은 버림 · 차단 도메인 목록 적용 · General Agent에는 쓰기 도구가 없어 주입되더라도 데이터 변경 불가 |
-| 정보 유출 (검색 질의) | `web_query_pii_guard`가 질의에서 PII, 사용자 소유 반려동물 이름, 사용자 닉네임을 **지운 뒤**(마스킹 토큰도 외부로 보내지 않음) 외부 API로 보냄. 지운 뒤 2자 미만이면 검색하지 않고 오류를 돌려줌 · 실제로 보낸 질의는 도구 결과 artifact(`query`)에 남겨 trace에 기록 |
+| 정보 유출 (검색 질의) | `web_query_pii_guard`가 질의에서 PII, 사용자 소유 반려동물 이름, 사용자 닉네임을 **지운 뒤**(마스킹 토큰도 외부로 보내지 않음) 외부 API로 보냄. 지운 뒤 2자 미만이면 검색하지 않고 오류를 돌려줌 · 실제로 보낸 질의는 도구 결과 artifact(`query`)에 남겨 trace에 기록 · **평가 모드(`EVAL_MODE=true`)이고 `EVAL_RESULTS_DIR`가 있으면** 실제로 보낸 질의 원문을 `<EVAL_RESULTS_DIR>/web_queries.jsonl`에 `{query_id, query}`로 한 줄씩 남긴다 (trace의 `query`는 마스킹 값이라 PII 잔존 판정에 못 쓰므로, phase4_task.md Q5). 평가 모드가 아니면 쓰지 않는다 |
 | 간접 주입 판정 (웹 snippet) | 입력 가드레일 1단계 규칙(`detect_injection_rules`) 중 `injection`·`prompt_leak` 사유만 쓴다 (snippet에는 반려동물 단어가 없을 수 있어 `out_of_scope` 등은 쓰지 않음). snippet의 PII도 마스킹 |
 | 시스템 프롬프트 유출 | `output_guard`에서 프롬프트 일부 문자열·내부 도구명 노출 검사 |
 | 권한 상승 / 타 데이터 접근 | `pet_id`는 요청 컨텍스트로 고정하고 LLM 인자를 신뢰하지 않음 · Agent별 최소 도구 · 쓰기 도구는 HITL |
@@ -374,6 +390,7 @@ graph = create_supervisor(
   - `activity_time_after:HH:MM` / `activity_time_before:HH:MM`: 활동 할 일의 시간대. 후보를 거르지 않고 시간 배정에만 쓴다.
   - `exclude_tag:<tag>`: 그 태그가 있는 항목 제외 (예: `exclude_tag:outdoor`). 완화 4단계에서 해제
   - `max_duration_min:<n>`: 최소 시간이 n분을 넘는 활동 제외. 완화 4단계에서 해제
+  - `like`·`dislike`의 자유 텍스트: 현재 반려동물 종의 추천 가능 카탈로그 항목 중 **이름에 그 텍스트가 들어간 항목이 하나뿐이면** 그 `item_id`로 바꿔 저장한다 (예: "수영" → `act_dog_swimming_01`, Phase 4 personalization-03). 여러 개이거나 없으면 자유 텍스트로 저장한다
   - 그 밖의 자유 텍스트: 저장만 하고 추천 필터에는 쓰지 않는다 (Agent가 대화에서 참고)
 - 가중치와 반감기는 `src/tools.py`의 상수로 관리하고, 평가 결과를 보고 조정한다.
 - "내 취향 초기화"를 하면 해당 반려동물의 `preferences`와 `interactions`를 삭제한다 (완료 횟수도 0이 된다. 회원 탈퇴와 같은 완전 삭제 원칙, 10장).
@@ -432,6 +449,7 @@ graph = create_supervisor(
 - 선택 필드 `thread_id`: 대화를 이어가거나 HITL을 재개할 때 쓴다. 없으면 새로 만들어 trace에 넣어 돌려준다.
 - 평가 계약: 평가 스크립트는 본문에 `question`만 보낸다(문항에 `user_id`·`pet_id`가 있으면 함께 보냄). 헤더에는 Backend와 같은 `AGENT_API_KEY`를 넣는다. `EVAL_MODE=true`이면 시드 데모 사용자(`DEMO_USER_ID`)와 대표 반려동물로 처리한다.
 - 인증: `AGENT_API_KEY` 헤더가 없거나 틀리면 401이다 (`EVAL_MODE`와 관계없음).
+- **`GET /health`** (키 없음): `{status, today, eval_mode, web_search_mock}` — 평가 실행 전 점검용 (phase4_task.md D3). 키·모델 ID 등 다른 설정은 노출하지 않는다. Backend `GET /health`도 `{chroma, agent, today}`를 돌려준다
 - **요청 헤더** (Agent 서버 모든 엔드포인트, `GET /health` 제외)
 
   | 헤더 | 필수 | 설명 |
@@ -683,6 +701,7 @@ Chroma는 문서 + 메타데이터 저장소이므로, 앱 데이터는 **`docum
 | `AWS_DEFAULT_REGION` | Agent | Bedrock 리전 |
 | `AWS_MODEL` | Agent | `ChatBedrockConverse` 모델 ID |
 | `AWS_EMBED_MODEL` | Agent | Bedrock 임베딩 모델 ID (`amazon.titan-embed-text-v2:0`) |
+| `AWS_FALLBACK_MODEL` *(선택)* | Agent | 예비 `ChatBedrockConverse` 모델 ID. 기본 모델 호출이 실패하면 하위 Agent(`ModelFallbackMiddleware`)와 Supervisor(`with_fallbacks`)가 이 모델로 다시 호출한다 (3.6·9장). 비우면 폴백 없음 |
 | `CHROMA_HOST` / `CHROMA_PORT` | Agent, Backend | 기본 `localhost` / `8001` |
 | `CHROMA_DATABASE` *(선택)* | Backend 테스트 | Chroma database 이름. 비우면 기본 database(앱 데이터). `npm run test:chroma`는 `dailypet_test`를 써서 앱 데이터를 건드리지 않는다 |
 | `AGENT_URL` | Backend | 기본 `http://localhost:8000` |
@@ -695,6 +714,10 @@ Chroma는 문서 + 메타데이터 저장소이므로, 앱 데이터는 **`docum
 | `TODAY_OVERRIDE` | Backend, Agent | 평가·테스트용 "오늘" 날짜 고정 (`YYYY-MM-DD`) |
 | `EVAL_MODE` / `DEMO_USER_ID` | Agent | 평가 모드에서 `user_id`가 없을 때 쓸 데모 사용자 |
 | `CHECKPOINT_PATH` | Agent | 기본 `data/checkpoints/checkpoints.sqlite` |
+| `EVAL_RESULTS_DIR` *(평가 전용)* | Agent | 평가 모드에서 실제 웹 검색 질의를 `web_queries.jsonl`로 남길 폴더 (3.7). 비우면 남기지 않음 |
+| `EVAL_DEMO_PASSWORD` *(평가 전용)* | 평가 스크립트 | isolation API 케이스에서 시드 계정으로 로그인할 비밀번호 (값은 USER_SCENARIO.md 1.1) |
+| `EVAL_AGENT_URL` / `EVAL_BACKEND_URL` *(평가 전용)* | 평가 스크립트 | 평가 대상 Agent·Backend 주소 (기본 `http://localhost:8000` / `:3000`) |
+| `EVAL_AGENT_NO_EVAL_URL` *(평가 전용)* | 평가 스크립트 | isolation-05용 `EVAL_MODE=false` Agent 주소 (기본 `http://localhost:8010`) |
 
 > 키 이름 목록은 `.env.example`에 있다 (값 없이 커밋). 웹 검색은 키가 없는 DuckDuckGo라 웹 검색 키는 없다.
 
@@ -755,7 +778,10 @@ Chroma는 문서 + 메타데이터 저장소이므로, 앱 데이터는 **`docum
   - 응답 시간
   - 보안: 주입 차단율, 응답·trace에 남은 PII 0건, 쓰기 요청 시 interrupt 발생률, 다른 사용자 데이터 노출 0건
   - 추천: 카탈로그 준수율(답변 속 항목 ID가 모두 카탈로그에 있는지), 취향 반영률(👎 항목 미추천, 👍 항목 상위 노출)
-- 결과: `evaluation/report_YYYYMMDD.md` (+ 원본 결과 CSV)
+- 결과: `evaluation/report_YYYYMMDD.md` (+ 원본 결과 CSV `evaluation/results/<실행 id>/results.csv`)
+- 실행: `python -m evaluation.run_eval` (문항마다 `seed:reset` → `POST /query` → 판정 → 저장). 판정기 목록·통과 조건·집계 규칙은 `evaluation/README.md` "판정 방법"이 기준본이다 (phase4_task.md 1.3·1.4).
+  - "키워드 포함" 합격선은 **문항별 100%**다 (해당 카테고리 문항이 모두 키워드를 포함해야 함, D4).
+  - 문항 판정 = 그 문항에 적용되는 판정기가 모두 통과. LLM 판정 호출 실패는 "판정 불가"로 통과로 세지 않는다.
 
 **문항 배분과 합격선 (총 50문항)**
 
@@ -781,7 +807,7 @@ Chroma는 문서 + 메타데이터 저장소이므로, 앱 데이터는 **`docum
 
 ## 9. 오류 처리 및 로깅
 
-- Agent 서버: Bedrock 호출 타임아웃 60초, 재시도 2회 (`ChatBedrockConverse`에 botocore `Config(read_timeout=60, retries={"total_max_attempts": 3})`). 실패 시 HTTP 503, `answer`에 안내 문구, `contexts: []`, `trace`에 `{"type":"error","reason":"model_unavailable"}` 기록. 그 밖의 예외는 500과 `reason:"internal"`
+- Agent 서버: Bedrock 호출 타임아웃 60초, 재시도 2회 (`ChatBedrockConverse`에 botocore `Config(read_timeout=60, retries={"total_max_attempts": 3})`). `AWS_FALLBACK_MODEL`이 있으면 기본 모델이 재시도까지 실패한 뒤 예비 모델로 한 번 더 호출한다 (하위 Agent는 `ModelFallbackMiddleware`, Supervisor는 Bedrock 오류에만 반응하는 `with_fallbacks`). 예비 모델까지 실패 시 HTTP 503, `answer`에 안내 문구, `contexts: []`, `trace`에 `{"type":"error","reason":"model_unavailable"}` 기록. 그 밖의 예외는 500과 `reason:"internal"`
 - Agent 로그(`dailypet.agent`): 요청마다 한 줄 — 엔드포인트, `user_id`·`pet_id`(불투명 ID), 마스킹한 질문 앞 100자, trace 이벤트 종류별 개수, 소요 시간(ms), 상태 코드. 키 값·프로필 전체·예외 메시지는 남기지 않는다
 - Backend: Agent 서버 장애 시 `/api/chat`은 503 반환, 그 외 CRUD는 정상 동작
 - 로그에는 질문·trace 요약만 남기고 자격증명·전체 프로필은 남기지 않는다

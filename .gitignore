@@ -10,3 +10,6 @@ data/checkpoints/
 test-results/
 playwright-report/
 src/frontend/tsconfig.tsbuildinfo
+
+# 평가 실행 중 Agent가 쓰는 임시 검색 질의 기록 (결과 폴더로 옮긴 뒤 마스킹)
+evaluation/results/_live/

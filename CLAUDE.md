@@ -78,6 +78,13 @@ dailypet/
 │   ├── chroma/             Chroma 저장소 (커밋 제외)
 │   └── checkpoints/        LangGraph SqliteSaver 파일 (커밋 제외)
 └── evaluation/             test_queries.csv 와 평가 리포트
+    ├── run_eval.py         평가 실행기 (python -m evaluation.run_eval)
+    ├── judges.py           판정기 (규칙 + LLM-as-judge)
+    ├── aggregate.py        카테고리 합격선 집계
+    ├── perf.py             성능 측정 (API p95)
+    ├── scan_secrets.py     결과·로그·저장소 PII·키 검색
+    ├── tests/              판정기·집계 pytest
+    └── results/            실행별 결과 폴더 (<YYYYMMDD_HHMM>/, 마스킹된 값만)
 ```
 
 ### 3.1 각 위치에 둘 것 / 두지 말 것
@@ -94,7 +101,7 @@ dailypet/
 | `src/backend/` | REST API, Agent 서버 프록시, 알림 스케줄러 (자체 `package.json`) | LLM 직접 호출 |
 | `data/` | 카탈로그 JSON, 출처, 지식 문서, 시드 JSON, `data/chroma/` 저장소 | 코드, 실제 사용자 개인정보 |
 | `database/` | `schema.md` (ERD 기반 DDL, 제약 조건 기준본) | 실제 데이터, DB 파일, 비밀번호 등 자격증명 |
-| `evaluation/` | `test_queries.csv`, 평가 스크립트 결과, 리포트 | 학습/서비스용 데이터 |
+| `evaluation/` | `test_queries.csv`, 평가 스크립트(`run_eval.py`·`judges.py`·`aggregate.py`·`perf.py`·`scan_secrets.py`)와 테스트, `results/<실행 id>/` 결과, 리포트 | 학습/서비스용 데이터, 마스킹 안 된 PII·키 값 |
 
 ## 4. 반드시 지킬 규칙
 
@@ -120,7 +127,7 @@ dailypet/
 
 ### 4.3 환경변수 / 보안
 - `.env`는 절대 커밋하지 않는다 (`.gitignore`에 포함됨). 새 키를 추가하면 `.env.example`에도 키 이름만 추가한다.
-- 현재 사용하는 키: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_DEFAULT_REGION`, `AWS_MODEL`, `AWS_EMBED_MODEL` (전체 목록은 `.env.example`, ARCHITECTURE.md 7장)
+- 현재 사용하는 키: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_DEFAULT_REGION`, `AWS_MODEL`, `AWS_EMBED_MODEL`, 선택 `AWS_FALLBACK_MODEL`(예비 모델) (전체 목록은 `.env.example`, ARCHITECTURE.md 7장)
 - 웹 검색은 Version 1에서 **키 없는 DuckDuckGo**만 쓴다. 웹 검색용 API 키를 추가하지 않는다.
 - 로그·trace에 자격증명이나 개인정보를 남기지 않는다.
 
@@ -168,7 +175,7 @@ dailypet/
   - **출력 가드레일**: 유해 식품 추천·진단/처방 표현·시스템 프롬프트 노출 검사, 응급 시 병원 권고 문구 확인
   - **HITL**: 채팅으로 요청한 **건강 일정 생성·수정** 도구는 `HumanInTheLoopMiddleware`로 사용자 승인을 받는다. 오늘의 할 일 자동 생성(`/tasks/generate`)은 HITL 대상이 아니다. 승인 대기 중에 새 메시지가 오거나 반려동물을 바꾸면 대기 중인 작업은 자동으로 거절 처리한다.
   - **PII**: `PIIMiddleware`로 마스킹한다 (4.7 참고).
-  - **안정성**: `ModelCallLimitMiddleware`, `ToolCallLimitMiddleware`, `ModelRetryMiddleware` / `ToolRetryMiddleware`, `SummarizationMiddleware`
+  - **안정성**: `ModelCallLimitMiddleware`, `ToolCallLimitMiddleware`, `ModelRetryMiddleware` / `ToolRetryMiddleware`, `ModelFallbackMiddleware`(예비 모델, `AWS_FALLBACK_MODEL`이 있을 때), `SummarizationMiddleware`
 - Supervisor(`create_supervisor`)에는 `pre_model_hook` / `post_model_hook`로 같은 가드레일을 건다. 그래프 바깥(`/query` 핸들러)에도 입력·출력 가드레일을 한 번 더 둔다 (다층 방어).
 - 미들웨어 순서, 적용 대상, 설정값은 ARCHITECTURE.md 3.6에 기록한다. 바꾸면 문서도 함께 고친다.
 
@@ -217,15 +224,15 @@ cd src/frontend && npm install && npm run dev           # :5173
 
 ## 6. 완료 기준 (Definition of Done)
 
-- [ ] `POST /query`가 `answer`, `contexts`, `trace`를 반환한다.
-- [ ] Supervisor가 질문 유형에 따라 식단 / 운동 / 건강관리 / General Agent로 올바르게 라우팅한다.
-- [ ] General Agent의 웹 검색 답변에 출처가 있고, 검색 질의에 PII가 없으며, 추천 항목 생성·저장을 하지 않는다.
-- [ ] `evaluation/test_queries.csv` 전체를 실행한 평가 리포트가 `evaluation/`에 있다.
-- [ ] SERVICE.md의 MVP 기능 수용 기준을 모두 만족한다.
-- [ ] 입력·출력 가드레일, HITL, PII 마스킹 미들웨어가 적용되어 있다. `injection`, `pii` 평가 카테고리를 통과한다.
-- [ ] 응답(`answer`, `contexts`, `trace`)과 로그에 마스킹되지 않은 PII가 없다.
-- [ ] 카탈로그 3종이 종×영역별 10~15개(연령대·저강도 최소 개수 충족), 출처 포함, 검수 완료 상태로 `data/catalog/`에 있다.
-- [ ] 모든 추천이 카탈로그 항목 ID로 추적된다. 👎 항목 재추천 등 취향 반영 평가를 통과한다.
-- [ ] 50문항 평가셋이 카테고리별 최소 문항 수와 합격선(ARCHITECTURE.md 8장)을 충족한다.
-- [ ] 사용자 간 데이터가 격리되어 있다 (다른 사용자의 반려동물에 접근할 수 없다).
-- [ ] `.env`, `data/chroma/`, `data/checkpoints/`가 커밋되지 않았다.
+- [x] `POST /query`가 `answer`, `contexts`, `trace`를 반환한다.
+- [x] Supervisor가 질문 유형에 따라 식단 / 운동 / 건강관리 / General Agent로 올바르게 라우팅한다.
+- [x] General Agent의 웹 검색 답변에 출처가 있고, 검색 질의에 PII가 없으며, 추천 항목 생성·저장을 하지 않는다.
+- [x] `evaluation/test_queries.csv` 전체를 실행한 평가 리포트가 `evaluation/`에 있다.
+- [x] SERVICE.md의 MVP 기능 수용 기준을 모두 만족한다.
+- [x] 입력·출력 가드레일, HITL, PII 마스킹 미들웨어가 적용되어 있다. `injection`, `pii` 평가 카테고리를 통과한다.
+- [x] 응답(`answer`, `contexts`, `trace`)과 로그에 마스킹되지 않은 PII가 없다.
+- [x] 카탈로그 3종이 종×영역별 10~15개(연령대·저강도 최소 개수 충족), 출처 포함, 검수 완료 상태로 `data/catalog/`에 있다.
+- [x] 모든 추천이 카탈로그 항목 ID로 추적된다. 👎 항목 재추천 등 취향 반영 평가를 통과한다.
+- [x] 50문항 평가셋이 카테고리별 최소 문항 수와 합격선(ARCHITECTURE.md 8장)을 충족한다.
+- [x] 사용자 간 데이터가 격리되어 있다 (다른 사용자의 반려동물에 접근할 수 없다).
+- [x] `.env`, `data/chroma/`, `data/checkpoints/`가 커밋되지 않았다.
