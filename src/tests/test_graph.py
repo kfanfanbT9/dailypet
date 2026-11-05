@@ -299,3 +299,120 @@ def real_env(real_catalog_loaded, real_embeddings, today, monkeypatch):
     tools.configure_resources(client=real_catalog_loaded, embeddings=real_embeddings, catalog=catalog_index())
     yield real_catalog_loaded
     config.get_settings.cache_clear()
+
+
+# ---------------------------------------------------------------- 최종 답변 선택 (Phase 4 E-2b)
+
+
+def test_final_answer_falls_back_to_sub_agent_when_supervisor_empty():
+    """Supervisor가 빈 응답을 내면 이번 질문 이후 하위 Agent의 최신 답을 쓴다 (ARCHITECTURE.md 3.2 주)."""
+    back = AIMessage("", name="diet_agent", tool_calls=[{"name": "transfer_back_to_supervisor", "args": {},
+                                                        "id": "t1"}])
+    msgs = [HumanMessage("이전 질문"), AIMessage("이전 답", name="exercise_agent"),
+            HumanMessage("보리 하루 사료량"), AIMessage("첫 초안", name="diet_agent"),
+            AIMessage("보리 하루 1,100kcal예요.", name="diet_agent"), back,
+            ToolMessage("Successfully transferred back", tool_call_id="t1"), AIMessage("", name="supervisor")]
+    assert agent.final_answer(msgs) == "보리 하루 1,100kcal예요."
+    multi = [HumanMessage("식단이랑 운동"), AIMessage("식단 답", name="diet_agent"),
+             AIMessage("운동 답", name="exercise_agent"), AIMessage(" ", name="supervisor")]
+    assert agent.final_answer(multi) == "식단 답\n\n운동 답"
+    assert agent.final_answer([*multi[:-1], AIMessage("합친 답", name="supervisor")]) == "합친 답"
+    assert agent.final_answer([HumanMessage("q"), AIMessage("", name="supervisor")]) == agent.SAFE_FALLBACK
+
+
+def test_supervisor_exposes_agent_names_inline(env):
+    """Bedrock은 message.name을 모델에 보내지 않으므로 하위 Agent 이름을 내용에 넣어 보낸다."""
+    sup = scripted(tool_call("transfer_to_diet_agent"), AIMessage("전달 완료"))
+    diet = scripted(AIMessage("보리는 하루 2회 급여해요."))
+    unused = scripted()
+    g = agent.build_graph(sup, agent_models={"diet_agent": diet, "exercise_agent": unused,
+                                              "health_agent": unused, "general_agent": unused},
+                          checkpointer=InMemorySaver())
+    ctx = AgentContext(user_id=P3, pet_id="pet_bori", thread_id=f"thr_{P3}_pet_bori_{uuid.uuid4().hex}")
+    g.invoke({"messages": [HumanMessage("보리 사료")]}, {"configurable": {"thread_id": ctx.thread_id}}, context=ctx)
+    last_call = ScriptedModel.seen[-1]
+    assert any("<name>diet_agent</name>" in agent._text(m) for m in last_call)
+
+
+def test_forward_message_keeps_answer_verbatim_and_state_clean(env):
+    """도우미 1명의 답은 forward_message로 그대로 전달하고, 다음 턴을 막는 미응답 tool_call을 남기지 않는다."""
+    sup = scripted(tool_call("transfer_to_diet_agent"), tool_call("forward_message", from_agent="diet_agent"))
+    diet = scripted(AIMessage("보리는 하루 2회 급여해요 (diet_dog_adult_meal_guide_01)."))
+    unused = scripted()
+    g = agent.build_graph(sup, agent_models={"diet_agent": diet, "exercise_agent": unused,
+                                              "health_agent": unused, "general_agent": unused},
+                          checkpointer=InMemorySaver())
+    ctx = AgentContext(user_id=P3, pet_id="pet_bori", thread_id=f"thr_{P3}_pet_bori_{uuid.uuid4().hex}")
+    res = agent.run_turn(g, ctx, question="보리 사료")
+    assert res.answer == "보리는 하루 2회 급여해요 (diet_dog_adult_meal_guide_01)."
+    assert ("tool_call", "forward_message") in [(e["type"], e.get("tool")) for e in res.trace]
+    msgs = g.get_state({"configurable": {"thread_id": ctx.thread_id}}).values["messages"]
+    answered = {m.tool_call_id for m in msgs if isinstance(m, ToolMessage)}
+    assert all(c["id"] in answered for m in msgs if isinstance(m, AIMessage) for c in m.tool_calls)
+
+
+def test_emergency_question_adds_direct_answer_directive():
+    out = agent.supervisor_input_guard({"messages": [HumanMessage("강아지가 포도 먹었어")]})
+    assert agent.EMERGENCY_DIRECTIVE in agent._text(out["llm_input_messages"][-1])
+    calm = agent.supervisor_input_guard({"messages": [HumanMessage("고양이한테 우유 줘도 돼?")]})
+    assert agent.EMERGENCY_DIRECTIVE not in agent._text(calm["llm_input_messages"][-1])
+
+
+# ---------------------------------------------------------------- 예비 모델 (AWS_FALLBACK_MODEL, ARCHITECTURE.md 3.6·9장)
+
+
+class ThrottledModel(ScriptedModel):
+    """항상 Bedrock 스로틀 오류를 내는 기본 모델."""
+
+    def _generate(self, messages, stop=None, run_manager=None, **kwargs):
+        from botocore.exceptions import ClientError
+
+        raise ClientError({"Error": {"Code": "ThrottlingException", "Message": "Too many tokens"}}, "Converse")
+
+
+def test_supervisor_falls_back_on_bedrock_error(env, monkeypatch):
+    primary = ThrottledModel(messages=iter([]))
+    backup = scripted(AIMessage("저는 강아지·고양이 돌봄을 돕는 DailyPet이에요."))
+    unused = scripted()
+    monkeypatch.setattr(agent, "fallback_for", lambda m: backup if m is primary else None)
+    g = agent.build_graph(primary, agent_models={n: unused for n in agent.AGENT_NAMES}, checkpointer=InMemorySaver())
+    ctx = AgentContext(user_id=P3, pet_id="pet_bori", thread_id=f"thr_{P3}_pet_bori_{uuid.uuid4().hex}")
+    assert agent.run_turn(g, ctx, question="안녕").answer == "저는 강아지·고양이 돌봄을 돕는 DailyPet이에요."
+
+
+def test_supervisor_fallback_ignores_non_bedrock_errors():
+    class Broken(ScriptedModel):
+        def _generate(self, messages, stop=None, run_manager=None, **kwargs):
+            raise ValueError("bug")
+
+    model = agent.supervisor_model_with_fallback(Broken(messages=iter([])), scripted(AIMessage("예비")))
+    with pytest.raises(ValueError):  # 코드 오류는 예비 모델로 숨기지 않는다
+        model.invoke([HumanMessage("q")])
+    names = {t["function"]["name"] for t in model.kwargs["tools"]}
+    assert names == {*(f"transfer_to_{n}" for n in agent.AGENT_NAMES), "forward_message"}
+
+
+def test_specialist_falls_back_via_middleware(env):
+    from langchain.agents import create_agent
+    from langchain.agents.middleware import ModelFallbackMiddleware
+
+    primary = ThrottledModel(messages=iter([]))
+    backup = scripted(AIMessage("보리는 하루 2회 급여해요."))
+    mw = agent.common_middleware([], primary, backup)
+    assert any(isinstance(m, ModelFallbackMiddleware) for m in mw)
+    assert not any(isinstance(m, ModelFallbackMiddleware) for m in agent.common_middleware([], primary))
+    a = create_agent(model=primary, tools=list(tools.DIET_TOOLS), middleware=mw, context_schema=AgentContext,
+                     name="diet_agent")
+    ctx = AgentContext(user_id=P3, pet_id="pet_bori", thread_id=f"thr_{P3}_pet_bori_{uuid.uuid4().hex}")
+    out = a.invoke({"messages": [HumanMessage("보리 사료")]}, context=ctx)
+    assert agent._text(out["messages"][-1]) == "보리는 하루 2회 급여해요."
+
+
+def test_fallback_off_when_unset_or_same(monkeypatch):
+    for value in ("", "same"):
+        monkeypatch.setenv("AWS_FALLBACK_MODEL", value)
+        monkeypatch.setenv("AWS_MODEL", "same")
+        config.get_settings.cache_clear()
+        monkeypatch.setattr(agent, "_fallback_model", None)
+        assert agent.get_fallback_model() is None
+    config.get_settings.cache_clear()

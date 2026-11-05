@@ -160,6 +160,17 @@ def test_remember_free_text_and_common_constraint(env):
     assert nabi_prefs["constraint"][0]["scope"] == "all_pets"
 
 
+def test_remember_free_text_maps_to_unique_catalog_name(env):
+    # "수영 싫어해" → 개 카탈로그 이름에 '수영'이 든 항목이 하나뿐이라 item_id로 저장 (ARCHITECTURE.md 3.8)
+    out, _ = call(tools.remember_preference, P3, "pet_bori", kind="dislike", target="수영")
+    assert out["target"] == "act_dog_swimming_01" and out["applies_to_recommendation"] is True
+    rec, _ = call(tools.recommend_from_catalog, P3, "pet_bori", category="activity", query="운동", k=5)
+    assert "act_dog_swimming_01" not in [i["item_id"] for i in rec["items"]]
+    # 여러 항목에 걸리는 말("산책")은 자유 텍스트로 둔다
+    walk, _ = call(tools.remember_preference, P3, "pet_bori", kind="like", target="산책")
+    assert walk["target"] == "산책" and walk["applies_to_recommendation"] is False
+
+
 def test_remember_unknown_catalog_id_rejected(env):
     out, _ = call(tools.remember_preference, P3, "pet_bori", kind="like", target="act_dog_fake_99")
     assert "error" in out

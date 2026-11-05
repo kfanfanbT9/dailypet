@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import logging
 import statistics
 import time
@@ -26,7 +27,7 @@ H = {"X-Agent-Api-Key": KEY}
 def env(catalog_loaded, fake_embeddings, today, monkeypatch):
     ingest_knowledge(catalog_loaded, fake_embeddings)
     monkeypatch.setenv("AGENT_API_KEY", KEY)
-    for k in ("WEB_SEARCH_MOCK", "EVAL_MODE", "DEMO_USER_ID"):
+    for k in ("WEB_SEARCH_MOCK", "EVAL_MODE", "DEMO_USER_ID", "EVAL_RESULTS_DIR"):
         monkeypatch.setenv(k, "")  # 빈 값: .env가 되살리지 못하게
     config.get_settings.cache_clear()
     tools.configure_resources(client=catalog_loaded, embeddings=fake_embeddings, catalog=catalog_index())
@@ -322,7 +323,27 @@ def test_tasks_generate_p95_under_1s(env, llm_forbidden):
 
 
 def test_health_endpoint_needs_no_key(env):
-    assert TestClient(agent.app).get("/health").json() == {"status": "ok"}
+    body = TestClient(agent.app).get("/health").json()
+    # 평가 실행 전 점검용 값만 (키·모델 ID 없음, phase4_task.md D3)
+    assert set(body) == {"status", "today", "eval_mode", "web_search_mock"}
+    assert body["status"] == "ok" and len(body["today"]) == 10
+
+
+def test_eval_web_query_recorded_only_in_eval_mode(env, tmp_path, monkeypatch):
+    from src.config import AgentContext, get_settings
+
+    ctx = AgentContext(user_id=P3, pet_id="pet_bori", thread_id="thr_x", eval_query_id="pii-01")
+    monkeypatch.setenv("EVAL_RESULTS_DIR", str(tmp_path))
+    monkeypatch.setenv("EVAL_MODE", "false")
+    get_settings.cache_clear()
+    agent.record_eval_web_query(ctx, "고양이 병원 예약 준비")
+    assert not (tmp_path / "web_queries.jsonl").exists()
+    monkeypatch.setenv("EVAL_MODE", "true")
+    get_settings.cache_clear()
+    agent.record_eval_web_query(ctx, "고양이 병원 예약 준비")
+    line = json.loads((tmp_path / "web_queries.jsonl").read_text(encoding="utf-8"))
+    assert line == {"query_id": "pii-01", "thread_id": "thr_x", "query": "고양이 병원 예약 준비"}
+    get_settings.cache_clear()
 
 
 # ================================================================ 실제 서버 스모크 (llm, chroma)

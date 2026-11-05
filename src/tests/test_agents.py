@@ -23,8 +23,12 @@ class ScriptedModel(GenericFakeChatModel):
 
     seen: list[list[Any]] = []
 
-    def bind_tools(self, tools: Any, **kwargs: Any) -> ScriptedModel:
-        return self
+    def bind_tools(self, tools: Any, **kwargs: Any) -> Any:
+        # 실제 모델처럼 tools가 묶인 RunnableBinding을 돌려준다. langgraph-supervisor의
+        # include_agent_name="inline"은 묶인 모델을 감싸므로, 묶였는지 검사가 이 값을 본다.
+        from langchain_core.utils.function_calling import convert_to_openai_tool
+
+        return self.bind(tools=[convert_to_openai_tool(t) for t in tools])
 
     def _generate(self, messages, stop=None, run_manager=None, **kwargs):
         ScriptedModel.seen.append(list(messages))

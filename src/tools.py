@@ -975,6 +975,24 @@ class RememberArgs(BaseModel):
         default="pet", description="pet=현재 반려동물만, all_pets=이 사용자의 모든 반려동물 공통")
 
 
+def _catalog_id_by_name(res: Any, ctx: AgentContext, text: str) -> str | None:
+    """자유 텍스트("수영")가 현재 반려동물 종의 추천 가능 항목 이름 하나에만 들어 있으면 그 item_id.
+
+    자유 텍스트는 추천 필터에 쓰이지 않으므로(ARCHITECTURE.md 3.8), 하나로 정해질 때만 ID로 바꾼다.
+    """
+    text = text.strip()
+    if len(text) < 2:
+        return None
+    try:
+        species = res.store.get_pet(ctx.user_id, ctx.pet_id).get("species")
+    except PermissionError:
+        return None
+    hits = [iid for iid, it in res.catalog.items()
+            if it.get("recommendable") is True and species in (it.get("species") or [])
+            and text in str(it.get("name", ""))]
+    return hits[0] if len(hits) == 1 else None
+
+
 @tool(args_schema=RememberArgs)
 def remember_preference(runtime: Runtime, kind: str, target: str, note: str = "",
                         scope: str = "pet") -> str:
@@ -990,6 +1008,8 @@ def remember_preference(runtime: Runtime, kind: str, target: str, note: str = ""
         return _error("카탈로그에 없는 항목 ID예요. recommend_from_catalog 결과의 ID를 쓰거나 이름을 자유 텍스트로 저장하세요.")
     today = today_kst()
     pet_id = ctx.pet_id if scope == "pet" else None
+    if kind in ("like", "dislike") and scope == "pet" and target not in res.catalog:
+        target = _catalog_id_by_name(res, ctx, target) or target
     digest = hashlib.sha256(f"{kind}|{target}".encode()).hexdigest()[:10]
     row: dict[str, Any] = {
         "id": f"pref_{pet_id or ctx.user_id}_{digest}",

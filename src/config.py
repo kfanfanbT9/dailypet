@@ -63,6 +63,7 @@ class Settings:
     aws_region: str | None
     aws_model: str | None
     aws_embed_model: str | None
+    aws_fallback_model: str | None = None  # 예비 모델 (ARCHITECTURE.md 3.6 5.9, 9장)
     chroma_host: str = "localhost"
     chroma_port: int = 8001
     agent_api_key: str | None = field(default=None, repr=False)
@@ -72,6 +73,7 @@ class Settings:
     checkpoint_path: Path = ROOT / "data" / "checkpoints" / "checkpoints.sqlite"
     web_search_mock: bool = False
     web_search_blocked_domains: tuple[str, ...] = ()
+    eval_results_dir: Path | None = None  # 평가 모드에서 실제 웹 검색 질의를 남길 폴더 (ARCHITECTURE.md 3.7)
 
     def require_agent(self) -> Settings:
         """Agent 서버 실행에 필요한 키가 모두 있는지 확인한다. 없으면 키 이름만 알려 준다."""
@@ -97,6 +99,7 @@ def load_settings(env_file: Path | None = ROOT / ".env") -> Settings:
         aws_region=_env("AWS_DEFAULT_REGION"),
         aws_model=_env("AWS_MODEL"),
         aws_embed_model=_env("AWS_EMBED_MODEL"),
+        aws_fallback_model=_env("AWS_FALLBACK_MODEL"),
         chroma_host=_env("CHROMA_HOST", "localhost") or "localhost",
         chroma_port=int(port),
         agent_api_key=_env("AGENT_API_KEY"),
@@ -108,7 +111,15 @@ def load_settings(env_file: Path | None = ROOT / ".env") -> Settings:
         web_search_blocked_domains=tuple(
             d.strip().lower() for d in blocked.split(",") if d.strip()
         ),
+        eval_results_dir=_resolve_dir(_env("EVAL_RESULTS_DIR")),
     )
+
+
+def _resolve_dir(value: str | None) -> Path | None:
+    if not value:
+        return None
+    path = Path(value)
+    return path if path.is_absolute() else ROOT / path
 
 
 @lru_cache(maxsize=1)

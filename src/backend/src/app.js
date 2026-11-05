@@ -32,7 +32,7 @@ export function createApp(deps) {
   });
 
   app.get("/health", async (_req, res) => {
-    const status = { chroma: "ok", agent: "ok" };
+    const status = { chroma: "ok", agent: "ok", today: deps.config.today() };
     try {
       await deps.repos.store.heartbeat();
     } catch {
