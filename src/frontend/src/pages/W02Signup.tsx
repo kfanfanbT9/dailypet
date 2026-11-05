@@ -7,7 +7,8 @@ import { ApiError } from "@/api/client";
 import { auth } from "@/api/endpoints";
 import { Button } from "@/components/base/Button";
 import { Input } from "@/components/base/Field";
-import { Mascot } from "@/components/mascot/Mascot";
+import { DreamBackdrop } from "@/components/brand/DreamBackdrop";
+import { LogoMark } from "@/components/brand/Logo";
 import { qk } from "@/hooks/queries";
 import { errorMessage } from "@/lib/messages";
 
@@ -90,8 +91,9 @@ export default function W02Signup() {
         </Link>
         <h1 className="font-display text-title-1 text-text">가입하기</h1>
       </header>
+      <DreamBackdrop className="rounded-card" />
       <div className="flex items-center gap-3">
-        <Mascot species="cat" mood="happy" size={96} decorative />
+        <LogoMark size={96} />
         <p className="font-display text-title-2 text-text">만나서 반가워요! 몇 가지만 알려주세요</p>
       </div>
       <form onSubmit={submit} noValidate className="flex flex-col gap-4">

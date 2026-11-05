@@ -1,37 +1,37 @@
 // W00 공통 레이아웃: 헤더(🔔·프로필) + 반려동물 탭 + 모바일 하단 내비 5칸 / 데스크톱 사이드바 240px·본문 최대 960px.
-import {
-  Bell,
-  CalendarHeart,
-  Heart,
-  Home,
-  Menu,
-  MessageCircle,
-  Scale,
-  Settings,
-  Plus,
-  UserRound,
-} from "lucide-react";
+import { Bell, Settings, Plus } from "lucide-react";
 import { useState, type KeyboardEvent, type ReactNode } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import {
+  CalendarDream,
+  ChatDream,
+  HeartDream,
+  HomeDream,
+  MoreDream,
+  ScaleDream,
+  UserDream,
+  type DreamIcon,
+} from "@/components/brand/DreamIcons";
+import { Logo } from "@/components/brand/Logo";
 import { Mascot } from "@/components/mascot/Mascot";
 import { NotificationSheet } from "@/components/domain/NotificationSheet";
 import { useNotifications } from "@/hooks/queries";
 import { useCurrentPet, usePetLink } from "@/state/currentPet";
 
 const MOBILE_NAV = [
-  { to: "/", label: "오늘", icon: Home },
-  { to: "/health", label: "일정", icon: CalendarHeart },
-  { to: "/chat", label: "채팅", icon: MessageCircle },
-  { to: "/preferences", label: "취향", icon: Heart },
-  { to: "/me", label: "더보기", icon: Menu },
+  { to: "/", label: "오늘", icon: HomeDream },
+  { to: "/health", label: "일정", icon: CalendarDream },
+  { to: "/chat", label: "채팅", icon: ChatDream },
+  { to: "/preferences", label: "취향", icon: HeartDream },
+  { to: "/me", label: "더보기", icon: MoreDream },
 ];
 const SIDE_NAV = [
-  { to: "/", label: "오늘", icon: Home },
-  { to: "/health", label: "건강 일정", icon: CalendarHeart },
-  { to: "/weights", label: "체중 기록", icon: Scale },
-  { to: "/chat", label: "채팅", icon: MessageCircle },
-  { to: "/preferences", label: "내 취향", icon: Heart },
-  { to: "/me", label: "내 정보", icon: UserRound },
+  { to: "/", label: "오늘", icon: HomeDream },
+  { to: "/health", label: "건강 일정", icon: CalendarDream },
+  { to: "/weights", label: "체중 기록", icon: ScaleDream },
+  { to: "/chat", label: "채팅", icon: ChatDream },
+  { to: "/preferences", label: "내 취향", icon: HeartDream },
+  { to: "/me", label: "내 정보", icon: UserDream },
 ];
 
 function PetTabs() {
@@ -106,7 +106,7 @@ function NavItem({
 }: {
   to: string;
   label: string;
-  icon: typeof Home;
+  icon: DreamIcon;
   variant: "bottom" | "side";
 }) {
   const link = usePetLink();
@@ -123,7 +123,7 @@ function NavItem({
             : "text-muted"
         }`}
       >
-        <Icon aria-hidden="true" />
+        <Icon active={active} />
         {label}
       </NavLink>
     );
@@ -134,7 +134,7 @@ function NavItem({
       aria-current={active ? "page" : undefined}
       className={`flex min-h-touch items-center gap-3 rounded-pill px-4 text-body ${active ? "bg-sky font-bold text-text" : "text-text"}`}
     >
-      <Icon aria-hidden="true" />
+      <Icon active={active} />
       {label}
     </NavLink>
   );
@@ -153,8 +153,8 @@ export function AppShell({ children }: { children?: ReactNode }) {
         본문으로 건너뛰기
       </a>
       <aside className="hidden w-sidebar shrink-0 flex-col gap-2 p-4 desktop:flex">
-        <p className="mb-4 px-4 font-display text-title-2 text-text">
-          <span aria-hidden="true">✨ </span>DailyPet
+        <p className="mb-4 px-2 text-title-2">
+          <Logo size={40} />
         </p>
         <nav aria-label="주 메뉴" className="flex flex-col gap-1">
           {SIDE_NAV.map((n) => (
@@ -165,8 +165,8 @@ export function AppShell({ children }: { children?: ReactNode }) {
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-30 flex flex-col gap-2 bg-bg px-4 py-2 tablet:px-6">
           <div className="flex items-center justify-between gap-2">
-            <p className="font-display text-title-2 text-text desktop:hidden">
-              <span aria-hidden="true">✨ </span>DailyPet
+            <p className="text-title-2 desktop:hidden">
+              <Logo size={32} />
             </p>
             <div className="hidden min-w-0 flex-1 desktop:block">
               <PetTabs />

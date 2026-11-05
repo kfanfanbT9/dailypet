@@ -1,6 +1,7 @@
 // 빈 상태·영역 오류·스켈레톤·진행 막대·탭 (Style-guide.md 7.10, 7.12).
 import { useRef, type KeyboardEvent, type ReactNode } from "react";
 import type { Species } from "@/api/types";
+import { DreamBackdrop } from "@/components/brand/DreamBackdrop";
 import { Mascot } from "@/components/mascot/Mascot";
 import { Button } from "./Button";
 
@@ -15,7 +16,12 @@ export function EmptyState({
 }) {
   return (
     <div className="flex flex-col items-center gap-4 py-12 text-center">
-      <Mascot species={species} mood="default" size={96} decorative />
+      <div className="relative w-full max-w-modal">
+        <DreamBackdrop />
+        <div className="absolute inset-0 flex items-end justify-center">
+          <Mascot species={species} mood="default" size={96} decorative />
+        </div>
+      </div>
       <p className="font-display text-title-2 text-text">{title}</p>
       {action && <Button onClick={action.onClick}>{action.label}</Button>}
     </div>

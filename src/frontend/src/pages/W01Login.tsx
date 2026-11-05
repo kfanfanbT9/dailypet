@@ -7,7 +7,8 @@ import { ApiError } from "@/api/client";
 import { auth, pets } from "@/api/endpoints";
 import { Button } from "@/components/base/Button";
 import { Input } from "@/components/base/Field";
-import { Mascot } from "@/components/mascot/Mascot";
+import { DreamBackdrop } from "@/components/brand/DreamBackdrop";
+import { LogoMark } from "@/components/brand/Logo";
 import { qk } from "@/hooks/queries";
 import { errorMessage } from "@/lib/messages";
 
@@ -56,9 +57,11 @@ export default function W01Login() {
   return (
     <main className="mx-auto flex min-h-dvh max-w-modal flex-col justify-center gap-6 px-4 py-8">
       <div className="flex flex-col items-center gap-2 text-center">
-        <div className="flex gap-4">
-          <Mascot species="dog" mood="happy" size={96} decorative />
-          <Mascot species="cat" mood="happy" size={96} decorative />
+        <div className="relative w-full overflow-hidden rounded-card">
+          <DreamBackdrop />
+          <div className="absolute inset-0 flex items-end justify-center">
+            <LogoMark size={96} />
+          </div>
         </div>
         <h1 className="font-display text-display text-text">DailyPet</h1>
         <p className="text-muted">오늘도 우리 아이와 반짝이는 하루를!</p>

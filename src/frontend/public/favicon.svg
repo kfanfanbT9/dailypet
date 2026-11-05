@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+<!-- DailyPet 꿈동산 로고 (자체 제작, doc/assets.md). src/components/brand/Logo.tsx와 같은 그림 -->
+<defs>
+<clipPath id="c">
+<circle cx="50" cy="50" r="46" />
+</clipPath>
+</defs>
+<circle cx="50" cy="50" r="46" fill="#e3f2ff" />
+<g clip-path="url(#c)">
+<circle cx="70" cy="28" r="11" fill="#ffc94d" />
+<circle cx="75" cy="24" r="9.5" fill="#e3f2ff" />
+<g fill="#ffc94d">
+<path d="M0 -6 L1.6 -1.6 L6 0 L1.6 1.6 L0 6 L-1.6 1.6 L-6 0 L-1.6 -1.6 Z" transform="translate(26 22) scale(0.9)" />
+<path d="M0 -6 L1.6 -1.6 L6 0 L1.6 1.6 L0 6 L-1.6 1.6 L-6 0 L-1.6 -1.6 Z" transform="translate(46 14) scale(0.55)" />
+<path d="M0 -6 L1.6 -1.6 L6 0 L1.6 1.6 L0 6 L-1.6 1.6 L-6 0 L-1.6 -1.6 Z" transform="translate(86 46) scale(0.6)" />
+</g>
+<g fill="#ffffff">
+<ellipse cx="24" cy="44" rx="12" ry="6" />
+<ellipse cx="31" cy="40" rx="8" ry="6" />
+</g>
+<path d="M0 70 Q28 52 56 66 T100 62 V100 H0 Z" fill="#a8e6cf" />
+<circle cx="39" cy="74" r="11" fill="#fff1c9" stroke="#3d3a4b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+<ellipse cx="28.5" cy="79" rx="4" ry="8.5" transform="rotate(12 28.5 79)" fill="#ffc94d" stroke="#3d3a4b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+<ellipse cx="49.5" cy="79" rx="4" ry="8.5" transform="rotate(-12 49.5 79)" fill="#ffc94d" stroke="#3d3a4b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+<circle cx="35.5" cy="73" r="1.8" fill="#3d3a4b" />
+<circle cx="42.5" cy="73" r="1.8" fill="#3d3a4b" />
+<ellipse cx="39" cy="77" rx="2" ry="1.5" fill="#3d3a4b" />
+<path d="M53 70 Q52 58 59 64 Z" fill="#ffb8c9" stroke="#3d3a4b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+<path d="M71 70 Q72 58 65 64 Z" fill="#ffb8c9" stroke="#3d3a4b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+<circle cx="62" cy="75" r="11" fill="#fff0f3" stroke="#3d3a4b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+<circle cx="58.5" cy="74" r="1.8" fill="#3d3a4b" />
+<circle cx="65.5" cy="74" r="1.8" fill="#3d3a4b" />
+<path d="M60.5 77.5 h3 l-1.5 1.5 z" fill="#b83a64" />
+<path d="M0 84 Q36 72 64 82 T100 80 V100 H0 Z" fill="#e8f8f0" stroke="#3d3a4b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+</g>
+<circle cx="50" cy="50" r="46" fill="none" stroke="#3d3a4b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

@@ -66,6 +66,21 @@
   :root[data-motion="reduced"] .skeleton {
     animation: none;
   }
+  /* 꿈동산 배경 별 반짝임 (DreamBackdrop) — 움직임 줄이기면 멈춘다 */
+  .dp-twinkle {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: dp-pulse calc(var(--motion-slow) * 8) ease-in-out infinite;
+  }
+  .dp-twinkle-2 {
+    animation-delay: calc(var(--motion-slow) * 2);
+  }
+  .dp-twinkle-3 {
+    animation-delay: calc(var(--motion-slow) * 4);
+  }
+  :root[data-motion="reduced"] .dp-twinkle {
+    animation: none;
+  }
 }
 
 @keyframes dp-pulse {

@@ -5,6 +5,17 @@ import { Badge, HealthBadge } from "@/components/base/Badge";
 import { Button } from "@/components/base/Button";
 import { Input } from "@/components/base/Field";
 import { EmptyState, ErrorState, ProgressBar, Skeleton } from "@/components/base/States";
+import { DreamBackdrop } from "@/components/brand/DreamBackdrop";
+import {
+  CalendarDream,
+  ChatDream,
+  HeartDream,
+  HomeDream,
+  MoreDream,
+  ScaleDream,
+  UserDream,
+} from "@/components/brand/DreamIcons";
+import { Logo, LogoMark } from "@/components/brand/Logo";
 import { Mascot, type Mood } from "@/components/mascot/Mascot";
 
 const COMBOS = [
@@ -41,6 +52,23 @@ export default function StyleGuide() {
           </Button>
         ))}
       </div>
+      <section aria-label="로고" className="flex flex-wrap items-end gap-4">
+        <LogoMark size={160} label="DailyPet 로고" />
+        <LogoMark size={96} />
+        <Logo size={40} className="text-title-2" />
+        <Logo size={32} className="text-title-2" />
+      </section>
+      <section aria-label="꿈동산 아이콘" className="flex flex-wrap items-center gap-4 text-text">
+        {[HomeDream, CalendarDream, ScaleDream, ChatDream, HeartDream, UserDream, MoreDream].map((I, i) => (
+          <span key={i} className="flex gap-1">
+            <I />
+            <I active />
+          </span>
+        ))}
+      </section>
+      <section aria-label="꿈동산 배경" className="overflow-hidden rounded-card">
+        <DreamBackdrop />
+      </section>
       <section aria-label="마스코트" className="flex flex-wrap items-end gap-4">
         {(["dog", "cat"] as Species[]).map((s) =>
           MOODS.map((m) => <Mascot key={s + m} species={s} mood={m} size={96} />),
