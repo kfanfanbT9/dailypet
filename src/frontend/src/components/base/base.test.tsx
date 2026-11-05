@@ -207,6 +207,25 @@ describe("api/client", () => {
     await expect(request("http://localhost:8000/query" as string)).rejects.toThrow();
     setUnauthorizedHandler(() => {});
   });
+  it("늦게 도착한 401은 요청이 출발할 때의 처리 콜백을 부른다 (재로그인한 화면을 쫓아내지 않음)", async () => {
+    const { delay } = await import("msw");
+    server.use(
+      http.get("/api/slow401", async () => {
+        await delay(30);
+        return HttpResponse.json({ error: { code: "unauthorized", message: "" } }, { status: 401 });
+      }),
+    );
+    const old = vi.fn();
+    const fresh = vi.fn();
+    setUnauthorizedHandler(old);
+    const pending = request("/api/slow401").catch(() => {});
+    setUnauthorizedHandler(fresh);
+    await pending;
+    expect(old).toHaveBeenCalledTimes(1);
+    expect(fresh).not.toHaveBeenCalled();
+    setUnauthorizedHandler(() => {});
+  });
+
   it("네트워크 오류 → ApiError(0, network)", async () => {
     server.use(http.get("/api/down", () => HttpResponse.error()));
     await expect(request("/api/down")).rejects.toMatchObject({ status: 0, code: "network" });

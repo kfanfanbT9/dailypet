@@ -33,6 +33,13 @@ export async function startFakeAgent() {
             },
           ],
     }),
+    /** (body) => item_ids — 기본: 닭고기 알레르겐이 없는 항목만 (테스트가 바꿔 쓸 수 있음) */
+    catalogSafe: (body) => ({
+      item_ids:
+        body.category === "diet"
+          ? ["diet_dog_carrot_treat_01", "diet_dog_green_bean_treat_01"]
+          : ["act_dog_nosework_find_it_01"],
+    }),
     query: (body) => {
       const thread = body.thread_id ?? `thr_${body.user_id}_${body.pet_id}_0123456789abcdef0123456789abcdef`;
       return {
@@ -53,7 +60,12 @@ export async function startFakeAgent() {
     }),
   };
 
-  const defaults = { tasksGenerate: state.tasksGenerate, query: state.query, resume: state.resume };
+  const defaults = {
+    tasksGenerate: state.tasksGenerate,
+    catalogSafe: state.catalogSafe,
+    query: state.query,
+    resume: state.resume,
+  };
 
   const app = express();
   app.use(express.json());
@@ -65,6 +77,7 @@ export async function startFakeAgent() {
   });
   app.get("/health", (_req, res) => res.json({ status: "ok" }));
   app.post("/tasks/generate", (req, res) => res.json(state.tasksGenerate(req.body)));
+  app.post("/catalog/safe", (req, res) => res.json(state.catalogSafe(req.body)));
   app.post("/query", (req, res) => {
     const r = state.query(req.body);
     res.status(r.status).json(r.body);

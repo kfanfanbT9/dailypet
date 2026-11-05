@@ -1,6 +1,7 @@
 // 화면 테스트 도우미: 목 DB에 로그인 상태를 만들고 앱 전체를 메모리 라우터로 렌더한다.
 import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { vi } from "vitest";
 import { AppRoutes, Providers, makeQueryClient } from "@/App";
 import { db } from "@/mocks/db";
 import { server } from "@/mocks/server";
@@ -14,11 +15,14 @@ export const USERS = {
   leaver: "usr_3263e0395d81",
 } as const;
 
-export function renderApp(path: string, opts: { as?: keyof typeof USERS | null; today?: string } = {}) {
+export function renderApp(
+  path: string,
+  opts: { as?: keyof typeof USERS | null; today?: string; fakeTimers?: boolean } = {},
+) {
   db.session = opts.as === null ? null : USERS[opts.as ?? "jiwoo"];
   if (opts.today) db.today = opts.today;
   const client = makeQueryClient();
-  const user = userEvent.setup();
+  const user = userEvent.setup(opts.fakeTimers ? { advanceTimers: vi.advanceTimersByTime } : {});
   const utils = render(
     <Providers client={client} initialPath={path}>
       <AppRoutes />

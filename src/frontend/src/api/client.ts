@@ -31,6 +31,8 @@ export interface RequestOptions {
 
 export async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
   if (!path.startsWith("/api/")) throw new Error("Backend /api/* 만 호출한다");
+  // 요청이 출발할 때의 401 처리 콜백을 쓴다 — 늦게 도착한 옛 요청의 401이 새로 로그인한 화면을 쫓아내지 않게
+  const unauthorized = onUnauthorized;
   const qs = opts.query
     ? new URLSearchParams(
         Object.entries(opts.query).filter(([, v]) => v !== undefined) as [string, string][],
@@ -57,7 +59,7 @@ export async function request<T>(path: string, opts: RequestOptions = {}): Promi
       err?.message ?? "",
       err?.fields?.map((f) => f.field) ?? [],
     );
-    if (res.status === 401 && !opts.skipAuthRedirect) onUnauthorized();
+    if (res.status === 401 && !opts.skipAuthRedirect) unauthorized();
     throw apiErr;
   }
   return data as T;

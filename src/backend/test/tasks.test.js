@@ -272,6 +272,43 @@ describe("재생성·교체·완료·삭제 (S04)", () => {
   });
 });
 
+describe("카탈로그 조회 — petId 안전 필터 (D5)", () => {
+  it("petId를 주면 Agent /catalog/safe 결과로 좁힌다", async () => {
+    const t = await app();
+    const a = await loginAs(t.app, "jiwoo");
+    const res = await a.get("/api/catalog?category=diet&species=dog&petId=pet_bori");
+    expect(res.status).toBe(200);
+    expect(res.body.map((i) => i.item_id).sort()).toEqual([
+      "diet_dog_carrot_treat_01",
+      "diet_dog_green_bean_treat_01",
+    ]);
+    const [call] = fake.calls("/catalog/safe");
+    expect(call.body).toEqual({ user_id: USERS.jiwoo.id, pet_id: "pet_bori", category: "diet" });
+    expect(call.headers["x-agent-api-key"]).toBe(TEST_KEY);
+  });
+
+  it("다른 사용자 petId → 404 (Agent 호출 0회), Agent 장애 → 503 (필터 없는 목록을 주지 않음)", async () => {
+    const t = await app();
+    const m = await loginAs(t.app, "mallory");
+    expect((await m.get("/api/catalog?category=diet&petId=pet_bori")).status).toBe(404);
+    expect(fake.calls("/catalog/safe")).toHaveLength(0);
+    fake.state.mode = "error";
+    const a = await loginAs(t.app, "jiwoo");
+    expect((await a.get("/api/catalog?category=diet&petId=pet_bori")).status).toBe(503);
+  });
+
+  it("category=health는 정기점검 항목(W03 접종 이력용), 카테고리 없으면 식단·활동만", async () => {
+    const t = await app();
+    const a = await loginAs(t.app, "haneul");
+    const health = (await a.get("/api/catalog?category=health&species=dog")).body;
+    expect(health.length).toBeGreaterThan(0);
+    expect(health.every((i) => i.category === "health" && i.item_id.startsWith("hc_dog_"))).toBe(true);
+    expect(health.find((i) => i.item_id === "hc_dog_dhpp").type).toBe("vaccine");
+    const all = (await a.get("/api/catalog?species=dog")).body;
+    expect(all.some((i) => i.category === "health")).toBe(false);
+  });
+});
+
 describe("카탈로그 조회", () => {
   it("/api/catalog?category=diet&species=dog에 harmful_food 없음", async () => {
     const t = await app();

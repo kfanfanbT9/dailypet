@@ -492,6 +492,19 @@ Response는 `/query`와 같은 `{answer, contexts, trace}` 형식이다. 요청�
 - 시간 배정: 식단은 `default_times.meal`의 첫 시각(없으면 08:00), 활동은 `default_times.walk`(없으면 18:00·19:30)를 쓰고, `activity_time_after/before` 제약에 맞춰 옮긴다. 건강 일정 할 일은 시간이 없다.
 - `keep_item_ids`의 항목은 응답에 다시 넣지 않고(Backend가 기존 할 일을 유지), 그 영역의 목표 개수에서 뺀다.
 
+### 4.1.3 Agent Server — `POST /catalog/safe` (비대화형, Backend 전용)
+
+할 일 직접 추가(W06) 목록을 그 반려동물에게 안전한 카탈로그 항목으로 좁힌다. 안전 필터 로직은 Python 한 곳(`src/tools.py` `safety_filter`)에만 두므로 Backend가 JS로 다시 만들지 않고 이 API를 부른다 (CLAUDE.md 4.2, phase3_task.md D5 2026-11-05 결정).
+
+```json
+// Request (헤더 X-Agent-Api-Key)
+{ "user_id": "usr_69d308a849e0", "pet_id": "pet_bori", "category": "diet" }   // category: diet | activity
+// Response
+{ "item_ids": ["diet_dog_carrot_treat_01", "..."] }
+```
+- LLM을 호출하지 않는다. `safety_filter`(추천 가능·종·연령·유해 식품·알레르기·질환 금기·강도 상한·크기 전용)만 적용하고, 취향(👎 제외 등)은 적용하지 않는다 — 사용자가 직접 고르는 목록이기 때문이다.
+- 다른 사용자의 `pet_id`는 403. 오류 형식은 `/tasks/generate`와 같다 (`{"detail": "..."}`).
+
 ### 4.2 Backend REST API (초안)
 
 `/api/auth/*`를 뺀 모든 API는 로그인이 필요하고, 본인 데이터만 다룬다.
@@ -525,7 +538,7 @@ Response는 `/query`와 같은 `{answer, contexts, trace}` 형식이다. 요청�
 | POST | `/api/pets/:id/feedback` | `{ itemId, signal: like\|dislike\|complete\|swap\|remove\|custom }` 취향 신호 기록 |
 | GET / DELETE | `/api/pets/:id/preferences` | 내 취향 보기 (dislike에는 `excluded_until` 포함) / 전체 초기화 |
 | DELETE | `/api/pets/:id/preferences/:prefId` | 취향 항목 하나 삭제 |
-| GET | `/api/catalog?category=&species=` | 카탈로그 조회 (직접 추가할 할 일 선택용) |
+| GET | `/api/catalog?category=&species=&petId=` | 카탈로그 조회 (직접 추가할 할 일 선택용, 추천 불가 항목 제외). `petId`(내 반려동물)를 주면 Agent `POST /catalog/safe`로 그 반려동물 기준 안전 필터를 적용한 항목만 돌려준다 (4.1.3). 이때 Agent 장애면 503 (안전 필터 없이 목록을 주지 않는다) |
 | POST | `/api/chat` | `{ question, petId, threadId? }` → Agent `POST /query` 프록시. 응답은 Agent의 `{ answer, contexts, trace }`에 `thread_id`를 더한 것. `thread_id`는 trace의 마지막 `final` 또는 `interrupt` 이벤트(`status: "cancelled"` 제외)에서 꺼낸다 (4.1 표) |
 | POST | `/api/chat/resume` | `{ threadId, decisions }` → Agent `POST /query/resume` 프록시 (HITL 승인) |
 

@@ -1459,3 +1459,25 @@ def tasks_generate(req: TasksRequest, store: Any = Depends(get_store)) -> dict[s
     log.info("endpoint=/tasks/generate user=%s pet=%s tasks=%d ms=%d status=200", req.user_id, req.pet_id,
              len(plan.tasks), int((time.perf_counter() - started) * 1000))
     return plan.to_response()
+
+
+class SafeCatalogRequest(BaseModel):
+    user_id: str = Field(min_length=1)
+    pet_id: str = Field(min_length=1)
+    category: Literal["diet", "activity"]
+
+
+@app.post("/catalog/safe", dependencies=[Depends(require_api_key)])
+def catalog_safe(req: SafeCatalogRequest, store: Any = Depends(get_store)) -> dict[str, Any]:
+    """직접 추가 목록용: 그 반려동물 기준 안전 필터만 적용한 카탈로그 ID (LLM 없음, ARCHITECTURE.md 4.1.3).
+
+    취향(👎 제외 등)은 적용하지 않는다 — 사용자가 직접 고르는 목록이다.
+    """
+    from src.config import today_kst
+
+    try:
+        pet = tools.PetProfile.from_row(store.get_pet(req.user_id, req.pet_id), today_kst())
+    except PermissionError:
+        raise ApiError(403, "이 반려동물에는 접근할 수 없어요.", "forbidden_pet") from None
+    items = [it for it in tools.get_resources().catalog.values() if it.get("category") == req.category]
+    return {"item_ids": sorted(it["item_id"] for it in tools.safety_filter(items, pet))}

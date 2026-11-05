@@ -391,3 +391,24 @@ def test_smoke_uvicorn_five_questions():
     finally:
         proc.terminate()
         proc.wait(timeout=20)
+
+
+# ================================================================ /catalog/safe (D5)
+
+
+def test_catalog_safe_filters_allergy_and_species(env, llm_forbidden):
+    r = llm_forbidden.post("/catalog/safe", headers=H, json={"user_id": P3, "pet_id": "pet_bori", "category": "diet"})
+    assert r.status_code == 200
+    ids = r.json()["item_ids"]
+    assert ids and "diet_dog_chicken_topping_01" not in ids          # 보리 닭고기 알레르기
+    assert not any(i.startswith("diet_cat_") for i in ids)            # 종
+    assert not any("harmful" in i for i in ids)                       # 유해 식품
+    hodu = llm_forbidden.post("/catalog/safe", headers=H, json={"user_id": "usr_d6eff68d8ef0", "pet_id": "pet_hodu", "category": "activity"})
+    from src.retriever import catalog_index
+    cat = catalog_index()
+    assert all("joint_disease" not in (cat[i].get("contraindications") or []) for i in hodu.json()["item_ids"])
+
+
+def test_catalog_safe_403_and_401(env, llm_forbidden):
+    assert llm_forbidden.post("/catalog/safe", headers=H, json={"user_id": P3, "pet_id": "pet_mocha", "category": "diet"}).status_code == 403
+    assert llm_forbidden.post("/catalog/safe", json={"user_id": P3, "pet_id": "pet_bori", "category": "diet"}).status_code == 401

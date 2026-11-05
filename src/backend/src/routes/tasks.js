@@ -31,8 +31,9 @@ const patchSchema = z
   })
   .strict();
 const catalogQuery = z.object({
-  category: z.enum(["diet", "activity"]).optional(),
+  category: z.enum(["diet", "activity", "health"]).optional(),
   species: z.enum(ENUMS.species).optional(),
+  petId: z.string().min(1).optional(),
 });
 
 async function loadTask(deps, userId, taskId) {
@@ -156,10 +157,19 @@ export function tasksRouter(deps) {
   });
 
   r.get("/catalog", async (req, res) => {
-    const { category, species } = parseBody(catalogQuery, req.query);
+    const { category, species, petId } = parseBody(catalogQuery, req.query);
+    let allowed = null;
+    if (petId) {
+      // 반려동물 기준 안전 필터는 Agent(Python)에만 있다 — 실패하면 필터 없는 목록 대신 503 (4.2, 4.1.3)
+      const pet = await loadPet(deps, req.userId, petId);
+      if (category !== "diet" && category !== "activity")
+        throw badRequest("petId는 식단·활동 목록에만 쓸 수 있어요.");
+      allowed = new Set(await deps.agent.safeCatalog({ user_id: req.userId, pet_id: pet.id, category }));
+    }
     const items = deps.catalog
       .list({ category, species, recommendableOnly: true })
-      .filter((it) => it.category !== "health")
+      .filter((it) => (category ? true : it.category !== "health")) // 카테고리 없으면 직접 추가용(식단·활동)만
+      .filter((it) => !allowed || allowed.has(it.item_id))
       .map((it) => ({
         item_id: it.item_id,
         name: it.name,
@@ -167,6 +177,7 @@ export function tasksRouter(deps) {
         species: it.species,
         intensity: it.intensity ?? null,
         subtype: it.subtype ?? null,
+        type: it.type ?? null,
         summary: (it.description ?? "").slice(0, 80),
       }));
     res.json(items);

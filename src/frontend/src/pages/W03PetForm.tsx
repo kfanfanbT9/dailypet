@@ -300,9 +300,9 @@ function PetForm({ pet }: { pet?: Pet }) {
       const saved = editing
         ? await petsApi.update(pet!.id, { ...input, species: undefined })
         : await petsApi.create(input);
+      if (editing && saved.tasks_outdated) markOutdated(saved.id); // 저장 응답 직후에 남긴다
       await qc.invalidateQueries({ queryKey: qk.pets });
       qc.removeQueries({ queryKey: qk.pet(saved.id) });
-      if (editing && saved.tasks_outdated) markOutdated(saved.id);
       toast(editing ? "저장했어요" : `${saved.name}를 만나서 반가워요!`);
       select(saved.id);
       navigate(`/?pet=${saved.id}`);

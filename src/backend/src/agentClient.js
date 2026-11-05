@@ -29,6 +29,12 @@ export function createAgentClient({ baseUrl, apiKey, fetchImpl = globalThis.fetc
       if (r.status !== 200) throw new AgentUnavailable(`status_${r.status}`);
       return r.body;
     },
+    /** POST /catalog/safe — 반려동물 기준 안전 필터 (LLM 없음, 4.1.3). 4xx·5xx면 예외. */
+    async safeCatalog(body) {
+      const r = await call("POST", "/catalog/safe", body, timeouts.tasks);
+      if (r.status !== 200) throw new AgentUnavailable(`status_${r.status}`);
+      return r.body.item_ids ?? [];
+    },
     /** POST /query — 60초 타임아웃. */
     query: (body) => call("POST", "/query", body, timeouts.query),
     /** POST /query/resume */
