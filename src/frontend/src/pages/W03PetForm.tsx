@@ -9,6 +9,7 @@ import type { HealthHistoryInput, Pet, PetInput, Species } from "@/api/types";
 import { Button } from "@/components/base/Button";
 import { FieldShell, Input, TextArea } from "@/components/base/Field";
 import { useToast } from "@/components/base/Toast";
+import { PET_NOT_FOUND_TOAST, RedirectWithToast } from "@/components/layout/RouteFallback";
 import { Mascot } from "@/components/mascot/Mascot";
 import { qk, useCatalog } from "@/hooks/queries";
 import { ageGroup, ageText, todayKstBrowser } from "@/lib/dates";
@@ -210,7 +211,16 @@ export default function W03PetForm() {
     enabled: editing,
   });
   if (editing && existing.isLoading) return <p role="status">불러오는 중이에요</p>;
-  if (editing && existing.isError) return <p className="py-12 text-center text-muted">찾을 수 없어요.</p>;
+  // 없거나 내 것이 아닌 반려동물 → 목록으로 (wireframe.md 0장 리다이렉트 규칙). 그 밖의 오류는 화면에 남긴다
+  if (editing && existing.isError) {
+    if (existing.error instanceof ApiError && existing.error.status === 404)
+      return <RedirectWithToast to="/pets" message={PET_NOT_FOUND_TOAST} />;
+    return (
+      <p className="py-12 text-center text-muted">
+        반려동물 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.
+      </p>
+    );
+  }
   return <PetForm key={existing.data?.id ?? "new"} pet={existing.data} />;
 }
 

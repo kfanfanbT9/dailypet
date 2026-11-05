@@ -11,13 +11,12 @@ import { DreamBackdrop } from "@/components/brand/DreamBackdrop";
 import { LogoMark } from "@/components/brand/Logo";
 import { qk } from "@/hooks/queries";
 import { errorMessage } from "@/lib/messages";
+import { safeNext } from "@/lib/safeNext";
 
 export const LOGIN_FAILED = "이메일 또는 비밀번호가 맞지 않아요";
 
-/** next 파라미터는 앱 안의 경로만 허용 (열린 리다이렉트 방지) */
-export function safeNext(next: string | null): string | null {
-  return next && next.startsWith("/") && !next.startsWith("//") ? next : null;
-}
+// next 파라미터 검사는 로그인 리다이렉트(GuestOnly)와 같이 쓴다 (wireframe.md 0장)
+export { safeNext } from "@/lib/safeNext";
 
 export default function W01Login() {
   const [email, setEmail] = useState("");

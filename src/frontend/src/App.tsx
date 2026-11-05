@@ -6,6 +6,7 @@ import { ApiError, setUnauthorizedHandler } from "@/api/client";
 import { ToastProvider, useToast } from "@/components/base/Toast";
 import { AppShell } from "@/components/layout/AppShell";
 import { RequireAuth } from "@/components/layout/RequireAuth";
+import { GuestOnly, NotFoundRedirect } from "@/components/layout/RouteFallback";
 import { CurrentPetProvider } from "@/state/currentPet";
 import { SettingsProvider } from "@/state/settings";
 import Licenses from "@/pages/Licenses";
@@ -63,8 +64,23 @@ function Protected({ children }: { children: ReactNode }) {
 export function AppRoutes() {
   return (
     <Routes>
-      <Route path="/login" element={<W01Login />} />
-      <Route path="/signup" element={<W02Signup />} />
+      {/* 리다이렉트(폴백) 규칙: wireframe.md 0장 */}
+      <Route
+        path="/login"
+        element={
+          <GuestOnly>
+            <W01Login />
+          </GuestOnly>
+        }
+      />
+      <Route
+        path="/signup"
+        element={
+          <GuestOnly>
+            <W02Signup />
+          </GuestOnly>
+        }
+      />
       <Route
         path="/"
         element={
@@ -162,14 +178,7 @@ export function AppRoutes() {
         }
       />
       {import.meta.env.DEV && <Route path="/_styleguide" element={<StyleGuide />} />}
-      <Route
-        path="*"
-        element={
-          <Protected>
-            <p className="py-12 text-center text-muted">찾을 수 없는 화면이에요.</p>
-          </Protected>
-        }
-      />
+      <Route path="*" element={<NotFoundRedirect />} />
     </Routes>
   );
 }
