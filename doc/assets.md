@@ -18,11 +18,11 @@ DailyPet에서 쓰는 글꼴, 마스코트, 일러스트, 아이콘, 애니메�
 
 | 에셋 | 종류 | 사용 위치 | 제작자/출처 | 라이선스 | 확인일 | 비고 |
 |------|------|-----------|-------------|----------|--------|------|
-| Jua | 글꼴 (제목용 `--font-display`) | 화면 제목, 마스코트 인사, 빈 상태 제목 | Woowahan Brothers / Google Fonts (https://fonts.google.com/specimen/Jua) | SIL OFL 1.1 | — | **후보.** 채택 시 확인일 기입 |
-| Nanum Gothic | 글꼴 (본문용 `--font-body`) | 본문, 버튼, 입력, 표 | NAVER / Google Fonts (https://fonts.google.com/specimen/Nanum+Gothic) | SIL OFL 1.1 | — | **후보.** 채택 시 확인일 기입 |
-| 개 마스코트 (기본·기쁨·미안·걱정·축하) | 일러스트 (SVG 또는 Lottie) | 헤더 탭, 대시보드 인사, 채팅 말풍선, 빈 상태·오류 | 미정 | 미정 | — | **미정** — 제작 방식은 오픈 이슈 (SERVICE.md 10장) |
-| 고양이 마스코트 (기본·기쁨·미안·걱정·축하) | 일러스트 (SVG 또는 Lottie) | 위와 같음 | 미정 | 미정 | — | **미정** — 제작 방식은 오픈 이슈 (SERVICE.md 10장) |
-| 아이콘 세트 | 아이콘 (선 2px, 둥근 끝) | 내비게이션, 버튼 | 미정 | 미정 | — | 오픈 라이선스 세트 하나만 선택 (Style-guide.md 8장) |
+| Jua | 글꼴 (제목용 `--font-display`) | 화면 제목, 마스코트 인사, 빈 상태 제목 | Woowahan Brothers / Google Fonts (https://fonts.google.com/specimen/Jua) | SIL OFL 1.1 | 2026-11-05 | **채택.** `@fontsource/jua` 5.3.0으로 직접 포함 (CDN 없음) |
+| Nanum Gothic | 글꼴 (본문용 `--font-body`) | 본문, 버튼, 입력, 표 | NAVER / Google Fonts (https://fonts.google.com/specimen/Nanum+Gothic) | SIL OFL 1.1 | 2026-11-05 | **채택.** `@fontsource/nanum-gothic` 5.3.0으로 직접 포함 (CDN 없음) |
+| 개 마스코트 (기본·기쁨·미안·걱정·축하) | 일러스트 (React SVG 컴포넌트) | 헤더 탭, 대시보드 인사, 채팅 말풍선, 빈 상태·오류 | 자체 제작 (코드로 그림, `src/frontend/src/components/mascot/`) | 해당 없음 (프로젝트 자체 저작물) | 2026-11-05 | 둥근 얼굴 + 아래로 처진 둥근 귀 + 큰 눈. 다른 IP 유사성 사람 확인: **대기** |
+| 고양이 마스코트 (기본·기쁨·미안·걱정·축하) | 일러스트 (React SVG 컴포넌트) | 위와 같음 | 자체 제작 (코드로 그림, 같은 폴더) | 해당 없음 (프로젝트 자체 저작물) | 2026-11-05 | 둥근 얼굴 + 둥근 삼각 귀 + 수염. 다른 IP 유사성 사람 확인: **대기** |
+| Lucide 아이콘 | 아이콘 (선 2px, 둥근 끝) | 내비게이션, 버튼 | Lucide Contributors (https://lucide.dev, `lucide-react`) | ISC | 2026-11-05 | **채택.** 이 세트 하나만 쓴다 (Style-guide.md 8장). 저작자 표시 의무 없음 |
 | 반짝임 파티클 | 모션 효과 | 할 일 완료, 축하 | 자체 제작 (코드로 그림) | 해당 없음 | — | 외부 에셋 없음 |
 
 ## 3. 변경 기록
@@ -30,3 +30,4 @@ DailyPet에서 쓰는 글꼴, 마스코트, 일러스트, 아이콘, 애니메�
 | 날짜 | 변경 내용 |
 |------|-----------|
 | 2026-11-04 | 문서 생성. 글꼴 후보 2종, 마스코트·아이콘은 미정으로 등록 |
+| 2026-11-05 | Phase 3 결정(Q1~Q4): 글꼴 2종 채택(`@fontsource`), 아이콘 Lucide 채택, 마스코트 자체 제작 SVG. 마스코트 IP 유사성 사람 확인은 대기 |

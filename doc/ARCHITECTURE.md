@@ -37,7 +37,7 @@
 | 영역 | 기술 | 비고 |
 |------|------|------|
 | Frontend | React 18, TypeScript, Vite, React Router, TanStack Query | 상태관리는 Query + 로컬 state로 최소화 |
-| UI / 디자인 | Tailwind CSS (디자인 토큰), Framer Motion (통통 튀는 모션), Lottie (마스코트 애니메이션, 선택), Google Fonts 둥근 한글 폰트 | 디즈니풍 가이드 → 7.6장 |
+| UI / 디자인 | Tailwind CSS 3 (디자인 토큰), Framer Motion (통통 튀는 모션), 자체 제작 SVG 마스코트, Lucide 아이콘, 둥근 한글 글꼴(Jua·Nanum Gothic, `@fontsource`로 직접 포함) | 디즈니풍 가이드 → 7.6장 |
 | Backend | Node.js 22.5 이상 (`node:sqlite` 내장 모듈 필요, 검증 26.13), JavaScript (ESM), Express 5, `chromadb` JS client 3.x, `node-cron` | 알림 계산 스케줄러 |
 | 인증 | 이메일 + 비밀번호, `bcryptjs` 해시(시드 `$2b$` 호환, 네이티브 빌드 없음), `jsonwebtoken`(JWT, httpOnly 쿠키), `zod` 입력 검증 | 이메일 인증·소셜 로그인 없음 |
 | DB | Chroma DB (server mode) | `data/chroma`에 영속화 |
@@ -45,6 +45,8 @@
 | LLM | Amazon Bedrock — `ChatBedrockConverse` | 모델 ID는 `.env`의 `AWS_MODEL` |
 | Embedding | Amazon Bedrock Embeddings (`BedrockEmbeddings`, **Titan Text Embeddings v2** `amazon.titan-embed-text-v2:0`, 1024차원, 한국어 지원) | 모델 ID는 `.env`의 `AWS_EMBED_MODEL` |
 | 웹 검색 | `langchain-community`의 `DuckDuckGoSearchResults` (`ddgs`, **API 키 없음**) | General Agent 전용. Version 1은 키 없는 DuckDuckGo만 쓴다 (유료·키 필요 API는 Version 2 후보) |
+
+**Frontend 내부 구조** (`src/frontend/`, 자체 `package.json`) — Vite + React 19 + TypeScript 5.9, 개발 서버 :5173이 `/api`를 Backend(:3000)로 프록시한다 (같은 출처라 httpOnly 쿠키가 붙는다). `src/api/`(fetch 래퍼 `client.ts` 하나로만 호출, 응답 타입), `src/hooks/`(TanStack Query), `src/state/`(선택 반려동물 `?pet=` + localStorage, 테마·움직임 설정), `src/lib/`(KST 표시 형식, trace 사용자 문구 `traceLabels.ts`, 채팅 응답 → 화면 모델 `chatView.ts`, 오류 문구, 태그 한국어 이름), `src/components/`(base·mascot·layout·domain), `src/pages/`(W01~W12, 화면 ID와 같은 이름), `src/mocks/`(MSW, `data/seed`로 목 데이터), `src/styles/tokens.css`(유일한 디자인 값 정의 위치). 라이브러리: `react-router-dom`, `@tanstack/react-query`, `tailwindcss` 3(의미 토큰만 연결), `framer-motion`, `lucide-react`(아이콘), `@fontsource/jua`·`@fontsource/nanum-gothic`(글꼴 직접 포함, 오프라인 동작) / 테스트 `vitest`, `@testing-library/*`, `msw`, `vitest-axe`, `@playwright/test`, `@axe-core/playwright`. 마스코트는 코드로 그린 자체 제작 SVG(개·고양이 × 기본·기쁨·미안·걱정·축하). 에셋 출처는 `doc/assets.md`.
 
 **Backend 내부 구조** (`src/backend/`, 자체 `package.json`) — `src/app.js`의 `createApp(deps)`가 Express 앱을 만들고, 저장소(`store`)·Agent 클라이언트·오늘 날짜 함수를 주입받는다 (테스트는 메모리 저장소·가짜 Agent를 넣는다). `src/lib/`(날짜·id·오류·로그 마스킹), `src/store/`(Chroma 저장 형식 5.1 인코딩, Chroma·메모리 저장소, `userId`를 강제하는 컬렉션별 저장소, schema.md 제약 검증), `src/services/`(연쇄 삭제·건강 일정 계산·알림·할 일·취향 신호), `src/routes/`(4.2 API), `src/jobs/overdue.js`(overdue 갱신), `src/seed/reset.js`(`npm run seed:reset`), `src/checkpoints.js`(LangGraph checkpoint thread 삭제, `node:sqlite`), `src/agentClient.js`(Agent 호출). 라이브러리: `express`, `chromadb`, `bcryptjs`, `jsonwebtoken`, `cookie-parser`, `zod`, `node-cron`, `dotenv` / 테스트 `vitest`, `supertest` / 린트 `eslint`, `prettier`, `eslint-config-prettier`. 버전은 `package.json`에 고정하고 `package-lock.json`을 커밋한다.
 
@@ -600,6 +602,7 @@ Chroma는 문서 + 메타데이터 저장소이므로, 앱 데이터는 **`docum
 - 식단: `subtype`(feeding_guide/treat/topping/hydration/weight_management/harmful_food), `serving_guide`, `kcal_note`, `allergens`
 - 정기점검: `type`(vaccine/checkup/deworming/heartworm/external_parasite/dental/other), `core`, `legal_required_kr`, `dose_schedule`, `booster_interval_days`, `interval_days`, `start_age_weeks`
 - `contraindications`의 질환 태그(예: `joint_disease`, `kidney_disease`, `brachycephalic`)는 프로필의 질환 메모를 같은 태그로 매핑해 하드 필터에 쓴다.
+- **태그 어휘와 화면 이름**: 프로필의 `allergies`·`conditions`는 카탈로그에 실제로 있는 태그 값만 고른다 — 알레르기 `chicken`(닭고기)·`fish`(생선), 질환 `joint_disease`(관절 질환)·`obesity_severe`(고도 비만)·`post_surgery`(수술 후 회복 중)·`brachycephalic`(단두종)·`ear_infection`(귀 염증)·`skin_disease`(피부 질환)·`heart_disease`(심장 질환)·`diabetes`(당뇨). 한국어 이름 표는 Frontend `src/lib/labels.ts` 한 곳에만 둔다. 표에 없는 태그(카탈로그가 늘어난 경우)는 태그 값을 그대로 보여 준다. 자유로운 건강 메모는 `memo`에 쓴다 (필터에 쓰지 않음).
 
 정기점검 항목에는 회차별 접종을 표현하는 `dose_schedule`을 추가한다.
 ```json
@@ -707,13 +710,13 @@ Chroma는 문서 + 메타데이터 저장소이므로, 앱 데이터는 **`docum
   | `--color-accent` | `#FFC94D` 골드 | `#FFD873` 별빛 |
   | `--color-pink` / `--color-mint` / `--color-sky` | `#FFB8C9` / `#A8E6CF` / `#BDE3FF` | 채도를 낮춘 버전 |
   | `--radius-card` | `20px` | 같음 |
-  | `--font-display` / `--font-body` | Jua / Nanum Gothic (후보) | 같음 |
+  | `--font-display` / `--font-body` | Jua / Nanum Gothic (채택, `@fontsource`로 직접 포함) | 같음 |
 
 - **컴포넌트**: 말랑한 카드(그림자 + 큰 반경), 버블형 채팅 말풍선, 알약 모양 버튼, 마스코트 아바타(개/고양이 종에 따라 바뀜)
 - **모션**: 할 일 완료 시 반짝임 파티클 + 스프링 바운스(Framer Motion), `prefers-reduced-motion`이면 끈다.
 - **에셋**: 마스코트·아이콘은 자체 제작 또는 라이선스 확인 자료만 쓰고 `doc/assets.md`에 출처를 기록한다. 디즈니 등 다른 회사의 IP는 쓰지 않는다.
 - **접근성**: 파스텔 배경 위 텍스트 명암비 4.5:1 이상 유지, 이모지에는 대체 텍스트 제공
-- **테마·모션 설정**: 자동/밝게/밤하늘 테마와 "움직임 줄이기"는 기기별 설정이라 서버에 저장하지 않고 `localStorage`에 둔다. 읽기에 실패하면 기본값(자동, 기기의 `prefers-reduced-motion`)을 쓴다.
+- **테마·모션 설정**: 자동/밝게/밤하늘 테마와 "움직임 줄이기"는 기기별 설정이라 서버에 저장하지 않고 `localStorage`에 둔다. 읽기에 실패하면 기본값(자동, 기기의 `prefers-reduced-motion`)을 쓴다. "자동"은 `index.html` 스크립트가 기기 설정을 읽어 실제 값(`data-theme="light|dark"`, `data-motion="full|reduced"`)으로 바꿔 넣고, 기기 설정이 바뀌면 다시 반영한다. 그래서 `tokens.css`에는 다크·움직임 줄이기 값을 **한 번만** 적는다 (Style-guide.md 10장)
 - **trace 표시**: Agent·도구 이름을 사용자용 문구로 바꾸는 표는 프론트엔드 한 곳(`src/frontend/src/lib/traceLabels.ts`)에 둔다. 표에 없는 항목은 "처리 중 단계"로 묶어 보여주고, `args`는 표시하지 않는다.
 - **확인 창**: 반려동물 삭제는 이름, 회원 탈퇴는 이메일을 입력해야 버튼이 켜진다. 할 일 다시 제안·취향 전체 초기화·대화 삭제는 일반 확인 창을 쓴다.
 - **건강 할 일 카드**: `category=health` 할 일에는 👍/👎/바꾸기를 표시하지 않는다 (취향 신호 대상 아님).

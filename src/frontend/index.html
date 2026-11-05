@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ko" data-theme="light" data-motion="full" data-species="dog">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>DailyPet</title>
+    <script>
+      // React보다 먼저 테마·움직임을 실제 값으로 설정한다 (Style-guide.md 10장).
+      // "자동"은 기기 설정을 읽어 light|dark, full|reduced로 바꿔 넣는다. localStorage 실패 시 자동.
+      (function () {
+        var root = document.documentElement;
+        function read(key) {
+          try {
+            return window.localStorage.getItem(key);
+          } catch (e) {
+            return null;
+          }
+        }
+        function apply() {
+          var theme = read("dp.theme") || "auto";
+          var motion = read("dp.reduceMotion") === "1";
+          var darkMq = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)");
+          var motionMq = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)");
+          root.setAttribute(
+            "data-theme",
+            theme === "auto" ? (darkMq && darkMq.matches ? "dark" : "light") : theme,
+          );
+          root.setAttribute("data-motion", motion || (motionMq && motionMq.matches) ? "reduced" : "full");
+        }
+        window.__dpApplySettings = apply;
+        apply();
+        if (window.matchMedia) {
+          ["(prefers-color-scheme: dark)", "(prefers-reduced-motion: reduce)"].forEach(function (q) {
+            var mq = window.matchMedia(q);
+            if (mq.addEventListener) mq.addEventListener("change", apply);
+          });
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

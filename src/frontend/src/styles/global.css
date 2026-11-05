@@ -1,0 +1,79 @@
+@import "@fontsource/jua/400.css";
+@import "@fontsource/nanum-gothic/400.css";
+@import "@fontsource/nanum-gothic/700.css";
+@import "./tokens.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-size: var(--text-body-size);
+    line-height: var(--text-body-line);
+  }
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+  :root[data-theme="dark"] body {
+    /* 밤하늘 연출: 위쪽에만 옅은 별 점 (10장) */
+    background-image: radial-gradient(
+      var(--color-star-dot) var(--size-hairline),
+      transparent var(--size-hairline)
+    );
+    background-size: var(--space-12) var(--space-12);
+    background-repeat: repeat-x;
+  }
+  :focus-visible {
+    outline: var(--border-strong) solid var(--color-focus);
+    outline-offset: var(--border-strong);
+  }
+  a {
+    color: var(--color-primary);
+  }
+}
+
+@layer utilities {
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  .wrap-anywhere {
+    overflow-wrap: anywhere;
+  }
+  .sr-only {
+    position: absolute;
+    width: var(--size-hairline);
+    height: var(--size-hairline);
+    padding: 0;
+    margin: calc(-1 * var(--size-hairline));
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .pb-safe {
+    padding-bottom: calc(var(--size-bottom-nav) + env(safe-area-inset-bottom));
+  }
+  .skeleton {
+    background: var(--color-border);
+    animation: dp-pulse calc(var(--motion-slow) * 5) ease-in-out infinite;
+  }
+  :root[data-motion="reduced"] .skeleton {
+    animation: none;
+  }
+}
+
+@keyframes dp-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}

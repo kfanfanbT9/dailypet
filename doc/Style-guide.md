@@ -404,6 +404,7 @@
 
 - 설정은 `localStorage`에 둔다. 읽기에 실패하면 "자동"을 쓴다 (ARCHITECTURE.md 7.6).
 - 첫 화면이 깜박이지 않게, `index.html`의 `<head>`에서 React보다 먼저 `data-theme`·`data-motion`을 설정한다.
+- **"자동"의 처리**: 스크립트가 `prefers-color-scheme`·`prefers-reduced-motion`을 읽어 `data-theme`·`data-motion`에 **실제 값**(`light|dark`, `full|reduced`)을 넣고, 기기 설정이 바뀌면 다시 넣는다. 그래서 `tokens.css`에는 다크 값과 움직임 줄이기 값을 `[data-theme="dark"]`·`[data-motion="reduced"]`에 **한 번만** 적는다 (13.2의 `@media` 중복 블록은 쓰지 않는다, P1 단일 기준본). 스크립트가 실패하면 밝게·움직임 있음으로 보인다.
 - **밤하늘 연출**: 배경 위쪽에 아주 옅은 별 점 패턴(`--color-accent` 15% 이하)을 깐다. 본문 영역 뒤에는 깔지 않는다.
 - 일러스트·마스코트는 두 테마에서 같은 파일을 쓴다. 밤하늘에서 외곽선이 묻히면 `drop-shadow`로 보완한다.
 
@@ -515,7 +516,7 @@
 }
 ```
 
-> 다크 값이 두 곳에 같은 내용으로 들어가므로, 빌드 도구(PostCSS)나 공용 선언으로 한 번만 쓰도록 구현한다 (P1 단일 기준본).
+> 다크 값이 두 곳에 같은 내용으로 들어가지 않도록, 구현은 `@media` 블록 대신 10장 "자동의 처리"(스크립트가 실제 값을 넣음)로 한 번만 적는다 (P1 단일 기준본).
 
 ---
 

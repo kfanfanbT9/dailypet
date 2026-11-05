@@ -1,0 +1,209 @@
+/*
+ * DailyPet 디자인 토큰 — 유일한 디자인 값 정의 위치 (CLAUDE.md 4.5.2, Style-guide.md 13).
+ * 원시(palette) → 의미(color/space/radius/font/shadow/motion) → 컴포넌트 3계층.
+ * 테마·움직임 "자동"은 index.html 스크립트가 실제 값으로 바꿔 넣으므로 다크·reduced 값은 한 번만 적는다 (Style-guide.md 10장).
+ */
+:root {
+  /* ── 원시 팔레트 (3.1) ── */
+  --palette-cream-50: #fff9f0;
+  --palette-white: #ffffff;
+  --palette-ink-900: #3d3a4b;
+  --palette-ink-600: #6b6880;
+  --palette-line-200: #ece6da;
+  --palette-blue-400: #4a7bf7;
+  --palette-blue-600: #3366e0;
+  --palette-blue-700: #2f5bd3;
+  --palette-sky-200: #bde3ff;
+  --palette-sky-100: #e3f2ff;
+  --palette-gold-300: #ffc94d;
+  --palette-pink-200: #ffb8c9;
+  --palette-pink-100: #ffe3ea;
+  --palette-pink-700: #b83a64;
+  --palette-mint-200: #a8e6cf;
+  --palette-mint-100: #ddf5ea;
+  --palette-butter-100: #fff1c9;
+  --palette-night-900: #1b1f3b;
+  --palette-night-800: #262b52;
+  --palette-night-700: #323868;
+  --palette-night-line: #3a4078;
+  --palette-star-100: #f2f0ff;
+  --palette-star-300: #b8b6d6;
+  --palette-star-400: #7fa2ff;
+  --palette-stargold-300: #ffd873;
+  --palette-green-700: #1f7a4d;
+  --palette-green-50: #e2f6ec;
+  --palette-green-300: #7fd1ae;
+  --palette-amber-700: #9a5b00;
+  --palette-amber-50: #fff4d6;
+  --palette-amber-300: #ffc46b;
+  --palette-red-600: #c23b3b;
+  --palette-red-50: #ffe8e8;
+  --palette-red-300: #ff8a8a;
+  --palette-violet-50: #f3f1fa;
+  --palette-periwinkle-300: #9aa0d6;
+  --palette-dusk-sky: #3e5a8c;
+  --palette-dusk-pink: #8a4a66;
+  --palette-dusk-mint: #3f7a66;
+
+  /* ── 의미: 색 — 밝게 (3.2~3.4) ── */
+  --color-bg: var(--palette-cream-50);
+  --color-surface: var(--palette-white);
+  --color-surface-raised: var(--palette-white);
+  --color-text: var(--palette-ink-900);
+  --color-text-muted: var(--palette-ink-600);
+  --color-border: var(--palette-line-200);
+  --color-primary: var(--palette-blue-600);
+  --color-on-primary: var(--palette-white);
+  --color-primary-decor: var(--palette-blue-400);
+  --color-accent: var(--palette-gold-300);
+  --color-sky: var(--palette-sky-200);
+  --color-pink: var(--palette-pink-200);
+  --color-mint: var(--palette-mint-200);
+  --color-focus: var(--palette-blue-600);
+  --color-success: var(--palette-green-700);
+  --color-success-bg: var(--palette-green-50);
+  --color-warning: var(--palette-amber-700);
+  --color-warning-bg: var(--palette-amber-50);
+  --color-danger: var(--palette-red-600);
+  --color-danger-bg: var(--palette-red-50);
+  --color-on-danger: var(--palette-white);
+  --color-info: var(--palette-blue-700);
+  --color-info-bg: var(--palette-sky-100);
+  --color-neutral: var(--palette-ink-600);
+  --color-neutral-bg: var(--palette-violet-50);
+  --color-cat-diet-bg: var(--palette-butter-100);
+  --color-cat-activity-bg: var(--palette-mint-100);
+  --color-cat-health-bg: var(--palette-pink-100);
+  --color-scrim: rgb(27 31 59 / 0.45);
+  --color-star-dot: rgb(255 216 115 / 0.15);
+
+  /* ── 종 강조색 — 개 (3.5) ── */
+  --color-species: var(--palette-sky-200);
+  --color-species-strong: var(--palette-blue-700);
+
+  /* ── 글꼴 (4) ── */
+  --font-display: "Jua", "Apple SD Gothic Neo", sans-serif;
+  --font-body: "Nanum Gothic", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-mono: ui-monospace, "D2Coding", monospace;
+  --text-display-size: 32px;
+  --text-display-line: 40px;
+  --text-title-1-size: 24px;
+  --text-title-1-line: 32px;
+  --text-title-2-size: 20px;
+  --text-title-2-line: 28px;
+  --text-title-3-size: 18px;
+  --text-title-3-line: 26px;
+  --text-body-size: 16px;
+  --text-body-line: 24px;
+  --text-small-size: 14px;
+  --text-small-line: 20px;
+  --text-caption-size: 12px;
+  --text-caption-line: 16px;
+
+  /* ── 간격 (5.1) ── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+
+  /* ── 크기 (5.2, 7장) ── */
+  --size-touch: 44px;
+  --size-button-md: 48px;
+  --size-button-sm: 36px;
+  --size-bottom-nav: 64px;
+  --size-sidebar: 240px;
+  --size-content: 960px;
+  --size-tablet: 640px;
+  --size-line: 36rem;
+  --size-modal: 440px;
+  --size-checkbox: 28px;
+  --size-badge: 24px;
+  --size-progress: 10px;
+  --size-hairline: 1px;
+  --border-input: 1.5px;
+  --border-strong: 2px;
+  --border-band: 3px;
+
+  /* ── 반경 (6.1) ── */
+  --radius-check: 6px;
+  --radius-sm: 12px;
+  --radius-input: 16px;
+  --radius-card: 20px;
+  --radius-sheet: 24px;
+  --radius-bubble: 20px;
+  --radius-bubble-tail: 6px;
+  --radius-pill: 999px;
+
+  /* ── 그림자 (6.2) ── */
+  --shadow-0: none;
+  --shadow-1: 0 2px 8px rgb(61 58 75 / 0.08);
+  --shadow-2: 0 6px 16px rgb(61 58 75 / 0.12);
+  --shadow-3: 0 12px 32px rgb(61 58 75 / 0.18);
+
+  /* ── 모션 (9) ── */
+  --motion-fast: 120ms;
+  --motion-base: 200ms;
+  --motion-slow: 320ms;
+  --motion-celebrate: 800ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  /* ── 컴포넌트 토큰 ── */
+  --button-primary-bg: var(--color-primary);
+  --button-primary-bg-hover: color-mix(in srgb, var(--color-primary) 88%, black);
+  --disabled-opacity: 0.45;
+  --press-scale: 0.97;
+}
+
+/* 밤하늘 (10장) — 한 번만 적는다 */
+:root[data-theme="dark"] {
+  --color-bg: var(--palette-night-900);
+  --color-surface: var(--palette-night-800);
+  --color-surface-raised: var(--palette-night-700);
+  --color-text: var(--palette-star-100);
+  --color-text-muted: var(--palette-star-300);
+  --color-border: var(--palette-night-line);
+  --color-primary: var(--palette-star-400);
+  --color-on-primary: var(--palette-night-900);
+  --color-primary-decor: var(--palette-star-400);
+  --color-accent: var(--palette-stargold-300);
+  --color-sky: var(--palette-dusk-sky);
+  --color-pink: var(--palette-dusk-pink);
+  --color-mint: var(--palette-dusk-mint);
+  --color-focus: var(--palette-stargold-300);
+  --color-success: var(--palette-green-300);
+  --color-success-bg: var(--palette-night-700);
+  --color-warning: var(--palette-amber-300);
+  --color-warning-bg: var(--palette-night-700);
+  --color-danger: var(--palette-red-300);
+  --color-danger-bg: var(--palette-night-700);
+  --color-on-danger: var(--palette-night-900);
+  --color-info: var(--palette-periwinkle-300);
+  --color-info-bg: var(--palette-night-700);
+  --color-neutral: var(--palette-star-300);
+  --color-neutral-bg: var(--palette-night-700);
+  --color-cat-diet-bg: var(--palette-night-800);
+  --color-cat-activity-bg: var(--palette-night-800);
+  --color-cat-health-bg: var(--palette-night-800);
+  --shadow-1: 0 0 0 1px var(--palette-night-line);
+  --shadow-2: 0 0 0 1px var(--palette-night-line);
+  --shadow-3: 0 0 0 1px var(--palette-night-line);
+  --button-primary-bg-hover: color-mix(in srgb, var(--color-primary) 88%, white);
+}
+
+/* 종 — 고양이 (3.5) */
+:root[data-species="cat"] {
+  --color-species: var(--palette-pink-200);
+  --color-species-strong: var(--palette-pink-700);
+}
+
+/* 움직임 줄이기 (9장) — 한 번만 적는다. 모달·시트는 120ms 페이드만 남긴다 */
+:root[data-motion="reduced"] {
+  --motion-base: 0ms;
+  --motion-slow: 120ms;
+  --motion-celebrate: 0ms;
+  --press-scale: 1;
+}
