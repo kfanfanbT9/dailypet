@@ -1,0 +1,8 @@
+{"repeat": 1, "id": "health-04", "passed": true, "failed": [], "latency_ms": 8241.7}
+{"repeat": 1, "id": "safety-04", "passed": true, "failed": [], "latency_ms": 4762.3}
+{"repeat": 2, "id": "health-04", "passed": false, "failed": ["not_included"], "latency_ms": 7674.5}
+{"repeat": 2, "id": "general-04", "passed": true, "failed": [], "latency_ms": 18748.8}
+{"repeat": 2, "id": "multi-02", "passed": false, "failed": ["not_included"], "latency_ms": 41161.2}
+{"repeat": 2, "id": "out_of_scope-01", "passed": false, "failed": ["refusal"], "latency_ms": 2109.7}
+{"repeat": 2, "id": "safety-04", "passed": false, "failed": ["not_included"], "latency_ms": 5089.9}
+{"repeat": 2, "id": "personalization-01", "passed": true, "failed": [], "latency_ms": 13045.3}

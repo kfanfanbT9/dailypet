@@ -1,0 +1,167 @@
+{
+  "S01": [
+    {
+      "check": "S01 자동 생성 할 일이 모두 카탈로그 ID + junior, 식단·활동 각 1개 이상",
+      "passed": true,
+      "evidence": [
+        "diet_dog_puppy_meal_guide_01",
+        "act_dog_puppy_explore_walk_01",
+        "act_dog_basic_training_01"
+      ]
+    },
+    {
+      "check": "S01 첫 할 일 조회(Backend → /tasks/generate) 1초 이내",
+      "passed": true,
+      "evidence": {
+        "ms": 104.3
+      }
+    },
+    {
+      "check": "S01 로그아웃 후 /api/pets 401",
+      "passed": true,
+      "evidence": {
+        "status": 401
+      }
+    }
+  ],
+  "S05": [
+    {
+      "check": "S05 calc_daily_calories가 33.2kg 기준 (34.0 아님)",
+      "passed": true,
+      "evidence": {
+        "calc_args": [
+          {
+            "species": "dog",
+            "weight_kg": 33.2,
+            "age_months": 67,
+            "neutered": true,
+            "activity_level": "normal",
+            "goal": "maintain"
+          }
+        ],
+        "answer": "보리의 하루 권장 칼로리를 계산했어요! 🐶✨\n\n---\n\n### 🌾 보리 하루 급여 가이드\n\n| 항목 | 수치 |\n|------|------|\n| **체중** | 33.2kg |\n| **기초 대사량 (RER)** | 968 kcal |\n| **하루 필요 칼로리 (DER)** | **1,5"
+      }
+    },
+    {
+      "check": "S05 답변에 하루 kcal과 끼니별 가이드",
+      "passed": true,
+      "evidence": "보리의 하루 권장 칼로리를 계산했어요! 🐶✨\n\n---\n\n### 🌾 보리 하루 급여 가이드\n\n| 항목 | 수치 |\n|------|------|\n| **체중** | 33.2kg |\n| **기초 대사량 (RER)** | 968 kcal |\n| **하루 필요 칼로리 (DER)** | **1,549 kcal** |\n| **끼니 수** | 하루 2회 |\n| **한 끼 칼로리** | 약 775 kcal |\n\n> 보리는 **중성화한 성체 골든리트리버**로, 계수 1.6을 적용했어요.\n\n---\n\n### 📌 급여 시 참고 사항\n- **사료 봉투의 칼"
+    },
+    {
+      "check": "S05 체중 기록·채팅 후 오늘 tasks 그대로",
+      "passed": true,
+      "evidence": {
+        "before": 3,
+        "after": 3
+      }
+    }
+  ],
+  "S09": [
+    {
+      "check": "S09 등록되지 않은 이름 '초코' → 찾지 못했다는 안내",
+      "passed": true,
+      "evidence": "현재 등록된 반려동물은 **보리**(강아지)와 **나비**(고양이)예요. 초코라는 이름의 반려동물은 찾을 수 없어요 😢\n\n혹시 **보리** 또는 **나비**의 산책·운동 정보를 원하셨나요? 아니면 초코가 다른 이름으로 등록되어 있을 수도 있으니 확인 부탁드려요! 🐾"
+    },
+    {
+      "check": "S09 보리·나비 각각 답함 (같은 사용자 소유 조회)",
+      "passed": true,
+      "evidence": {
+        "ids": [],
+        "tools": [
+          "list_my_pets",
+          "get_pet_profile",
+          "get_pet_profile",
+          "search_pet_knowledge",
+          "search_pet_knowledge",
+          "forward_message"
+        ]
+      }
+    },
+    {
+      "check": "S09 선택 안 된 나비 쓰기 요청 → interrupt 없음 + 선택 안내",
+      "passed": true,
+      "evidence": "저는 접종·검진·구충 일정 안내를 도와드리는 도우미예요. 😊\n\n나비의 검진 일정을 잡으려면 **나비를 선택한 뒤 요청해 주세요**. 지금은 다른 반려동물이 선택된 상태라 나비의 일정을 직접 등록해 드리기 어렵답니다.\n\n나비로 전환하신 후 다시 말씀해 주시면 바로 도와드릴게요! 🐱\n\n(안전을 위해 일부 내용은 빼고 안내했어요.)"
+    }
+  ],
+  "S10": [
+    {
+      "check": "S10 실행",
+      "passed": false,
+      "evidence": "TypeError: string indices must be integers, not 'str'"
+    }
+  ],
+  "S13": [
+    {
+      "check": "S13 정보 질문 '어질리티가 뭐야?' → general_agent",
+      "passed": false,
+      "evidence": {
+        "handoffs": []
+      }
+    }
+  ],
+  "S21": [
+    {
+      "check": "S21 1단계 remember_preference 2건 + 저장 알림",
+      "passed": false,
+      "evidence": {
+        "args": []
+      }
+    },
+    {
+      "check": "S21 수영은 act_dog_swimming_01로, 연어는 자유 텍스트로 저장",
+      "passed": false,
+      "evidence": {
+        "dislike": [],
+        "like": []
+      }
+    },
+    {
+      "check": "S21 2단계 추천에 act_dog_swimming_01 없음",
+      "passed": false,
+      "evidence": {
+        "item_ids": [
+          "act_dog_nosework_find_it_01",
+          "act_dog_daily_walk_01",
+          "act_dog_swimming_01"
+        ]
+      }
+    },
+    {
+      "check": "S21 연어 레시피 등 카탈로그 밖 추천 없음",
+      "passed": true,
+      "evidence": [
+        "act_dog_daily_walk_01",
+        "act_dog_nosework_find_it_01",
+        "act_dog_swimming_01"
+      ]
+    },
+    {
+      "check": "S21 4단계 전체 초기화 후 보리 취향 빈 목록 (공통 제약 제외)",
+      "passed": true,
+      "evidence": {
+        "remaining_scopes": []
+      }
+    }
+  ],
+  "S16a": [
+    {
+      "check": "S16 1단계 보리 대화 목록에 S06 대화",
+      "passed": true,
+      "evidence": {
+        "thread": "9b3c6761"
+      }
+    },
+    {
+      "check": "S16 나비 대화 목록에 보리 대화 없음",
+      "passed": true,
+      "evidence": {
+        "nabi_count": 0
+      }
+    },
+    {
+      "check": "_thread",
+      "passed": true,
+      "evidence": "thr_usr_69d308a849e0_pet_bori_7ae952ac863f4a04909986d59b3c6761"
+    }
+  ]
+}

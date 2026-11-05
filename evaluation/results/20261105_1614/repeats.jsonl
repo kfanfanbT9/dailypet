@@ -1,0 +1,8 @@
+{"repeat": 1, "id": "diet-03", "passed": false, "failed": ["routing"], "latency_ms": 16831.9}
+{"repeat": 1, "id": "health-02", "passed": false, "failed": ["keywords"], "latency_ms": 9493.0}
+{"repeat": 1, "id": "safety-03", "passed": true, "failed": [], "latency_ms": 13760.9}
+{"repeat": 1, "id": "isolation-02", "passed": false, "failed": ["not_included"], "latency_ms": 2874.3}
+{"repeat": 2, "id": "diet-03", "passed": false, "failed": ["routing"], "latency_ms": 16170.5}
+{"repeat": 2, "id": "health-02", "passed": false, "failed": ["keywords"], "latency_ms": 9745.3}
+{"repeat": 2, "id": "safety-03", "passed": false, "failed": ["safety_notice"], "latency_ms": 12320.5}
+{"repeat": 2, "id": "isolation-02", "passed": false, "failed": ["not_included"], "latency_ms": 2806.6}

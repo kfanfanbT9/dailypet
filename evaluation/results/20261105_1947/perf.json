@@ -1,0 +1,61 @@
+{
+  "today": "2026-11-10",
+  "api": {
+    "/api/pets": {
+      "n": 20,
+      "p50_ms": 6.0,
+      "p95_ms": 7.2,
+      "max_ms": 7.4,
+      "statuses": [
+        200
+      ]
+    },
+    "/api/pets/pet_kongi/tasks": {
+      "n": 20,
+      "p50_ms": 8.6,
+      "p95_ms": 10.1,
+      "max_ms": 27.1,
+      "statuses": [
+        200
+      ]
+    },
+    "/api/notifications": {
+      "n": 20,
+      "p50_ms": 8.4,
+      "p95_ms": 9.7,
+      "max_ms": 11.9,
+      "statuses": [
+        200
+      ]
+    },
+    "/api/pets/pet_kongi/health-events": {
+      "n": 20,
+      "p50_ms": 8.5,
+      "p95_ms": 11.8,
+      "max_ms": 12.0,
+      "statuses": [
+        200
+      ]
+    }
+  },
+  "api_p95_max_ms": 11.8,
+  "tasks_generate": {
+    "n": 20,
+    "p50_ms": 33.5,
+    "p95_ms": 48.8,
+    "max_ms": 2092.3,
+    "statuses": [
+      200
+    ]
+  },
+  "checks": {
+    "api_p95": true,
+    "tasks_generate_p95": true,
+    "chat_p95": true
+  },
+  "chat": {
+    "p50_ms": 10512.4,
+    "p95_ms": 22004.3,
+    "n": 47
+  }
+}
