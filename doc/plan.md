@@ -345,6 +345,8 @@ LLM 없이 결정적으로 동작하는 순수 함수. `/tasks/generate`와 채�
 
 ## Phase 2 · Backend (Node.js)
 
+> 세부 작업(파일·함수·테스트·순서)은 [phase2_task.md](phase2_task.md)를 따른다.
+
 ### B-1. 골격·Chroma 저장소 계층
 
 **의존성**
