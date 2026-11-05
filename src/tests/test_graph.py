@@ -26,7 +26,7 @@ P3, P1, SEOJUN = "usr_69d308a849e0", "usr_1c3544ae18bc", "usr_a80678fb2f7a"
 def env(catalog_loaded, fake_embeddings, today, monkeypatch):
     ingest_knowledge(catalog_loaded, fake_embeddings)
     for key in ("WEB_SEARCH_MOCK", "EVAL_MODE"):
-        monkeypatch.delenv(key, raising=False)
+        monkeypatch.setenv(key, "")  # 빈 값: .env가 되살리지 못하게 (override=False)
     config.get_settings.cache_clear()
     tools.configure_resources(client=catalog_loaded, embeddings=fake_embeddings, catalog=catalog_index())
     yield catalog_loaded
@@ -290,7 +290,7 @@ def test_real_out_of_scope_not_routed(real_env, question):
 @pytest.fixture
 def real_env(real_catalog_loaded, real_embeddings, today, monkeypatch):
     for key in ("WEB_SEARCH_MOCK", "EVAL_MODE"):
-        monkeypatch.delenv(key, raising=False)
+        monkeypatch.setenv(key, "")  # 빈 값: .env가 되살리지 못하게 (override=False)
     config.get_settings.cache_clear()
     try:
         agent.get_model().invoke("ping")

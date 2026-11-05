@@ -253,25 +253,25 @@ repos.users.getById(userId) / getByEmail(email) / create(row) / remove(userId)  
 **의존성**: B-1
 
 **작업**
-- [ ] `POST /api/auth/signup` `{ email, password, nickname }`
+- [x] `POST /api/auth/signup` `{ email, password, nickname }`
   - 이메일 `trim().toLowerCase()`, 형식 검사. 비밀번호 8자 이상, 닉네임 1~20자 (규칙을 SERVICE.md F0에 적는다, D4)
   - `user_id = usr_ + sha256(email)[:12]`. 이미 있으면 **409** "이미 사용 중인 이메일이에요"
   - `bcryptjs` cost 10으로 해시. 원문은 변수 밖으로 나가지 않는다 (로그·오류 메시지·응답에 없음)
   - 가입 직후 로그인 상태로 만든다 (S01 2단계)
-- [ ] `POST /api/auth/login`: 실패 사유를 구분하지 않고 401 "이메일 또는 비밀번호를 확인해 주세요"
-- [ ] JWT: `{ sub: user_id }`, 만료 7일, `JWT_SECRET` 서명. 쿠키 `dp_session` (`httpOnly`, `SameSite=Lax`, `Secure`는 로컬 데모라 끔, `path=/`)
-- [ ] `POST /api/auth/logout`: 쿠키 삭제. 이후 `/api/pets`는 401 (S01)
-- [ ] `requireAuth`: 쿠키 검증 → `req.userId`. 토큰은 유효한데 `users`에 없으면(탈퇴 후) 401
-- [ ] `GET /api/me`: `{ user_id, email, nickname, created_at }` (해시 제외)
-- [ ] `DELETE /api/me` `{ confirm_email }`: 가입 이메일과 같아야 실행 (SERVICE.md F0). 실제 삭제는 B-4 `cascade.deleteUser`
+- [x] `POST /api/auth/login`: 실패 사유를 구분하지 않고 401 "이메일 또는 비밀번호를 확인해 주세요"
+- [x] JWT: `{ sub: user_id }`, 만료 7일, `JWT_SECRET` 서명. 쿠키 `dp_session` (`httpOnly`, `SameSite=Lax`, `Secure`는 로컬 데모라 끔, `path=/`)
+- [x] `POST /api/auth/logout`: 쿠키 삭제. 이후 `/api/pets`는 401 (S01)
+- [x] `requireAuth`: 쿠키 검증 → `req.userId`. 토큰은 유효한데 `users`에 없으면(탈퇴 후) 401
+- [x] `GET /api/me`: `{ user_id, email, nickname, created_at }` (해시 제외)
+- [x] `DELETE /api/me` `{ confirm_email }`: 가입 이메일과 같아야 실행 (SERVICE.md F0). 실제 삭제는 B-4 `cascade.deleteUser`
 
 **테스트** (`test/auth.test.js`)
-- [ ] `NewBie@Demo.DailyPet` 가입 → `users`에 소문자 이메일, id `usr_fce210e795d0`, `password_hash`가 `$2` 접두사
-- [ ] 저장된 document 전체와 응답 본문에 비밀번호 원문 문자열이 없다
-- [ ] `HANEUL@demo.dailypet`(시드 계정과 대소문자만 다름) → 409, 행 수 변화 없음
-- [ ] 시드 계정이 USER_SCENARIO.md 1.1의 데모 비밀번호로 로그인된다 (`$2b$` 해시 호환)
-- [ ] 로그아웃 후 `/api/pets` 401, 위조·만료 토큰 401
-- [ ] `/api/auth/*`를 뺀 모든 라우트가 `requireAuth`를 거친다 (라우터 목록을 순회하는 테스트)
+- [x] `NewBie@Demo.DailyPet` 가입 → `users`에 소문자 이메일, id `usr_fce210e795d0`, `password_hash`가 `$2` 접두사
+- [x] 저장된 document 전체와 응답 본문에 비밀번호 원문 문자열이 없다
+- [x] `HANEUL@demo.dailypet`(시드 계정과 대소문자만 다름) → 409, 행 수 변화 없음
+- [x] 시드 계정이 USER_SCENARIO.md 1.1의 데모 비밀번호로 로그인된다 (`$2b$` 해시 호환)
+- [x] 로그아웃 후 `/api/pets` 401, 위조·만료 토큰 401
+- [x] `/api/auth/*`를 뺀 모든 라우트가 `requireAuth`를 거친다 (라우터 목록을 순회하는 테스트)
 
 ---
 
@@ -280,24 +280,24 @@ repos.users.getById(userId) / getByEmail(email) / create(row) / remove(userId)  
 **의존성**: B-1, P0-6 ✅
 
 **작업**
-- [ ] `seed/reset.js [--variant <이름>]`
+- [x] `seed/reset.js [--variant <이름>]`
   1. 앱 데이터 컬렉션 8종을 지우고 다시 만든다 (`deleteCollection` → `getOrCreateCollection`). 카탈로그·지식 컬렉션은 이름 목록으로 **명시적으로 제외**한다
   2. `data/checkpoints/` 안의 SQLite 파일을 지운다 (`CHECKPOINT_PATH` 기준. 폴더 밖 경로면 거부)
   3. `data/seed/*.json`을 `encodeAppRecord`로 적재한다. 적재 전에 `validate.js`로 전부 검증하고, 하나라도 실패하면 아무것도 쓰지 않고 끝낸다
   4. `--variant`: `data/seed/variants/<이름>.json`의 `update` → `add` → `delete`를 적용한다. `setup_queries`가 있으면 Agent `POST /query`를 순서대로 부르고(Agent가 꺼져 있으면 실패 메시지와 종료 코드 1), 없으면 건너뛴다
   5. `overdue` 갱신(B-5 `jobs/overdue.js`)을 한 번 실행한다 (`TODAY_OVERRIDE`별 결과를 결정적으로 만들기 위해)
   6. 컬렉션별 건수를 출력한다
-- [ ] 실행 중인 Backend가 같은 Chroma를 쓰고 있어도 깨지지 않게, 리셋 뒤 Backend 캐시(카탈로그 외 없음)를 두지 않는다
-- [ ] Agent 서버가 떠 있으면 checkpoint 파일이 열려 있을 수 있다. 파일 삭제 대신 테이블 비우기(`DELETE FROM checkpoints; DELETE FROM writes;`)로 바꿀지 B-3에서 확인하고 결과를 README에 적는다
+- [x] 실행 중인 Backend가 같은 Chroma를 쓰고 있어도 깨지지 않게, 리셋 뒤 Backend 캐시(카탈로그 외 없음)를 두지 않는다
+- [x] Agent 서버가 떠 있으면 checkpoint 파일이 열려 있을 수 있다. 파일 삭제 대신 테이블 비우기(`DELETE FROM checkpoints; DELETE FROM writes;`)로 바꿀지 B-3에서 확인하고 결과를 README에 적는다
 
 **테스트** (`test/seed.test.js`)
-- [ ] 리셋 후 건수: 사용자 6, 반려동물 7, 건강 일정·할 일·체중·신호·취향·대화 기록이 시드 파일 행 수와 같다
-- [ ] 두 번 연속 실행 → 모든 컬렉션의 id 집합과 document가 같다
-- [ ] `catalog_activity`에 표시 행을 넣어 두고 리셋 → 그대로 남아 있다
-- [ ] `--variant mocha_joint` → 모카 `conditions`에 `joint_disease`, `--variant hodu_dislikes` → 호두 dislike 신호 9건 추가
-- [ ] `--variant bori_pending_hitl` + 가짜 Agent → `setup_queries`가 시드 순서대로 호출된다
-- [ ] 잘못된 행이 섞인 임시 시드 → 실패하고 아무것도 쓰지 않는다
-- [ ] (`test:chroma`) 실제 Chroma에 리셋 후 Python `src/tests/seed_loader.py`와 같은 결과 (id·metadata 비교)
+- [x] 리셋 후 건수: 사용자 6, 반려동물 7, 건강 일정·할 일·체중·신호·취향·대화 기록이 시드 파일 행 수와 같다
+- [x] 두 번 연속 실행 → 모든 컬렉션의 id 집합과 document가 같다
+- [x] `catalog_activity`에 표시 행을 넣어 두고 리셋 → 그대로 남아 있다
+- [x] `--variant mocha_joint` → 모카 `conditions`에 `joint_disease`, `--variant hodu_dislikes` → 호두 dislike 신호 9건 추가
+- [x] `--variant bori_pending_hitl` + 가짜 Agent → `setup_queries`가 시드 순서대로 호출된다
+- [x] 잘못된 행이 섞인 임시 시드 → 실패하고 아무것도 쓰지 않는다
+- [x] (`test:chroma`) 실제 Chroma에 리셋 후 Python `src/tests/seed_loader.py`와 같은 결과 (id·metadata 비교)
 
 ---
 
@@ -517,7 +517,7 @@ CLAUDE.md 2장 규칙에 따라, 아래 항목은 **코드보다 문서를 먼�
 | D1 ✅ | Backend 내부 구조(1.1)와 라이브러리(1.2) | ARCHITECTURE.md 2장 | B-0 |
 | D2 ✅ | Python ↔ Node 공유 기준 사례 목록 (1.3, `app_records.json`·`prefId` 규칙 포함) | ARCHITECTURE.md 5.1 | B-0 |
 | D3 ✅ | 테스트 전용 `CHROMA_DATABASE` 키 | ARCHITECTURE.md 7장, `.env.example` | B-0 |
-| D4 | 가입 입력 규칙 (비밀번호 8자 이상, 닉네임 1~20자) | SERVICE.md F0 | B-2 |
+| D4 ✅ | 가입 입력 규칙 (비밀번호 8자 이상, 닉네임 1~20자) | SERVICE.md F0 | B-2 |
 | D5 | 건강 초기 일정표 규칙 (8장 표), 시드와 맞는지 확인 결과 | ARCHITECTURE.md 6장, 필요하면 USER_SCENARIO.md 2.3 | B-5 |
 | D6 | 완료·교체·삭제 신호는 할 일 API가 기록, `/feedback`은 👍/👎(+직접 신호)용 | ARCHITECTURE.md 4.2 | B-7 |
 | D7 | `tasks`에 선택 필드 `reason`, `rank`, `relaxed` 추가 | ARCHITECTURE.md 5장, ERD.md, `database/schema.md` | B-6 |
@@ -562,8 +562,8 @@ CLAUDE.md 2장 규칙에 따라, 아래 항목은 **코드보다 문서를 먼�
 |------|------|------|
 | B-0 기반·계약 | ✅ | 2026-11-05 · chromadb JS 3.5.0 ↔ 서버 1.5.9 확인. `app_records.json` Python 생성·최신성 테스트 |
 | B-1 골격·저장소 | ✅ | 2026-11-05 · 시드 52행 인코딩이 Python과 같음, 같은 조회 10종이 메모리·실제 Chroma에서 같은 결과. 단위 51개 + Chroma 12개 |
-| B-2 인증 | ⬜ | |
-| B-3 시드 리셋 | ⬜ | |
+| B-2 인증 | ✅ | 2026-11-05 · bcryptjs cost 10, JWT 7일 httpOnly 쿠키. 모든 /api 라우트가 구조적으로 requireAuth (라우터 순회 테스트) |
+| B-3 시드 리셋 | ✅ | 2026-11-05 · checkpoint는 테이블 비우기. 실제 `data/chroma`에 기본 시드 적재 확인. **발견: Chroma upsert가 metadata를 합침 → Python·Node 모두 delete→add로 수정** |
 | B-4 반려동물·연쇄 삭제 | ⬜ | |
 | B-5 건강 일정·알림 | ⬜ | |
 | B-6 할 일 | ⬜ | 가짜 Agent로 먼저, A-9 후 통합 |

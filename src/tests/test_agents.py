@@ -44,7 +44,7 @@ def tool_call(name: str, **args: Any) -> AIMessage:
 def env(catalog_loaded, fake_embeddings, today, monkeypatch):
     ingest_knowledge(catalog_loaded, fake_embeddings)
     for key in ("WEB_SEARCH_MOCK", "EVAL_MODE"):
-        monkeypatch.delenv(key, raising=False)
+        monkeypatch.setenv(key, "")  # 빈 값: .env가 되살리지 못하게 (override=False)
     config.get_settings.cache_clear()
     tools.configure_resources(client=catalog_loaded, embeddings=fake_embeddings, catalog=catalog_index())
     yield catalog_loaded
@@ -226,7 +226,7 @@ def test_read_tools_do_not_interrupt(env):
 def real_env(real_catalog_loaded, real_embeddings, today, monkeypatch):
     """실제 Bedrock 모델·임베딩 환경 (의미 검색 순위가 실제와 같아야 모델 동작을 검증할 수 있다)."""
     for key in ("WEB_SEARCH_MOCK", "EVAL_MODE"):
-        monkeypatch.delenv(key, raising=False)
+        monkeypatch.setenv(key, "")  # 빈 값: .env가 되살리지 못하게 (override=False)
     config.get_settings.cache_clear()
     try:
         agent.get_model().invoke("ping")

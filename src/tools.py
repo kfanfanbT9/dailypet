@@ -168,8 +168,9 @@ class AppStore:
 
     def _upsert(self, collection: str, row: dict[str, Any]) -> dict[str, Any]:
         rid, doc, meta = encode_app_record(row)
-        self.client.get_or_create_collection(collection, embedding_function=None).upsert(
-            ids=[rid], documents=[doc], metadatas=[meta], embeddings=[DUMMY_EMBEDDING])
+        col = self.client.get_or_create_collection(collection, embedding_function=None)
+        # Chroma upsert는 metadata를 합쳐 빠진 키가 남는다 → 지우고 다시 넣는다 (ARCHITECTURE.md 5.1)
+        retriever.replace_records(col, ids=[rid], documents=[doc], metadatas=[meta], embeddings=[DUMMY_EMBEDDING])
         return row
 
     def get_health_event(self, user_id: str, pet_id: str, event_id: str) -> dict[str, Any]:

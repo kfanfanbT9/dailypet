@@ -22,7 +22,7 @@ def env(catalog_loaded, fake_embeddings, today, monkeypatch):
     """시드 + 카탈로그 + 지식(가짜 임베딩) + 기준일 11/10."""
     ingest_knowledge(catalog_loaded, fake_embeddings)
     for key in ("WEB_SEARCH_MOCK", "EVAL_MODE", "WEB_SEARCH_BLOCKED_DOMAINS"):
-        monkeypatch.delenv(key, raising=False)
+        monkeypatch.setenv(key, "")  # 빈 값: .env가 되살리지 못하게 (override=False)
     config.get_settings.cache_clear()
     tools.configure_resources(client=catalog_loaded, embeddings=fake_embeddings, catalog=catalog_index())
     yield catalog_loaded
@@ -257,3 +257,16 @@ def test_real_duckduckgo(env):
 
 def test_today_override_used(env):
     assert config.today_kst() == date(2026, 11, 10)
+
+
+def test_app_store_upsert_replaces_metadata(chroma_client):
+    """Chroma upsert는 metadata를 합치므로, 갱신 때 빠진 키(예: excluded_until)가 남으면 안 된다."""
+    store = tools.AppStore(chroma_client)
+    row = {"id": "pref_t_1", "user_id": "usr_69d308a849e0", "pet_id": "pet_bori", "kind": "dislike",
+           "target": "act_dog_nosework_find_it_01", "note": "", "score": -3, "excluded_until": "2099-01-01",
+           "updated_at": "2026-11-08T21:00:00+09:00"}
+    store._upsert("preferences", row)
+    store._upsert("preferences", {**row, "kind": "like", "score": 3, "excluded_until": None})
+    col = chroma_client.get_collection("preferences")
+    assert "excluded_until" not in col.get(ids=["pref_t_1"])["metadatas"][0]
+    assert col.get(where={"excluded_until": "2099-01-01"})["ids"] == []

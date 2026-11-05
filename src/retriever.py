@@ -134,6 +134,15 @@ def _vector_collection(client: ClientAPI, name: str) -> Collection:
     return client.get_or_create_collection(name, embedding_function=None, configuration=_COSINE)
 
 
+def replace_records(col: Collection, *, ids: list[str], **fields: Any) -> None:
+    """id를 통째로 바꿔 넣는다. Chroma `upsert`는 기존 metadata를 합쳐 빠진 키가 남으므로
+    이미 있는 id는 지우고 다시 넣는다 (ARCHITECTURE.md 5.1 "행 갱신")."""
+    existing = col.get(ids=ids, include=[])["ids"]
+    if existing:
+        col.delete(ids=existing)
+    col.add(ids=ids, **fields)
+
+
 def _sync_ids(col: Collection, keep: set[str]) -> int:
     """`keep`에 없는 기존 id를 지운다 (다시 적재해도 남는 찌꺼기 없음). 지운 개수."""
     stale = [i for i in col.get(include=[])["ids"] if i not in keep]
@@ -228,7 +237,8 @@ def ingest_catalog(
         col = _vector_collection(client, name)
         if area_items:
             docs = [catalog_document(it) for it in area_items]
-            col.upsert(
+            replace_records(
+                col,
                 ids=[it["item_id"] for it in area_items],
                 documents=docs,
                 metadatas=[catalog_metadata(it) for it in area_items],
@@ -311,7 +321,8 @@ def ingest_knowledge(
             "title": str(doc.meta.get("title", path.stem)),
             "file": path.name,
         }
-        col.upsert(
+        replace_records(
+            col,
             ids=ids,
             documents=chunks,
             metadatas=[{**base, "chunk": n} for n in range(len(chunks))],

@@ -62,7 +62,11 @@ export function createChromaStore({ host = "localhost", port = 8001, database } 
       if (rows.length === 0) return;
       const c = await col(name);
       const enc = rows.map(encodeAppRecord);
-      await c.upsert({
+      // Chroma upsert는 metadata를 합친다(빠진 키가 남음) → 이미 있는 id는 지우고 다시 넣는다 (ARCHITECTURE.md 5.1)
+      const ids = enc.map((e) => e.id);
+      const existing = (await c.get({ ids, include: [] })).ids;
+      if (existing.length) await c.delete({ ids: existing });
+      await c.add({
         ids: enc.map((e) => e.id),
         documents: enc.map((e) => e.document),
         metadatas: enc.map((e) => e.metadata),

@@ -27,7 +27,7 @@ def env(catalog_loaded, fake_embeddings, today, monkeypatch):
     ingest_knowledge(catalog_loaded, fake_embeddings)
     monkeypatch.setenv("AGENT_API_KEY", KEY)
     for k in ("WEB_SEARCH_MOCK", "EVAL_MODE", "DEMO_USER_ID"):
-        monkeypatch.delenv(k, raising=False)
+        monkeypatch.setenv(k, "")  # 빈 값: .env가 되살리지 못하게
     config.get_settings.cache_clear()
     tools.configure_resources(client=catalog_loaded, embeddings=fake_embeddings, catalog=catalog_index())
     # 2단계 분류기는 Bedrock을 부르므로 오프라인 테스트에서는 '허용'으로 고정

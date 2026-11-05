@@ -7,6 +7,7 @@ import { createAgentClient } from "../src/agentClient.js";
 import { createApp } from "../src/app.js";
 import { loadCatalog } from "../src/catalog.js";
 import { createCheckpoints } from "../src/checkpoints.js";
+import { markOverdue } from "../src/jobs/overdue.js";
 import { setLogSink } from "../src/lib/logger.js";
 import { ROUTERS } from "../src/routes/index.js";
 import { createMemoryStore } from "../src/store/memory.js";
@@ -39,6 +40,7 @@ export async function createTestApp(opts = {}) {
   const store = createMemoryStore();
   const catalog = sharedCatalog;
   await loadSeedIntoStore(store, catalog, { variant: opts.variant ?? null });
+  await markOverdue(store, state.today); // seed:reset과 같이 적재 직후 overdue 갱신
   const repos = createRepos(store, { catalog });
   const checkpointPath = opts.checkpointPath ?? join(mkdtempSync(join(tmpdir(), "dp-cp-")), "cp.sqlite");
   const config = {

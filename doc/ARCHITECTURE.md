@@ -541,6 +541,7 @@ Chroma는 문서 + 메타데이터 저장소이므로, 앱 데이터는 **`docum
 | null · 빈 리스트 | 메타데이터에서는 키를 뺀다 (Chroma는 `null`·빈 리스트를 거부). `$not_contains`는 키가 없는 행도 포함한다 |
 | 시각 비교 | `created_at`·`updated_at`이 있으면 epoch 초 `created_ts`·`updated_ts`를 함께 넣는다 (`due_ts`와 같은 방식) |
 | 임베딩 | 앱 데이터 컬렉션은 의미 검색을 하지 않는다. 길이 1인 더미 벡터 `[0.0]`을 넣고, 컬렉션의 `embedding_function`은 쓰지 않는다 |
+| 행 갱신 | Chroma `upsert`는 기존 행의 metadata를 **교체하지 않고 합친다** (새 값에 없는 키가 남아 `where`에 계속 걸림, 2026-11-05 Python·JS 클라이언트 모두 확인). 그래서 이미 있는 id는 **지운 뒤 다시 넣는다**(delete → add). Python `AppStore._upsert`, Node `store/chroma.js` 모두 같은 규칙 |
 
 - 구현: Python은 `src/retriever.py`의 `encode_app_record` / `decode_app_record`, Node는 `src/backend/src/store/record.js`. 두 쪽은 `data/seed/` 적재 결과가 같은지로 확인한다.
 

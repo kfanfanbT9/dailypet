@@ -10,6 +10,9 @@ cd src/backend && npm run seed:reset -- --variant <이름>   # 변형 시드
 ```
 
 - 앱 데이터 컬렉션과 `data/checkpoints/`를 비운 뒤 아래 JSON을 적재한다. 카탈로그·지식 컬렉션은 건드리지 않는다.
+- checkpoint는 **파일을 지우지 않고 `checkpoints`·`writes` 테이블을 비운다**. Agent 서버가 SQLite 파일을 열어 둔 상태에서도 연결이 깨지지 않게 하기 위해서다 (`busy_timeout` 3초). `CHECKPOINT_PATH`가 `data/checkpoints/` 밖이면 거부한다.
+- 적재 전에 모든 행을 `database/schema.md` 제약으로 검증하고, 하나라도 틀리면 아무것도 쓰지 않는다.
+- 적재 직후 `overdue` 갱신을 한 번 실행한다 (`TODAY_OVERRIDE` 기준 결과를 결정적으로 만들기 위해).
 - 변형 시드는 기본 시드를 적재한 다음에 적용한다.
 
 ## 파일
