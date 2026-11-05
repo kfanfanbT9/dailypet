@@ -92,3 +92,10 @@ def test_variant_hodu_dislikes_adds_rows():
 def test_variant_setup_queries_warns():
     with pytest.warns(UserWarning, match="setup_queries"):
         read_seed("bori_pending_hitl")
+
+
+def test_app_records_fixture_is_current():
+    """Node가 읽는 공유 기준 사례 파일이 지금 시드·인코딩 규칙과 같다 (다르면 make_fixtures로 갱신)."""
+    from src.tests.make_fixtures import FIXTURE_PATH, render
+
+    assert FIXTURE_PATH.read_text(encoding="utf-8") == render(), "python -m src.tests.make_fixtures 로 갱신"

@@ -74,7 +74,7 @@ src/backend/
 └── test/                   node:test 또는 vitest, supertest
 ```
 
-- [ ] 위 배치를 ARCHITECTURE.md 2장(기술 스택)에 "Backend 내부 구조" 한 단락으로 적는다 (**문서 먼저**, D1)
+- [x] 위 배치를 ARCHITECTURE.md 2장(기술 스택)에 "Backend 내부 구조" 한 단락으로 적는다 (**문서 먼저**, D1)
 
 ### 1.2 라이브러리
 
@@ -91,8 +91,8 @@ src/backend/
 | 테스트 | `vitest`, `supertest` | |
 | 린트 | `eslint`, `prettier`, `eslint-config-prettier` | |
 
-- [ ] 버전을 `package.json`에 고정하고 `package-lock.json`을 커밋한다
-- [ ] `chromadb` JS 클라이언트로 서버(:8001)에 `heartbeat`·`get(where)`·`$contains`가 되는지 스모크 테스트를 먼저 쓴다 (Phase 1의 라이브러리 스모크와 같은 목적)
+- [x] 버전을 `package.json`에 고정하고 `package-lock.json`을 커밋한다
+- [x] `chromadb` JS 클라이언트로 서버(:8001)에 `heartbeat`·`get(where)`·`$contains`가 되는지 스모크 테스트를 먼저 쓴다 (Phase 1의 라이브러리 스모크와 같은 목적)
 
 ### 1.3 Python ↔ Node 공유 계약
 
@@ -109,8 +109,8 @@ src/backend/
 | 취향 점수 기본값 | like 3 / dislike −3 / constraint 0 | `services/signals.js` | 단위 테스트 |
 | `thread_id` | `thr_{user_id}_{pet_id}_{uuid hex}` | `lib/ids.js` | 접두사로 소유자 확인 |
 
-- [ ] `src/tests/fixtures/app_records.json`을 만드는 Python 스크립트(또는 pytest 픽스처 갱신 테스트)를 추가하고, Python 쪽 테스트가 파일이 최신인지 확인한다
-- [ ] 위 표를 ARCHITECTURE.md 5.1 아래 "공유 기준 사례" 목록으로 남긴다 (D2)
+- [x] `src/tests/fixtures/app_records.json`을 만드는 Python 스크립트(또는 pytest 픽스처 갱신 테스트)를 추가하고, Python 쪽 테스트가 파일이 최신인지 확인한다
+- [x] 위 표를 ARCHITECTURE.md 5.1 아래 "공유 기준 사례" 목록으로 남긴다 (D2)
 
 ### 1.4 테스트 전략
 
@@ -175,15 +175,15 @@ flowchart LR
 
 **의존성**: P0-8 ✅, A-0 ✅ (저장 형식 5.1 확정)
 
-- [ ] 1.1 배치, 1.3 공유 계약, 1.4 `CHROMA_DATABASE`를 문서(ARCHITECTURE.md 2·5.1·7장, `.env.example`)에 반영 (D1~D3)
-- [ ] `src/backend/package.json`, `eslint.config.js`, `.prettierrc`, `npm run lint`·`npm run format` 동작
-- [ ] `src/tests/fixtures/app_records.json` 생성 (Python), Node 테스트에서 읽을 수 있음
-- [ ] `test/fakeAgent.js`, `test/helpers.js`(`createTestApp`, 시드 적재, 로그인 쿠키 얻기)
-- [ ] `chromadb` JS 스모크 테스트 (`npm run test:chroma`)
+- [x] 1.1 배치, 1.3 공유 계약, 1.4 `CHROMA_DATABASE`를 문서(ARCHITECTURE.md 2·5.1·7장, `.env.example`)에 반영 (D1~D3)
+- [x] `src/backend/package.json`, `eslint.config.js`, `.prettierrc`, `npm run lint`·`npm run format` 동작
+- [x] `src/tests/fixtures/app_records.json` 생성 (Python), Node 테스트에서 읽을 수 있음
+- [x] `test/fakeAgent.js`, `test/helpers.js`(`createTestApp`, 시드 적재, 로그인 쿠키 얻기)
+- [x] `chromadb` JS 스모크 테스트 (`npm run test:chroma`)
 
 **완료 조건**
-- [ ] `npm test`가 테스트 0개로 정상 종료하고, `npm run lint`가 통과한다
-- [ ] `npm run test:chroma`로 서버 heartbeat와 리스트 메타데이터 `$contains` 조회가 된다
+- [x] `npm test`가 테스트 0개로 정상 종료하고, `npm run lint`가 통과한다
+- [x] `npm run test:chroma`로 서버 heartbeat와 리스트 메타데이터 `$contains` 조회가 된다
 
 ---
 
@@ -215,36 +215,36 @@ repos.users.getById(userId) / getByEmail(email) / create(row) / remove(userId)  
 ```
 
 **작업**
-- [ ] `config.js`: `CHROMA_HOST/PORT`, `AGENT_URL`, `AGENT_API_KEY`, `JWT_SECRET`, `TODAY_OVERRIDE`, `CHECKPOINT_PATH`, `FAULT_INJECT`를 읽는다. 필수 키가 없으면 **키 이름만** 알리고 종료한다. 키 값은 어디에도 출력하지 않는다
-- [ ] `lib/dates.js`: `Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul' })`로 KST 날짜를 얻는다. 날짜 산술은 `YYYY-MM-DD` 문자열 ↔ UTC 자정 `Date`로 해서 서버 TZ에 영향받지 않게 한다
-- [ ] `store/record.js`: 5.1 규칙 그대로
+- [x] `config.js`: `CHROMA_HOST/PORT`, `AGENT_URL`, `AGENT_API_KEY`, `JWT_SECRET`, `TODAY_OVERRIDE`, `CHECKPOINT_PATH`, `FAULT_INJECT`를 읽는다. 필수 키가 없으면 **키 이름만** 알리고 종료한다. 키 값은 어디에도 출력하지 않는다
+- [x] `lib/dates.js`: `Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul' })`로 KST 날짜를 얻는다. 날짜 산술은 `YYYY-MM-DD` 문자열 ↔ UTC 자정 `Date`로 해서 서버 TZ에 영향받지 않게 한다
+- [x] `store/record.js`: 5.1 규칙 그대로
   - document는 키를 정렬한 JSON (`sort_keys=True`와 같은 결과, `ensure_ascii=False`)
   - metadata 제외 필드: `id`, `default_times`, `trace`, `question`, `answer`, `memo`, `password_hash`
   - null·빈 리스트·객체는 키를 뺀다. 문자열 리스트만 리스트로 남긴다
   - `created_at`·`updated_at` → `created_ts`·`updated_ts`(epoch 초)
-- [ ] `store/chroma.js`: 앱 컬렉션 8종을 `getOrCreateCollection`(임베딩 함수 없음)으로 잡고, 쓰기에는 더미 벡터 `[0.0]`을 넣는다. 카탈로그·지식 컬렉션은 열지 않는다
-- [ ] `store/repos.js`
+- [x] `store/chroma.js`: 앱 컬렉션 8종을 `getOrCreateCollection`(임베딩 함수 없음)으로 잡고, 쓰기에는 더미 벡터 `[0.0]`을 넣는다. 카탈로그·지식 컬렉션은 열지 않는다
+- [x] `store/repos.js`
   - 조회 `where`에 `{ user_id: userId }`를 **항상** `$and`로 붙인다 (호출자가 빼먹을 수 없게 내부에서)
   - `get(userId, id)`는 id로 읽은 뒤 `user_id`가 다르면 `null`을 돌려준다 (라우트에서 404)
   - 쓰기 전에 `validate.js`를 거친다
-- [ ] `store/validate.js`: `database/schema.md`의 CHECK를 JS로 옮긴다
+- [x] `store/validate.js`: `database/schema.md`의 CHECK를 JS로 옮긴다
   - enum: `species`, `sex`, `size`, `activity_level`, 건강 `type`·`status`, 할 일 `category`·`source`, `signal`, 취향 `kind`
   - 날짜 형식(`YYYY-MM-DD`이고 실제 있는 날짜), `time`(`HH:MM`), id 접두사(`usr_`·`pet_`·`task_`·`evt_`·`wt_`·`int_`·`pref_`·`log_`)
   - 참조 규칙: 할 일 영역별 참조(diet/activity → 같은 영역 카탈로그 ID, health → 같은 반려동물의 일정, custom → 참조 없음), `custom` 영역이면 `source=custom`
   - `status=done` ⇔ `completed_date` 있음, `excluded_until`은 dislike 전용, `signal != custom`이면 `catalog_item_id` 필수
   - 체중 범위: 개 0.5~100 / 고양이 0.3~15
   - 위반하면 `HttpError(400)`와 필드 이름
-- [ ] `catalog.js`: `data/catalog/*.json`을 읽어 `reviewed: true`만 남긴다 (Backend는 카탈로그를 수정하지 않는다). `get(itemId)`, `list({category, species})`, `healthItems(species)`
-- [ ] `app.js` / `server.js`: `createApp(deps)`와 `GET /health`(Chroma·Agent 연결 상태, 키 없음)
+- [x] `catalog.js`: `data/catalog/*.json`을 읽어 `reviewed: true`만 남긴다 (Backend는 카탈로그를 수정하지 않는다). `get(itemId)`, `list({category, species})`, `healthItems(species)`
+- [x] `app.js` / `server.js`: `createApp(deps)`와 `GET /health`(Chroma·Agent 연결 상태, 키 없음)
 
 **테스트** (`test/dates.test.js`, `test/record.test.js`, `test/validate.test.js`, `test/repos.test.js`)
-- [ ] `date_cases.json`의 모든 사례가 Python과 같은 결과 (연령 경계, 2/29 생일, D-7 경계)
-- [ ] `TODAY_OVERRIDE=2026-11-10` → `todayKst()`가 `2026-11-10`. 서버 `TZ=UTC`로 바꿔도 같다
-- [ ] `encodeAppRecord(시드 각 행)`이 `app_records.json`과 document·metadata 모두 같다
-- [ ] 시드 `health_events`의 `due_ts`가 `kstMidnightEpoch(due_date)`와 같다
-- [ ] 검증: `species:"rabbit"` 400, diet 할 일에 `act_*` ID 400, `status:"done"`인데 `completed_date` 없음 400, 2026-02-30 400
-- [ ] 저장소: `userId` 없이 호출하면 예외, 다른 사용자 id로 `get` → `null`, 메모리 저장소가 지원하지 않는 `where` 연산이면 예외
-- [ ] (`test:chroma`) 같은 시드를 메모리 저장소와 실제 Chroma에 넣고 같은 조회 10종의 결과가 같다
+- [x] `date_cases.json`의 모든 사례가 Python과 같은 결과 (연령 경계, 2/29 생일, D-7 경계)
+- [x] `TODAY_OVERRIDE=2026-11-10` → `todayKst()`가 `2026-11-10`. 서버 `TZ=UTC`로 바꿔도 같다
+- [x] `encodeAppRecord(시드 각 행)`이 `app_records.json`과 document·metadata 모두 같다
+- [x] 시드 `health_events`의 `due_ts`가 `kstMidnightEpoch(due_date)`와 같다
+- [x] 검증: `species:"rabbit"` 400, diet 할 일에 `act_*` ID 400, `status:"done"`인데 `completed_date` 없음 400, 2026-02-30 400
+- [x] 저장소: `userId` 없이 호출하면 예외, 다른 사용자 id로 `get` → `null`, 메모리 저장소가 지원하지 않는 `where` 연산이면 예외
+- [x] (`test:chroma`) 같은 시드를 메모리 저장소와 실제 Chroma에 넣고 같은 조회 10종의 결과가 같다
 
 ---
 
@@ -514,9 +514,9 @@ CLAUDE.md 2장 규칙에 따라, 아래 항목은 **코드보다 문서를 먼�
 
 | # | 내용 | 고칠 문서 | 시점 |
 |---|------|-----------|------|
-| D1 | Backend 내부 구조(1.1)와 라이브러리(1.2) | ARCHITECTURE.md 2장 | B-0 |
-| D2 | Python ↔ Node 공유 기준 사례 목록 (1.3, `app_records.json`·`prefId` 규칙 포함) | ARCHITECTURE.md 5.1 | B-0 |
-| D3 | 테스트 전용 `CHROMA_DATABASE` 키 | ARCHITECTURE.md 7장, `.env.example` | B-0 |
+| D1 ✅ | Backend 내부 구조(1.1)와 라이브러리(1.2) | ARCHITECTURE.md 2장 | B-0 |
+| D2 ✅ | Python ↔ Node 공유 기준 사례 목록 (1.3, `app_records.json`·`prefId` 규칙 포함) | ARCHITECTURE.md 5.1 | B-0 |
+| D3 ✅ | 테스트 전용 `CHROMA_DATABASE` 키 | ARCHITECTURE.md 7장, `.env.example` | B-0 |
 | D4 | 가입 입력 규칙 (비밀번호 8자 이상, 닉네임 1~20자) | SERVICE.md F0 | B-2 |
 | D5 | 건강 초기 일정표 규칙 (8장 표), 시드와 맞는지 확인 결과 | ARCHITECTURE.md 6장, 필요하면 USER_SCENARIO.md 2.3 | B-5 |
 | D6 | 완료·교체·삭제 신호는 할 일 API가 기록, `/feedback`은 👍/👎(+직접 신호)용 | ARCHITECTURE.md 4.2 | B-7 |
@@ -560,8 +560,8 @@ CLAUDE.md 2장 규칙에 따라, 아래 항목은 **코드보다 문서를 먼�
 
 | Task | 상태 | 비고 |
 |------|------|------|
-| B-0 기반·계약 | ⬜ | |
-| B-1 골격·저장소 | ⬜ | |
+| B-0 기반·계약 | ✅ | 2026-11-05 · chromadb JS 3.5.0 ↔ 서버 1.5.9 확인. `app_records.json` Python 생성·최신성 테스트 |
+| B-1 골격·저장소 | ✅ | 2026-11-05 · 시드 52행 인코딩이 Python과 같음, 같은 조회 10종이 메모리·실제 Chroma에서 같은 결과. 단위 51개 + Chroma 12개 |
 | B-2 인증 | ⬜ | |
 | B-3 시드 리셋 | ⬜ | |
 | B-4 반려동물·연쇄 삭제 | ⬜ | |

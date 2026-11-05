@@ -1,0 +1,39 @@
+{
+  "name": "dailypet-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DailyPet Backend — REST API, Chroma 앱 데이터, Agent 프록시, 알림 스케줄러",
+  "type": "module",
+  "engines": {
+    "node": ">=22.5"
+  },
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "test": "vitest run --exclude test/chroma.test.js --exclude test/agent.test.js",
+    "test:chroma": "vitest run test/chroma.test.js",
+    "test:agent": "vitest run test/agent.test.js",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "seed:reset": "node src/seed/reset.js"
+  },
+  "dependencies": {
+    "bcryptjs": "3.0.3",
+    "chromadb": "3.5.0",
+    "cookie-parser": "1.4.7",
+    "dotenv": "18.0.9",
+    "express": "5.3.0",
+    "jsonwebtoken": "9.0.3",
+    "node-cron": "4.6.0",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.14.0",
+    "eslint-config-prettier": "10.1.8",
+    "globals": "17.14.0",
+    "prettier": "3.9.10",
+    "supertest": "7.3.1",
+    "vitest": "5.1.0"
+  }
+}

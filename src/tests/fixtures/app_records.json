@@ -1,0 +1,728 @@
+{
+  "chat_logs": [
+    {
+      "document": "{\"answer\": \"코코(3.5kg)는 하루 약 175~210ml를 기준으로 신선한 물을 항상 둘 수 있게 해 주세요.\", \"created_at\": \"2026-11-09T20:30:00+09:00\", \"id\": \"log_coco_1109_1\", \"pet_id\": \"pet_coco\", \"question\": \"코코 하루에 물 얼마나 줘야 해?\", \"thread_id\": \"thr_usr_3263e0395d81_pet_coco_0d6c1f3a\", \"trace\": [{\"to\": \"diet_agent\", \"type\": \"handoff\"}], \"user_id\": \"usr_3263e0395d81\"}",
+      "id": "log_coco_1109_1",
+      "metadata": {
+        "created_at": "2026-11-09T20:30:00+09:00",
+        "created_ts": 1794223800,
+        "pet_id": "pet_coco",
+        "thread_id": "thr_usr_3263e0395d81_pet_coco_0d6c1f3a",
+        "user_id": "usr_3263e0395d81"
+      }
+    }
+  ],
+  "health_events": [
+    {
+      "document": "{\"catalog_item_id\": \"hc_dog_dhpp\", \"completed_date\": null, \"dose_no\": 3, \"due_date\": \"2026-11-13\", \"due_ts\": 1794495600, \"id\": \"evt_kongi_dhpp3\", \"pet_id\": \"pet_kongi\", \"status\": \"scheduled\", \"type\": \"vaccine\", \"user_id\": \"usr_1c3544ae18bc\"}",
+      "id": "evt_kongi_dhpp3",
+      "metadata": {
+        "catalog_item_id": "hc_dog_dhpp",
+        "dose_no": 3,
+        "due_date": "2026-11-13",
+        "due_ts": 1794495600,
+        "pet_id": "pet_kongi",
+        "status": "scheduled",
+        "type": "vaccine",
+        "user_id": "usr_1c3544ae18bc"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"hc_dog_rabies\", \"completed_date\": null, \"dose_no\": 1, \"due_date\": \"2026-11-17\", \"due_ts\": 1794841200, \"id\": \"evt_kongi_rabies\", \"pet_id\": \"pet_kongi\", \"status\": \"scheduled\", \"type\": \"vaccine\", \"user_id\": \"usr_1c3544ae18bc\"}",
+      "id": "evt_kongi_rabies",
+      "metadata": {
+        "catalog_item_id": "hc_dog_rabies",
+        "dose_no": 1,
+        "due_date": "2026-11-17",
+        "due_ts": 1794841200,
+        "pet_id": "pet_kongi",
+        "status": "scheduled",
+        "type": "vaccine",
+        "user_id": "usr_1c3544ae18bc"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"hc_dog_deworming_puppy\", \"completed_date\": null, \"dose_no\": null, \"due_date\": \"2026-10-20\", \"due_ts\": 1792422000, \"id\": \"evt_kongi_deworm\", \"pet_id\": \"pet_kongi\", \"status\": \"needs_history\", \"type\": \"deworming\", \"user_id\": \"usr_1c3544ae18bc\"}",
+      "id": "evt_kongi_deworm",
+      "metadata": {
+        "catalog_item_id": "hc_dog_deworming_puppy",
+        "due_date": "2026-10-20",
+        "due_ts": 1792422000,
+        "pet_id": "pet_kongi",
+        "status": "needs_history",
+        "type": "deworming",
+        "user_id": "usr_1c3544ae18bc"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"hc_cat_annual_checkup\", \"completed_date\": null, \"dose_no\": null, \"due_date\": \"2026-11-20\", \"due_ts\": 1795100400, \"id\": \"evt_nabi_checkup\", \"pet_id\": \"pet_nabi\", \"status\": \"scheduled\", \"type\": \"checkup\", \"user_id\": \"usr_69d308a849e0\"}",
+      "id": "evt_nabi_checkup",
+      "metadata": {
+        "catalog_item_id": "hc_cat_annual_checkup",
+        "due_date": "2026-11-20",
+        "due_ts": 1795100400,
+        "pet_id": "pet_nabi",
+        "status": "scheduled",
+        "type": "checkup",
+        "user_id": "usr_69d308a849e0"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"hc_cat_senior_checkup\", \"completed_date\": null, \"dose_no\": null, \"due_date\": \"2026-12-07\", \"due_ts\": 1796569200, \"id\": \"evt_hodu_senior\", \"pet_id\": \"pet_hodu\", \"status\": \"scheduled\", \"type\": \"checkup\", \"user_id\": \"usr_d6eff68d8ef0\"}",
+      "id": "evt_hodu_senior",
+      "metadata": {
+        "catalog_item_id": "hc_cat_senior_checkup",
+        "due_date": "2026-12-07",
+        "due_ts": 1796569200,
+        "pet_id": "pet_hodu",
+        "status": "scheduled",
+        "type": "checkup",
+        "user_id": "usr_d6eff68d8ef0"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"hc_dog_dhpp\", \"completed_date\": \"2026-10-02\", \"dose_no\": 1, \"due_date\": \"2026-10-02\", \"due_ts\": 1790866800, \"id\": \"evt_kongi_dhpp1\", \"pet_id\": \"pet_kongi\", \"status\": \"done\", \"type\": \"vaccine\", \"user_id\": \"usr_1c3544ae18bc\"}",
+      "id": "evt_kongi_dhpp1",
+      "metadata": {
+        "catalog_item_id": "hc_dog_dhpp",
+        "completed_date": "2026-10-02",
+        "dose_no": 1,
+        "due_date": "2026-10-02",
+        "due_ts": 1790866800,
+        "pet_id": "pet_kongi",
+        "status": "done",
+        "type": "vaccine",
+        "user_id": "usr_1c3544ae18bc"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"hc_dog_dhpp\", \"completed_date\": \"2026-10-23\", \"dose_no\": 2, \"due_date\": \"2026-10-23\", \"due_ts\": 1792681200, \"id\": \"evt_kongi_dhpp2\", \"pet_id\": \"pet_kongi\", \"status\": \"done\", \"type\": \"vaccine\", \"user_id\": \"usr_1c3544ae18bc\"}",
+      "id": "evt_kongi_dhpp2",
+      "metadata": {
+        "catalog_item_id": "hc_dog_dhpp",
+        "completed_date": "2026-10-23",
+        "dose_no": 2,
+        "due_date": "2026-10-23",
+        "due_ts": 1792681200,
+        "pet_id": "pet_kongi",
+        "status": "done",
+        "type": "vaccine",
+        "user_id": "usr_1c3544ae18bc"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"hc_cat_senior_checkup\", \"completed_date\": \"2026-06-10\", \"dose_no\": null, \"due_date\": \"2026-06-10\", \"due_ts\": 1781017200, \"id\": \"evt_hodu_senior_prev\", \"pet_id\": \"pet_hodu\", \"status\": \"done\", \"type\": \"checkup\", \"user_id\": \"usr_d6eff68d8ef0\"}",
+      "id": "evt_hodu_senior_prev",
+      "metadata": {
+        "catalog_item_id": "hc_cat_senior_checkup",
+        "completed_date": "2026-06-10",
+        "due_date": "2026-06-10",
+        "due_ts": 1781017200,
+        "pet_id": "pet_hodu",
+        "status": "done",
+        "type": "checkup",
+        "user_id": "usr_d6eff68d8ef0"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"hc_dog_annual_checkup\", \"completed_date\": null, \"dose_no\": null, \"due_date\": \"2026-12-01\", \"due_ts\": 1796050800, \"id\": \"evt_coco_checkup\", \"pet_id\": \"pet_coco\", \"status\": \"scheduled\", \"type\": \"checkup\", \"user_id\": \"usr_3263e0395d81\"}",
+      "id": "evt_coco_checkup",
+      "metadata": {
+        "catalog_item_id": "hc_dog_annual_checkup",
+        "due_date": "2026-12-01",
+        "due_ts": 1796050800,
+        "pet_id": "pet_coco",
+        "status": "scheduled",
+        "type": "checkup",
+        "user_id": "usr_3263e0395d81"
+      }
+    }
+  ],
+  "interactions": [
+    {
+      "document": "{\"catalog_item_id\": \"act_dog_nosework_find_it_01\", \"created_at\": \"2026-11-03T18:20:00+09:00\", \"id\": \"int_bori_1103_complete\", \"pet_id\": \"pet_bori\", \"signal\": \"complete\", \"user_id\": \"usr_69d308a849e0\"}",
+      "id": "int_bori_1103_complete",
+      "metadata": {
+        "catalog_item_id": "act_dog_nosework_find_it_01",
+        "created_at": "2026-11-03T18:20:00+09:00",
+        "created_ts": 1793697600,
+        "pet_id": "pet_bori",
+        "signal": "complete",
+        "user_id": "usr_69d308a849e0"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"act_dog_nosework_find_it_01\", \"created_at\": \"2026-11-05T18:15:00+09:00\", \"id\": \"int_bori_1105_complete\", \"pet_id\": \"pet_bori\", \"signal\": \"complete\", \"user_id\": \"usr_69d308a849e0\"}",
+      "id": "int_bori_1105_complete",
+      "metadata": {
+        "catalog_item_id": "act_dog_nosework_find_it_01",
+        "created_at": "2026-11-05T18:15:00+09:00",
+        "created_ts": 1793870100,
+        "pet_id": "pet_bori",
+        "signal": "complete",
+        "user_id": "usr_69d308a849e0"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"act_dog_nosework_find_it_01\", \"created_at\": \"2026-11-08T18:30:00+09:00\", \"id\": \"int_bori_1108_complete\", \"pet_id\": \"pet_bori\", \"signal\": \"complete\", \"user_id\": \"usr_69d308a849e0\"}",
+      "id": "int_bori_1108_complete",
+      "metadata": {
+        "catalog_item_id": "act_dog_nosework_find_it_01",
+        "created_at": "2026-11-08T18:30:00+09:00",
+        "created_ts": 1794130200,
+        "pet_id": "pet_bori",
+        "signal": "complete",
+        "user_id": "usr_69d308a849e0"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"diet_dog_weight_loss_plan_01\", \"created_at\": \"2026-11-03T08:10:00+09:00\", \"id\": \"int_bori_1103_diet\", \"pet_id\": \"pet_bori\", \"signal\": \"complete\", \"user_id\": \"usr_69d308a849e0\"}",
+      "id": "int_bori_1103_diet",
+      "metadata": {
+        "catalog_item_id": "diet_dog_weight_loss_plan_01",
+        "created_at": "2026-11-03T08:10:00+09:00",
+        "created_ts": 1793661000,
+        "pet_id": "pet_bori",
+        "signal": "complete",
+        "user_id": "usr_69d308a849e0"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"diet_dog_carrot_treat_01\", \"created_at\": \"2026-11-05T08:10:00+09:00\", \"id\": \"int_bori_1105_diet\", \"pet_id\": \"pet_bori\", \"signal\": \"complete\", \"user_id\": \"usr_69d308a849e0\"}",
+      "id": "int_bori_1105_diet",
+      "metadata": {
+        "catalog_item_id": "diet_dog_carrot_treat_01",
+        "created_at": "2026-11-05T08:10:00+09:00",
+        "created_ts": 1793833800,
+        "pet_id": "pet_bori",
+        "signal": "complete",
+        "user_id": "usr_69d308a849e0"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"act_dog_daily_walk_01\", \"created_at\": \"2026-11-05T19:50:00+09:00\", \"id\": \"int_bori_1105_walk\", \"pet_id\": \"pet_bori\", \"signal\": \"complete\", \"user_id\": \"usr_69d308a849e0\"}",
+      "id": "int_bori_1105_walk",
+      "metadata": {
+        "catalog_item_id": "act_dog_daily_walk_01",
+        "created_at": "2026-11-05T19:50:00+09:00",
+        "created_ts": 1793875800,
+        "pet_id": "pet_bori",
+        "signal": "complete",
+        "user_id": "usr_69d308a849e0"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"diet_cat_adult_meal_guide_01\", \"created_at\": \"2026-11-08T08:05:00+09:00\", \"id\": \"int_mocha_1108_meal\", \"pet_id\": \"pet_mocha\", \"signal\": \"complete\", \"user_id\": \"usr_a80678fb2f7a\"}",
+      "id": "int_mocha_1108_meal",
+      "metadata": {
+        "catalog_item_id": "diet_cat_adult_meal_guide_01",
+        "created_at": "2026-11-08T08:05:00+09:00",
+        "created_ts": 1794092700,
+        "pet_id": "pet_mocha",
+        "signal": "complete",
+        "user_id": "usr_a80678fb2f7a"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"act_cat_wand_hunt_01\", \"created_at\": \"2026-11-08T21:00:00+09:00\", \"id\": \"int_mocha_1108_dislike\", \"pet_id\": \"pet_mocha\", \"signal\": \"dislike\", \"user_id\": \"usr_a80678fb2f7a\"}",
+      "id": "int_mocha_1108_dislike",
+      "metadata": {
+        "catalog_item_id": "act_cat_wand_hunt_01",
+        "created_at": "2026-11-08T21:00:00+09:00",
+        "created_ts": 1794139200,
+        "pet_id": "pet_mocha",
+        "signal": "dislike",
+        "user_id": "usr_a80678fb2f7a"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"diet_dog_adult_meal_guide_01\", \"created_at\": \"2026-11-09T08:10:00+09:00\", \"id\": \"int_coco_1109_complete\", \"pet_id\": \"pet_coco\", \"signal\": \"complete\", \"user_id\": \"usr_3263e0395d81\"}",
+      "id": "int_coco_1109_complete",
+      "metadata": {
+        "catalog_item_id": "diet_dog_adult_meal_guide_01",
+        "created_at": "2026-11-09T08:10:00+09:00",
+        "created_ts": 1794179400,
+        "pet_id": "pet_coco",
+        "signal": "complete",
+        "user_id": "usr_3263e0395d81"
+      }
+    }
+  ],
+  "pets": [
+    {
+      "document": "{\"activity_level\": \"normal\", \"allergies\": [], \"birth_date\": \"2026-07-10\", \"breed\": \"푸들\", \"conditions\": [], \"created_at\": \"2026-10-01T10:05:00+09:00\", \"default_times\": {}, \"id\": \"pet_kongi\", \"memo\": \"\", \"name\": \"콩이\", \"neutered\": 0, \"sex\": \"male\", \"size\": \"small\", \"species\": \"dog\", \"user_id\": \"usr_1c3544ae18bc\", \"weight_kg\": 3.1}",
+      "id": "pet_kongi",
+      "metadata": {
+        "activity_level": "normal",
+        "birth_date": "2026-07-10",
+        "breed": "푸들",
+        "created_at": "2026-10-01T10:05:00+09:00",
+        "created_ts": 1790816700,
+        "name": "콩이",
+        "neutered": 0,
+        "sex": "male",
+        "size": "small",
+        "species": "dog",
+        "user_id": "usr_1c3544ae18bc",
+        "weight_kg": 3.1
+      }
+    },
+    {
+      "document": "{\"activity_level\": \"low\", \"allergies\": [], \"birth_date\": \"2023-05-01\", \"breed\": \"코리안숏헤어\", \"conditions\": [], \"created_at\": \"2026-10-01T11:05:00+09:00\", \"default_times\": {\"meal\": [\"08:00\", \"20:00\"]}, \"id\": \"pet_mocha\", \"memo\": \"\", \"name\": \"모카\", \"neutered\": 1, \"sex\": \"female\", \"size\": null, \"species\": \"cat\", \"user_id\": \"usr_a80678fb2f7a\", \"weight_kg\": 4.6}",
+      "id": "pet_mocha",
+      "metadata": {
+        "activity_level": "low",
+        "birth_date": "2023-05-01",
+        "breed": "코리안숏헤어",
+        "created_at": "2026-10-01T11:05:00+09:00",
+        "created_ts": 1790820300,
+        "name": "모카",
+        "neutered": 1,
+        "sex": "female",
+        "species": "cat",
+        "user_id": "usr_a80678fb2f7a",
+        "weight_kg": 4.6
+      }
+    },
+    {
+      "document": "{\"activity_level\": \"normal\", \"allergies\": [\"chicken\"], \"birth_date\": \"2021-03-15\", \"breed\": \"골든리트리버\", \"conditions\": [], \"created_at\": \"2026-10-01T12:05:00+09:00\", \"default_times\": {}, \"id\": \"pet_bori\", \"memo\": \"과체중, 감량 중\", \"name\": \"보리\", \"neutered\": 1, \"sex\": \"female\", \"size\": \"large\", \"species\": \"dog\", \"user_id\": \"usr_69d308a849e0\", \"weight_kg\": 34.0}",
+      "id": "pet_bori",
+      "metadata": {
+        "activity_level": "normal",
+        "allergies": [
+          "chicken"
+        ],
+        "birth_date": "2021-03-15",
+        "breed": "골든리트리버",
+        "created_at": "2026-10-01T12:05:00+09:00",
+        "created_ts": 1790823900,
+        "name": "보리",
+        "neutered": 1,
+        "sex": "female",
+        "size": "large",
+        "species": "dog",
+        "user_id": "usr_69d308a849e0",
+        "weight_kg": 34.0
+      }
+    },
+    {
+      "document": "{\"activity_level\": null, \"allergies\": [], \"birth_date\": \"2024-02-20\", \"breed\": \"러시안블루\", \"conditions\": [], \"created_at\": \"2026-10-01T12:10:00+09:00\", \"default_times\": {}, \"id\": \"pet_nabi\", \"memo\": \"\", \"name\": \"나비\", \"neutered\": 1, \"sex\": \"male\", \"size\": null, \"species\": \"cat\", \"user_id\": \"usr_69d308a849e0\", \"weight_kg\": 4.0}",
+      "id": "pet_nabi",
+      "metadata": {
+        "birth_date": "2024-02-20",
+        "breed": "러시안블루",
+        "created_at": "2026-10-01T12:10:00+09:00",
+        "created_ts": 1790824200,
+        "name": "나비",
+        "neutered": 1,
+        "sex": "male",
+        "species": "cat",
+        "user_id": "usr_69d308a849e0",
+        "weight_kg": 4.0
+      }
+    },
+    {
+      "document": "{\"activity_level\": \"low\", \"allergies\": [], \"birth_date\": \"2013-04-01\", \"breed\": \"코리안숏헤어\", \"conditions\": [\"joint_disease\"], \"created_at\": \"2026-10-01T13:05:00+09:00\", \"default_times\": {}, \"id\": \"pet_hodu\", \"memo\": \"신장 수치 관찰 중\", \"name\": \"호두\", \"neutered\": 1, \"sex\": \"male\", \"size\": null, \"species\": \"cat\", \"user_id\": \"usr_d6eff68d8ef0\", \"weight_kg\": 3.8}",
+      "id": "pet_hodu",
+      "metadata": {
+        "activity_level": "low",
+        "birth_date": "2013-04-01",
+        "breed": "코리안숏헤어",
+        "conditions": [
+          "joint_disease"
+        ],
+        "created_at": "2026-10-01T13:05:00+09:00",
+        "created_ts": 1790827500,
+        "name": "호두",
+        "neutered": 1,
+        "sex": "male",
+        "species": "cat",
+        "user_id": "usr_d6eff68d8ef0",
+        "weight_kg": 3.8
+      }
+    },
+    {
+      "document": "{\"activity_level\": null, \"allergies\": [], \"birth_date\": \"2023-06-01\", \"breed\": \"믹스견\", \"conditions\": [], \"created_at\": \"2026-10-01T14:05:00+09:00\", \"default_times\": {}, \"id\": \"pet_mal\", \"memo\": \"\", \"name\": \"테스트\", \"neutered\": 0, \"sex\": null, \"size\": \"medium\", \"species\": \"dog\", \"user_id\": \"usr_39e92ecdda26\", \"weight_kg\": 10.0}",
+      "id": "pet_mal",
+      "metadata": {
+        "birth_date": "2023-06-01",
+        "breed": "믹스견",
+        "created_at": "2026-10-01T14:05:00+09:00",
+        "created_ts": 1790831100,
+        "name": "테스트",
+        "neutered": 0,
+        "size": "medium",
+        "species": "dog",
+        "user_id": "usr_39e92ecdda26",
+        "weight_kg": 10.0
+      }
+    },
+    {
+      "document": "{\"activity_level\": \"normal\", \"allergies\": [], \"birth_date\": \"2020-09-15\", \"breed\": \"말티즈\", \"conditions\": [], \"created_at\": \"2026-10-01T15:05:00+09:00\", \"default_times\": {}, \"id\": \"pet_coco\", \"memo\": \"\", \"name\": \"코코\", \"neutered\": 1, \"sex\": \"female\", \"size\": \"small\", \"species\": \"dog\", \"user_id\": \"usr_3263e0395d81\", \"weight_kg\": 3.5}",
+      "id": "pet_coco",
+      "metadata": {
+        "activity_level": "normal",
+        "birth_date": "2020-09-15",
+        "breed": "말티즈",
+        "created_at": "2026-10-01T15:05:00+09:00",
+        "created_ts": 1790834700,
+        "name": "코코",
+        "neutered": 1,
+        "sex": "female",
+        "size": "small",
+        "species": "dog",
+        "user_id": "usr_3263e0395d81",
+        "weight_kg": 3.5
+      }
+    }
+  ],
+  "preferences": [
+    {
+      "document": "{\"excluded_until\": \"2026-11-14\", \"id\": \"pref_mocha_dislike_wand\", \"kind\": \"dislike\", \"note\": \"낚싯대 놀이 싫어요 (11/08)\", \"pet_id\": \"pet_mocha\", \"score\": -3, \"target\": \"act_cat_wand_hunt_01\", \"updated_at\": \"2026-11-08T21:00:00+09:00\", \"user_id\": \"usr_a80678fb2f7a\"}",
+      "id": "pref_mocha_dislike_wand",
+      "metadata": {
+        "excluded_until": "2026-11-14",
+        "kind": "dislike",
+        "note": "낚싯대 놀이 싫어요 (11/08)",
+        "pet_id": "pet_mocha",
+        "score": -3,
+        "target": "act_cat_wand_hunt_01",
+        "updated_at": "2026-11-08T21:00:00+09:00",
+        "updated_ts": 1794139200,
+        "user_id": "usr_a80678fb2f7a"
+      }
+    },
+    {
+      "document": "{\"excluded_until\": null, \"id\": \"pref_seojun_time_constraint\", \"kind\": \"constraint\", \"note\": \"놀이·산책은 19:00 이후 (사용자 공통)\", \"pet_id\": null, \"score\": 0, \"target\": \"activity_time_after:19:00\", \"updated_at\": \"2026-10-01T11:10:00+09:00\", \"user_id\": \"usr_a80678fb2f7a\"}",
+      "id": "pref_seojun_time_constraint",
+      "metadata": {
+        "kind": "constraint",
+        "note": "놀이·산책은 19:00 이후 (사용자 공통)",
+        "score": 0,
+        "target": "activity_time_after:19:00",
+        "updated_at": "2026-10-01T11:10:00+09:00",
+        "updated_ts": 1790820600,
+        "user_id": "usr_a80678fb2f7a"
+      }
+    },
+    {
+      "document": "{\"excluded_until\": null, \"id\": \"pref_coco_like_walk\", \"kind\": \"like\", \"note\": \"\", \"pet_id\": \"pet_coco\", \"score\": 3, \"target\": \"act_dog_daily_walk_01\", \"updated_at\": \"2026-11-09T20:00:00+09:00\", \"user_id\": \"usr_3263e0395d81\"}",
+      "id": "pref_coco_like_walk",
+      "metadata": {
+        "kind": "like",
+        "note": "",
+        "pet_id": "pet_coco",
+        "score": 3,
+        "target": "act_dog_daily_walk_01",
+        "updated_at": "2026-11-09T20:00:00+09:00",
+        "updated_ts": 1794222000,
+        "user_id": "usr_3263e0395d81"
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "document": "{\"catalog_item_id\": \"diet_dog_weight_loss_plan_01\", \"category\": \"diet\", \"date\": \"2026-11-03\", \"done\": 1, \"health_event_id\": null, \"id\": \"task_bori_1103_1\", \"pet_id\": \"pet_bori\", \"source\": \"auto\", \"time\": \"08:00\", \"title\": \"체중 감량 급여 계획\", \"user_id\": \"usr_69d308a849e0\"}",
+      "id": "task_bori_1103_1",
+      "metadata": {
+        "catalog_item_id": "diet_dog_weight_loss_plan_01",
+        "category": "diet",
+        "date": "2026-11-03",
+        "done": 1,
+        "pet_id": "pet_bori",
+        "source": "auto",
+        "time": "08:00",
+        "title": "체중 감량 급여 계획",
+        "user_id": "usr_69d308a849e0"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"act_dog_nosework_find_it_01\", \"category\": \"activity\", \"date\": \"2026-11-03\", \"done\": 1, \"health_event_id\": null, \"id\": \"task_bori_1103_2\", \"pet_id\": \"pet_bori\", \"source\": \"auto\", \"time\": \"18:00\", \"title\": \"노즈워크 '찾아' 게임\", \"user_id\": \"usr_69d308a849e0\"}",
+      "id": "task_bori_1103_2",
+      "metadata": {
+        "catalog_item_id": "act_dog_nosework_find_it_01",
+        "category": "activity",
+        "date": "2026-11-03",
+        "done": 1,
+        "pet_id": "pet_bori",
+        "source": "auto",
+        "time": "18:00",
+        "title": "노즈워크 '찾아' 게임",
+        "user_id": "usr_69d308a849e0"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"act_dog_sniff_walk_01\", \"category\": \"activity\", \"date\": \"2026-11-03\", \"done\": 0, \"health_event_id\": null, \"id\": \"task_bori_1103_3\", \"pet_id\": \"pet_bori\", \"source\": \"auto\", \"time\": \"19:30\", \"title\": \"냄새 맡기 산책 (스니프 워크)\", \"user_id\": \"usr_69d308a849e0\"}",
+      "id": "task_bori_1103_3",
+      "metadata": {
+        "catalog_item_id": "act_dog_sniff_walk_01",
+        "category": "activity",
+        "date": "2026-11-03",
+        "done": 0,
+        "pet_id": "pet_bori",
+        "source": "auto",
+        "time": "19:30",
+        "title": "냄새 맡기 산책 (스니프 워크)",
+        "user_id": "usr_69d308a849e0"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"diet_dog_carrot_treat_01\", \"category\": \"diet\", \"date\": \"2026-11-05\", \"done\": 1, \"health_event_id\": null, \"id\": \"task_bori_1105_1\", \"pet_id\": \"pet_bori\", \"source\": \"auto\", \"time\": \"08:00\", \"title\": \"당근 간식\", \"user_id\": \"usr_69d308a849e0\"}",
+      "id": "task_bori_1105_1",
+      "metadata": {
+        "catalog_item_id": "diet_dog_carrot_treat_01",
+        "category": "diet",
+        "date": "2026-11-05",
+        "done": 1,
+        "pet_id": "pet_bori",
+        "source": "auto",
+        "time": "08:00",
+        "title": "당근 간식",
+        "user_id": "usr_69d308a849e0"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"act_dog_nosework_find_it_01\", \"category\": \"activity\", \"date\": \"2026-11-05\", \"done\": 1, \"health_event_id\": null, \"id\": \"task_bori_1105_2\", \"pet_id\": \"pet_bori\", \"source\": \"auto\", \"time\": \"18:00\", \"title\": \"노즈워크 '찾아' 게임\", \"user_id\": \"usr_69d308a849e0\"}",
+      "id": "task_bori_1105_2",
+      "metadata": {
+        "catalog_item_id": "act_dog_nosework_find_it_01",
+        "category": "activity",
+        "date": "2026-11-05",
+        "done": 1,
+        "pet_id": "pet_bori",
+        "source": "auto",
+        "time": "18:00",
+        "title": "노즈워크 '찾아' 게임",
+        "user_id": "usr_69d308a849e0"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"act_dog_daily_walk_01\", \"category\": \"activity\", \"date\": \"2026-11-05\", \"done\": 1, \"health_event_id\": null, \"id\": \"task_bori_1105_3\", \"pet_id\": \"pet_bori\", \"source\": \"auto\", \"time\": \"19:30\", \"title\": \"일상 산책\", \"user_id\": \"usr_69d308a849e0\"}",
+      "id": "task_bori_1105_3",
+      "metadata": {
+        "catalog_item_id": "act_dog_daily_walk_01",
+        "category": "activity",
+        "date": "2026-11-05",
+        "done": 1,
+        "pet_id": "pet_bori",
+        "source": "auto",
+        "time": "19:30",
+        "title": "일상 산책",
+        "user_id": "usr_69d308a849e0"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"diet_dog_treat_rule_01\", \"category\": \"diet\", \"date\": \"2026-11-08\", \"done\": 0, \"health_event_id\": null, \"id\": \"task_bori_1108_1\", \"pet_id\": \"pet_bori\", \"source\": \"auto\", \"time\": \"08:00\", \"title\": \"간식 10% 규칙\", \"user_id\": \"usr_69d308a849e0\"}",
+      "id": "task_bori_1108_1",
+      "metadata": {
+        "catalog_item_id": "diet_dog_treat_rule_01",
+        "category": "diet",
+        "date": "2026-11-08",
+        "done": 0,
+        "pet_id": "pet_bori",
+        "source": "auto",
+        "time": "08:00",
+        "title": "간식 10% 규칙",
+        "user_id": "usr_69d308a849e0"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"act_dog_nosework_find_it_01\", \"category\": \"activity\", \"date\": \"2026-11-08\", \"done\": 1, \"health_event_id\": null, \"id\": \"task_bori_1108_2\", \"pet_id\": \"pet_bori\", \"source\": \"auto\", \"time\": \"18:00\", \"title\": \"노즈워크 '찾아' 게임\", \"user_id\": \"usr_69d308a849e0\"}",
+      "id": "task_bori_1108_2",
+      "metadata": {
+        "catalog_item_id": "act_dog_nosework_find_it_01",
+        "category": "activity",
+        "date": "2026-11-08",
+        "done": 1,
+        "pet_id": "pet_bori",
+        "source": "auto",
+        "time": "18:00",
+        "title": "노즈워크 '찾아' 게임",
+        "user_id": "usr_69d308a849e0"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"act_dog_snuffle_puzzle_01\", \"category\": \"activity\", \"date\": \"2026-11-08\", \"done\": 0, \"health_event_id\": null, \"id\": \"task_bori_1108_3\", \"pet_id\": \"pet_bori\", \"source\": \"auto\", \"time\": \"19:30\", \"title\": \"스너플 매트·퍼즐 급여\", \"user_id\": \"usr_69d308a849e0\"}",
+      "id": "task_bori_1108_3",
+      "metadata": {
+        "catalog_item_id": "act_dog_snuffle_puzzle_01",
+        "category": "activity",
+        "date": "2026-11-08",
+        "done": 0,
+        "pet_id": "pet_bori",
+        "source": "auto",
+        "time": "19:30",
+        "title": "스너플 매트·퍼즐 급여",
+        "user_id": "usr_69d308a849e0"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"diet_cat_adult_meal_guide_01\", \"category\": \"diet\", \"date\": \"2026-11-08\", \"done\": 1, \"health_event_id\": null, \"id\": \"task_mocha_1108_1\", \"pet_id\": \"pet_mocha\", \"source\": \"auto\", \"time\": \"08:00\", \"title\": \"성묘 정량 소량 다회 급여\", \"user_id\": \"usr_a80678fb2f7a\"}",
+      "id": "task_mocha_1108_1",
+      "metadata": {
+        "catalog_item_id": "diet_cat_adult_meal_guide_01",
+        "category": "diet",
+        "date": "2026-11-08",
+        "done": 1,
+        "pet_id": "pet_mocha",
+        "source": "auto",
+        "time": "08:00",
+        "title": "성묘 정량 소량 다회 급여",
+        "user_id": "usr_a80678fb2f7a"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"act_cat_wand_hunt_01\", \"category\": \"activity\", \"date\": \"2026-11-08\", \"done\": 0, \"health_event_id\": null, \"id\": \"task_mocha_1108_2\", \"pet_id\": \"pet_mocha\", \"source\": \"auto\", \"time\": \"19:30\", \"title\": \"낚싯대 장난감 사냥 놀이\", \"user_id\": \"usr_a80678fb2f7a\"}",
+      "id": "task_mocha_1108_2",
+      "metadata": {
+        "catalog_item_id": "act_cat_wand_hunt_01",
+        "category": "activity",
+        "date": "2026-11-08",
+        "done": 0,
+        "pet_id": "pet_mocha",
+        "source": "auto",
+        "time": "19:30",
+        "title": "낚싯대 장난감 사냥 놀이",
+        "user_id": "usr_a80678fb2f7a"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"diet_dog_adult_meal_guide_01\", \"category\": \"diet\", \"date\": \"2026-11-09\", \"done\": 1, \"health_event_id\": null, \"id\": \"task_coco_1109_1\", \"pet_id\": \"pet_coco\", \"source\": \"auto\", \"time\": \"08:00\", \"title\": \"성견 하루 2회 정량 급여\", \"user_id\": \"usr_3263e0395d81\"}",
+      "id": "task_coco_1109_1",
+      "metadata": {
+        "catalog_item_id": "diet_dog_adult_meal_guide_01",
+        "category": "diet",
+        "date": "2026-11-09",
+        "done": 1,
+        "pet_id": "pet_coco",
+        "source": "auto",
+        "time": "08:00",
+        "title": "성견 하루 2회 정량 급여",
+        "user_id": "usr_3263e0395d81"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": \"act_dog_daily_walk_01\", \"category\": \"activity\", \"date\": \"2026-11-09\", \"done\": 0, \"health_event_id\": null, \"id\": \"task_coco_1109_2\", \"pet_id\": \"pet_coco\", \"source\": \"auto\", \"time\": \"19:30\", \"title\": \"일상 산책\", \"user_id\": \"usr_3263e0395d81\"}",
+      "id": "task_coco_1109_2",
+      "metadata": {
+        "catalog_item_id": "act_dog_daily_walk_01",
+        "category": "activity",
+        "date": "2026-11-09",
+        "done": 0,
+        "pet_id": "pet_coco",
+        "source": "auto",
+        "time": "19:30",
+        "title": "일상 산책",
+        "user_id": "usr_3263e0395d81"
+      }
+    },
+    {
+      "document": "{\"catalog_item_id\": null, \"category\": \"custom\", \"date\": \"2026-11-09\", \"done\": 0, \"health_event_id\": null, \"id\": \"task_coco_1109_3\", \"pet_id\": \"pet_coco\", \"source\": \"custom\", \"time\": \"21:00\", \"title\": \"빗질\", \"user_id\": \"usr_3263e0395d81\"}",
+      "id": "task_coco_1109_3",
+      "metadata": {
+        "category": "custom",
+        "date": "2026-11-09",
+        "done": 0,
+        "pet_id": "pet_coco",
+        "source": "custom",
+        "time": "21:00",
+        "title": "빗질",
+        "user_id": "usr_3263e0395d81"
+      }
+    }
+  ],
+  "users": [
+    {
+      "document": "{\"created_at\": \"2026-10-01T10:00:00+09:00\", \"email\": \"haneul@demo.dailypet\", \"id\": \"usr_1c3544ae18bc\", \"nickname\": \"하늘\", \"password_hash\": \"$2b$10$L1OWUqLSH8nwo58HrdE7J.e32tMy8u3fqDy2z/hLirBRWgeHaQbtW\"}",
+      "id": "usr_1c3544ae18bc",
+      "metadata": {
+        "created_at": "2026-10-01T10:00:00+09:00",
+        "created_ts": 1790816400,
+        "email": "haneul@demo.dailypet",
+        "nickname": "하늘"
+      }
+    },
+    {
+      "document": "{\"created_at\": \"2026-10-01T11:00:00+09:00\", \"email\": \"seojun@demo.dailypet\", \"id\": \"usr_a80678fb2f7a\", \"nickname\": \"서준\", \"password_hash\": \"$2b$10$G3CMBZSjKrEm0A.aP5.EfOpbd8lj4BQxYqv/wx/21n9F1pQGvxavC\"}",
+      "id": "usr_a80678fb2f7a",
+      "metadata": {
+        "created_at": "2026-10-01T11:00:00+09:00",
+        "created_ts": 1790820000,
+        "email": "seojun@demo.dailypet",
+        "nickname": "서준"
+      }
+    },
+    {
+      "document": "{\"created_at\": \"2026-10-01T12:00:00+09:00\", \"email\": \"jiwoo@demo.dailypet\", \"id\": \"usr_69d308a849e0\", \"nickname\": \"지우\", \"password_hash\": \"$2b$10$KrVFL4.sI2tmnBsA1FrtzOunnpe8IAKocKUrmGVbu97RvgNTsmOrC\"}",
+      "id": "usr_69d308a849e0",
+      "metadata": {
+        "created_at": "2026-10-01T12:00:00+09:00",
+        "created_ts": 1790823600,
+        "email": "jiwoo@demo.dailypet",
+        "nickname": "지우"
+      }
+    },
+    {
+      "document": "{\"created_at\": \"2026-10-01T13:00:00+09:00\", \"email\": \"youngja@demo.dailypet\", \"id\": \"usr_d6eff68d8ef0\", \"nickname\": \"영자\", \"password_hash\": \"$2b$10$216Qsz3JNx0Ms2URrSGnuOUhWKxJGXWgbH/Td2zPVi3eOeK3UnQ3C\"}",
+      "id": "usr_d6eff68d8ef0",
+      "metadata": {
+        "created_at": "2026-10-01T13:00:00+09:00",
+        "created_ts": 1790827200,
+        "email": "youngja@demo.dailypet",
+        "nickname": "영자"
+      }
+    },
+    {
+      "document": "{\"created_at\": \"2026-10-01T14:00:00+09:00\", \"email\": \"mallory@demo.dailypet\", \"id\": \"usr_39e92ecdda26\", \"nickname\": \"mallory\", \"password_hash\": \"$2b$10$vbTawJSraSSfY84lxcdv1uLoEQIVGz7uYdRxgFnZQ3e9uijulcVSW\"}",
+      "id": "usr_39e92ecdda26",
+      "metadata": {
+        "created_at": "2026-10-01T14:00:00+09:00",
+        "created_ts": 1790830800,
+        "email": "mallory@demo.dailypet",
+        "nickname": "mallory"
+      }
+    },
+    {
+      "document": "{\"created_at\": \"2026-10-01T15:00:00+09:00\", \"email\": \"leaver@demo.dailypet\", \"id\": \"usr_3263e0395d81\", \"nickname\": \"떠남\", \"password_hash\": \"$2b$10$DDT43UREcK0xeORhnoSBAe5GJAPwsFvkSFJoIYoikZ2740u9YhNyq\"}",
+      "id": "usr_3263e0395d81",
+      "metadata": {
+        "created_at": "2026-10-01T15:00:00+09:00",
+        "created_ts": 1790834400,
+        "email": "leaver@demo.dailypet",
+        "nickname": "떠남"
+      }
+    }
+  ],
+  "weight_logs": [
+    {
+      "document": "{\"date\": \"2026-10-10\", \"id\": \"wt_bori_1010\", \"pet_id\": \"pet_bori\", \"user_id\": \"usr_69d308a849e0\", \"weight_kg\": 35.0}",
+      "id": "wt_bori_1010",
+      "metadata": {
+        "date": "2026-10-10",
+        "pet_id": "pet_bori",
+        "user_id": "usr_69d308a849e0",
+        "weight_kg": 35.0
+      }
+    },
+    {
+      "document": "{\"date\": \"2026-11-01\", \"id\": \"wt_bori_1101\", \"pet_id\": \"pet_bori\", \"user_id\": \"usr_69d308a849e0\", \"weight_kg\": 34.0}",
+      "id": "wt_bori_1101",
+      "metadata": {
+        "date": "2026-11-01",
+        "pet_id": "pet_bori",
+        "user_id": "usr_69d308a849e0",
+        "weight_kg": 34.0
+      }
+    },
+    {
+      "document": "{\"date\": \"2026-11-01\", \"id\": \"wt_coco_1101\", \"pet_id\": \"pet_coco\", \"user_id\": \"usr_3263e0395d81\", \"weight_kg\": 3.5}",
+      "id": "wt_coco_1101",
+      "metadata": {
+        "date": "2026-11-01",
+        "pet_id": "pet_coco",
+        "user_id": "usr_3263e0395d81",
+        "weight_kg": 3.5
+      }
+    }
+  ]
+}

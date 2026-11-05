@@ -43,8 +43,10 @@ def read_seed(variant: str | None = None) -> dict[str, list[dict[str, Any]]]:
         if dup:
             raise ValueError(f"변형 {variant}: {name} id 중복 {sorted(dup)}")
         rows[name].extend(copy.deepcopy(extra))
-    for name, ids in spec.get("remove", {}).items():
-        rows[name] = [r for r in rows[name] if r["id"] not in set(ids)]
+    # 형식(data/seed/README.md)은 "delete". 예전 이름 "remove"도 받는다 (Node seed:reset과 같은 규칙)
+    for key in ("delete", "remove"):
+        for name, ids in spec.get(key, {}).items():
+            rows[name] = [r for r in rows[name] if r["id"] not in set(ids)]
     if spec.get("setup_queries"):
         warnings.warn(
             f"변형 {variant}의 setup_queries {len(spec['setup_queries'])}건은 Agent 서버가 필요해 건너뛴다",

@@ -38,13 +38,15 @@
 |------|------|------|
 | Frontend | React 18, TypeScript, Vite, React Router, TanStack Query | 상태관리는 Query + 로컬 state로 최소화 |
 | UI / 디자인 | Tailwind CSS (디자인 토큰), Framer Motion (통통 튀는 모션), Lottie (마스코트 애니메이션, 선택), Google Fonts 둥근 한글 폰트 | 디즈니풍 가이드 → 7.6장 |
-| Backend | Node.js 20 LTS, JavaScript (ESM), Express, `chromadb` JS client, `node-cron` | 알림 계산 스케줄러 |
-| 인증 | 이메일 + 비밀번호, `bcrypt` 해시, `jsonwebtoken`(JWT, httpOnly 쿠키), `zod` 입력 검증 | 이메일 인증·소셜 로그인 없음 |
+| Backend | Node.js 22.5 이상 (`node:sqlite` 내장 모듈 필요, 검증 26.13), JavaScript (ESM), Express 5, `chromadb` JS client 3.x, `node-cron` | 알림 계산 스케줄러 |
+| 인증 | 이메일 + 비밀번호, `bcryptjs` 해시(시드 `$2b$` 호환, 네이티브 빌드 없음), `jsonwebtoken`(JWT, httpOnly 쿠키), `zod` 입력 검증 | 이메일 인증·소셜 로그인 없음 |
 | DB | Chroma DB (server mode) | `data/chroma`에 영속화 |
 | Agent | Python 3.11+, LangChain v1, LangGraph, `langgraph-supervisor`, `langgraph-checkpoint-sqlite`, `langchain-aws`, `langchain-chroma`, FastAPI, Uvicorn | |
 | LLM | Amazon Bedrock — `ChatBedrockConverse` | 모델 ID는 `.env`의 `AWS_MODEL` |
 | Embedding | Amazon Bedrock Embeddings (`BedrockEmbeddings`, **Titan Text Embeddings v2** `amazon.titan-embed-text-v2:0`, 1024차원, 한국어 지원) | 모델 ID는 `.env`의 `AWS_EMBED_MODEL` |
 | 웹 검색 | `langchain-community`의 `DuckDuckGoSearchResults` (`ddgs`, **API 키 없음**) | General Agent 전용. Version 1은 키 없는 DuckDuckGo만 쓴다 (유료·키 필요 API는 Version 2 후보) |
+
+**Backend 내부 구조** (`src/backend/`, 자체 `package.json`) — `src/app.js`의 `createApp(deps)`가 Express 앱을 만들고, 저장소(`store`)·Agent 클라이언트·오늘 날짜 함수를 주입받는다 (테스트는 메모리 저장소·가짜 Agent를 넣는다). `src/lib/`(날짜·id·오류·로그 마스킹), `src/store/`(Chroma 저장 형식 5.1 인코딩, Chroma·메모리 저장소, `userId`를 강제하는 컬렉션별 저장소, schema.md 제약 검증), `src/services/`(연쇄 삭제·건강 일정 계산·알림·할 일·취향 신호), `src/routes/`(4.2 API), `src/jobs/overdue.js`(overdue 갱신), `src/seed/reset.js`(`npm run seed:reset`), `src/checkpoints.js`(LangGraph checkpoint thread 삭제, `node:sqlite`), `src/agentClient.js`(Agent 호출). 라이브러리: `express`, `chromadb`, `bcryptjs`, `jsonwebtoken`, `cookie-parser`, `zod`, `node-cron`, `dotenv` / 테스트 `vitest`, `supertest` / 린트 `eslint`, `prettier`, `eslint-config-prettier`. 버전은 `package.json`에 고정하고 `package-lock.json`을 커밋한다.
 
 ## 3. Agent 설계
 
@@ -540,7 +542,19 @@ Chroma는 문서 + 메타데이터 저장소이므로, 앱 데이터는 **`docum
 | 시각 비교 | `created_at`·`updated_at`이 있으면 epoch 초 `created_ts`·`updated_ts`를 함께 넣는다 (`due_ts`와 같은 방식) |
 | 임베딩 | 앱 데이터 컬렉션은 의미 검색을 하지 않는다. 길이 1인 더미 벡터 `[0.0]`을 넣고, 컬렉션의 `embedding_function`은 쓰지 않는다 |
 
-- 구현: Python은 `src/retriever.py`의 `encode_app_record` / `decode_app_record`, Node는 B-1 저장소 모듈. 두 쪽은 `data/seed/` 적재 결과가 같은지로 확인한다.
+- 구현: Python은 `src/retriever.py`의 `encode_app_record` / `decode_app_record`, Node는 `src/backend/src/store/record.js`. 두 쪽은 `data/seed/` 적재 결과가 같은지로 확인한다.
+
+**Python ↔ Node 공유 기준 사례** (한쪽만 바꾸지 않는다. 양쪽 테스트가 같은 파일을 읽는다)
+
+| 계약 | Python 기준 | Node | 기준 사례 |
+|------|-------------|------|-----------|
+| 저장 형식 | `encode_app_record` | `store/record.js` | `src/tests/fixtures/app_records.json` (시드 전 행의 `id`·`document`·`metadata`, Python이 생성하고 Python 테스트가 최신인지 확인). document는 **파싱한 값**이 같아야 한다 (Python `json.dumps`는 `4.0`·`", "` 구분자를 유지하고 JS는 `4`·`","`로 써서 문자열은 다를 수 있음). metadata는 값이 같아야 한다 |
+| 날짜·연령·D-day | `src/config.py` | `lib/dates.js` | `src/tests/fixtures/date_cases.json` |
+| `due_ts` | KST 자정 epoch 초 | `kstMidnightEpoch` | 시드 `health_events.due_ts` |
+| `user_id` | `usr_` + sha256(소문자 이메일)[:12] | `lib/ids.js` | 시드 사용자 6명 |
+| 취향 행 id | `pref_{pet_id 또는 user_id}_{sha256("kind\|target")[:10]}` (`tools.py` `remember_preference`) | `lib/ids.js` `prefId` | 채팅으로 저장한 취향과 버튼 👍/👎가 같은 행이 된다 |
+| 취향 점수·제외 기한 | like 3 / dislike −3 / constraint 0, `excluded_until = 오늘 + 6일` | `services/signals.js` | 11/08 👎 → 11/14 |
+| `thread_id` | `thr_{user_id}_{pet_id}_{uuid hex}` | `lib/ids.js` | 접두사로 소유자 확인 |
 
 
 | 컬렉션 | id | 주요 metadata | 용도 |
@@ -625,6 +639,7 @@ Chroma는 문서 + 메타데이터 저장소이므로, 앱 데이터는 **`docum
 | `AWS_MODEL` | Agent | `ChatBedrockConverse` 모델 ID |
 | `AWS_EMBED_MODEL` | Agent | Bedrock 임베딩 모델 ID (`amazon.titan-embed-text-v2:0`) |
 | `CHROMA_HOST` / `CHROMA_PORT` | Agent, Backend | 기본 `localhost` / `8001` |
+| `CHROMA_DATABASE` *(선택)* | Backend 테스트 | Chroma database 이름. 비우면 기본 database(앱 데이터). `npm run test:chroma`는 `dailypet_test`를 써서 앱 데이터를 건드리지 않는다 |
 | `AGENT_URL` | Backend | 기본 `http://localhost:8000` |
 | `AGENT_API_KEY` | Backend, Agent | Backend → Agent 내부 호출 인증 |
 | `JWT_SECRET` | Backend | 로그인 토큰 서명 |
