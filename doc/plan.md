@@ -442,6 +442,8 @@ LLM 없이 결정적으로 동작하는 순수 함수. `/tasks/generate`와 채�
 
 ## Phase 3 · Frontend (React + TypeScript)
 
+> 세부 작업(파일·컴포넌트·테스트·순서)은 [phase3_task.md](phase3_task.md)를 따른다.
+
 ### F-1. 골격·디자인 토큰 🔁
 
 **의존성**

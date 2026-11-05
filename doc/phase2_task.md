@@ -433,7 +433,7 @@ repos.users.getById(userId) / getByEmail(email) / create(row) / remove(userId)  
   - **오늘**이고 목록이 없으면 Agent를 불러 만든다. 과거·미래 날짜는 만들지 않는다
   - 같은 반려동물에 대한 동시 요청이 두 번 만들지 않게 반려동물별 진행 중 Promise를 공유한다 (프로세스 안 잠금)
   - Agent 장애: 200 `{ date, tasks: [], notice: "추천을 불러오지 못했어요", retryable: true }` (S22 3단계). 기존 목록이 있으면 Agent를 부르지 않으므로 영향 없음 (S22 1단계)
-  - 정렬: `time` 오름차순, 시간 없는 항목(건강)은 맨 위
+  - 정렬: `time` 오름차순, 시간 없는 항목(건강)은 맨 아래 (wireframe W05)
 - [ ] 생성 결과 저장 규칙
   - diet/activity: `source=auto`, `catalog_item_id`, `title`, `time`, `reason`, `rank`, `relaxed`
   - health: `health_event_id`, `title`, 시간 없음. 같은 `health_event_id`의 할 일이 이미 있으면 새로 만들지 않는다
