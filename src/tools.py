@@ -113,6 +113,14 @@ class AppStore:
     def list_pets(self, user_id: str) -> list[dict[str, Any]]:
         return self._rows("pets", {"user_id": user_id})
 
+    def get_nickname(self, user_id: str) -> str | None:
+        """사용자 닉네임만 돌려준다 (웹 검색 질의에서 지우는 용도). 이메일·비밀번호 해시는 꺼내지 않는다."""
+        try:
+            docs = self.client.get_collection("users").get(ids=[user_id], include=["documents"])["documents"]
+        except Exception:  # users 컬렉션이 없는 환경 (Agent 단독 테스트 등)
+            return None
+        return decode_app_record(docs[0]).get("nickname") if docs else None
+
     def _pet_rows(self, collection: str, user_id: str, pet_id: str) -> list[dict[str, Any]]:
         self.get_pet(user_id, pet_id)  # 소유권 확인
         return self._rows(collection, where_all({"user_id": user_id}, {"pet_id": pet_id}))

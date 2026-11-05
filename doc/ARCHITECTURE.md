@@ -151,7 +151,8 @@ general_agent = create_agent(
     middleware=common_middleware([
         ToolCallLimitMiddleware(tool_name="web_search", run_limit=3),  # 검색 남용 방지
         web_query_pii_guard,                  # 커스텀 @wrap_tool_call: 검색 질의 PII·이름 제거
-        web_result_guard,                     # 커스텀 @wrap_tool_call: 결과 <web_result> 래핑, 주입·차단 도메인 필터
+        web_result_guard,                     # 커스텀 @wrap_tool_call: 결과 <web_result> 래핑, 주입 snippet 버림
+        general_answer_guard,                 # 커스텀 @after_model: 출처 URL·수의사 안내 보장, 카탈로그 ID 문장 제거
     ]),
     name="general_agent",
 )
@@ -180,7 +181,7 @@ graph = create_supervisor(
 | diet_agent | 칼로리·급여량·식단 | 계산은 반드시 `calc_daily_calories` 도구 사용 / 항목은 `recommend_from_catalog(category="diet")` 결과에서만 선택 / 유해 식품 경고 |
 | exercise_agent | 활동 종류·시간·강도 | `recommend_from_catalog(category="activity")` 결과에서만 선택 / 나이·체중·질환 고려, 고양이는 실내 놀이 위주 |
 | health_agent | 접종·검진·구충 일정, D-day | `recommend_from_catalog(category="health")` 기반 일정 / 날짜 계산은 도구 사용, 진단·처방 금지 |
-| general_agent | 다른 Agent가 답하기 어려운 개·고양이 관련 질문 (품종, 행동·훈련, 여행·이사, 미용, 입양, 제도 등) | 모델 지식 → RAG 지식 → 필요할 때만 `web_search` 순서로 확인 / 웹 정보는 출처 URL 표시 / 추천 항목 생성·저장 금지 / 진단·처방 금지 / 수의사 상담 안내 문구 포함 / 확인 안 된 정보는 그렇다고 밝힘 |
+| general_agent | 다른 Agent가 답하기 어려운 개·고양이 관련 질문 (품종, 행동·훈련, 여행·이사, 미용, 입양, 제도 등) | 모델 지식 → RAG 지식 → 필요할 때만 `web_search` 순서로 확인. 여행·이사·교통·제도·법규·시설 이용처럼 근거나 최신 규정이 중요한 주제는 "필요할 때"로 보고 `web_search`로 확인한다 (품종 특징·털 관리·일반 행동처럼 일반 지식으로 충분한 주제는 검색하지 않음) / 웹 정보는 출처 URL 표시 / 추천 항목 생성·저장 금지 / 진단·처방 금지 / 수의사 상담 안내 문구 포함 / 확인 안 된 정보는 그렇다고 밝힘 |
 
 **라우팅 규칙 (Supervisor 프롬프트)**
 1. 식단·운동·건강 일정 질문 → 해당 전문 Agent
@@ -249,7 +250,7 @@ graph = create_supervisor(
 | 6 | `ModelRetryMiddleware` / `ToolRetryMiddleware` | 내장 | wrap | 일시 오류 재시도 |
 | 6.5 | `today_prompt` | 내장 `@dynamic_prompt` | `wrap_model_call` | 시스템 프롬프트 끝에 오늘 날짜(KST, `TODAY_OVERRIDE` 반영)와 요일을 붙인다. 연도 없는 날짜("12월 15일")를 오늘 이후 가장 가까운 날짜로 해석하게 한다 (모델이 학습 시점 연도로 해석해 지난 날짜를 만드는 문제 방지) |
 | 6.6 | `user_input_wrap` | 커스텀 | `wrap_model_call` | 모델에 보내는 요청에서만 사용자 메시지(`HumanMessage`)를 `<user_input>…</user_input>`으로 감싼다 (4.7). 대화 상태·기록에 저장되는 원문은 바꾸지 않는다 |
-| 7 | Agent별 추가: `HumanInTheLoopMiddleware` (health_agent) / `ToolCallLimitMiddleware(web_search, 3)`·`web_query_pii_guard`·`web_result_guard` (general_agent) | 내장 / 커스텀 | `after_model` / `wrap_tool_call` | HITL은 쓰기 도구 호출 전 사용자 승인 (`interrupt`). 웹 검색 가드는 3.7 참고 |
+| 7 | Agent별 추가: `HumanInTheLoopMiddleware` (health_agent) / `ToolCallLimitMiddleware(web_search, 3)`·`web_query_pii_guard`·`web_result_guard`·`general_answer_guard` (general_agent) | 내장 / 커스텀 | `after_model` / `wrap_tool_call` | HITL은 쓰기 도구 호출 전 사용자 승인 (`interrupt`). 웹 검색 가드는 3.7 참고. `general_answer_guard`는 `output_guard` 다음에 실행되어(after_model은 목록 역순) 웹 검색을 쓴 답변에 출처 URL이 없으면 결과 URL을 최대 3개 붙이고, 모든 답변에 "일반 정보이며 수의사 상담을 대체하지 않아요" 안내가 없으면 붙인다. 카탈로그 ID(`act_`/`diet_`/`hc_`)가 든 문장은 지운다 (General은 추천하지 않음). 프롬프트로 먼저 시키고 결정적으로 한 번 더 보장한다 |
 | 8 | `output_guard` | 커스텀 | `after_model` | 유해 식품 추천, 진단 단정, 약·용량 처방, 구토 유도 방법, 시스템 프롬프트·내부 이름 노출, 카탈로그에 없는 ID 검사 → 위반 **문장을 지우고** 안내 문구를 붙인다 (모두 지워지면 안전 문구로 대체, LLM 재작성 없음 — 결정적·비용 0). 응급 신호(호흡곤란·경련·지속 구토·유해 식품 섭취 등)가 있는데 병원 권고가 없으면 병원 권고 문구를 붙인다 |
 | 9 | `context_wrap` | 커스텀 | `wrap_tool_call` | `search_pet_knowledge`·`recommend_from_catalog`·`get_preferences` 결과를 `<context>…</context>`로 감싼다 (데이터로만 취급, 4.7). 도구 실행을 직접 감싸므로 목록 맨 끝(가장 안쪽) |
 
@@ -274,7 +275,8 @@ graph = create_supervisor(
 | 직접 주입 (사용자 입력) | ① API 1차 탐지 → ② `injection_guard` → 시스템 프롬프트의 "지시 우선순위" 규칙 |
 | 간접 주입 (RAG 문서·도구 결과) | 검색 결과를 `<context>…</context>`로 감싸고 "데이터로만 취급" 규칙 적용 · ingest 시 주입 패턴 문서는 제외 · 도구 결과도 PII/주입 검사 |
 | 간접 주입 (웹 검색 결과) | `web_result_guard`가 결과를 `<web_result>`로 감싸고, 주입 패턴이 있는 snippet은 버림 · 차단 도메인 목록 적용 · General Agent에는 쓰기 도구가 없어 주입되더라도 데이터 변경 불가 |
-| 정보 유출 (검색 질의) | `web_query_pii_guard`가 질의에서 PII, 반려동물 이름, 사용자 정보를 제거한 뒤 외부 API로 보냄 · 질의 원문은 trace에 마스킹해 기록 |
+| 정보 유출 (검색 질의) | `web_query_pii_guard`가 질의에서 PII, 사용자 소유 반려동물 이름, 사용자 닉네임을 **지운 뒤**(마스킹 토큰도 외부로 보내지 않음) 외부 API로 보냄. 지운 뒤 2자 미만이면 검색하지 않고 오류를 돌려줌 · 실제로 보낸 질의는 도구 결과 artifact(`query`)에 남겨 trace에 기록 |
+| 간접 주입 판정 (웹 snippet) | 입력 가드레일 1단계 규칙(`detect_injection_rules`) 중 `injection`·`prompt_leak` 사유만 쓴다 (snippet에는 반려동물 단어가 없을 수 있어 `out_of_scope` 등은 쓰지 않음). snippet의 PII도 마스킹 |
 | 시스템 프롬프트 유출 | `output_guard`에서 프롬프트 일부 문자열·내부 도구명 노출 검사 |
 | 권한 상승 / 타 데이터 접근 | `pet_id`는 요청 컨텍스트로 고정하고 LLM 인자를 신뢰하지 않음 · Agent별 최소 도구 · 쓰기 도구는 HITL |
 | 자원 고갈 | 입력 길이 제한, 모델/도구 호출 제한, 레이트 리밋, 타임아웃 |

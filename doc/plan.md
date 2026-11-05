@@ -273,7 +273,7 @@ LLM 없이 결정적으로 동작하는 순수 함수. `/tasks/generate`와 채�
 - [x] 모든 Chroma 조회 `where`에 `user_id`가 강제로 들어간다 (다른 사용자 `pet_id`로 조회하면 거부, 단위 테스트)
 - [x] 칼로리·급여량 계산 도구가 공식 기반이다
 - [x] 쓰기 도구(`create_health_event`, `update_health_event`)는 현재 `pet_id`에만 쓴다
-- [ ] `web_search`는 질의 PII 마스킹, 차단 도메인 필터, 요청당 3회 제한, `<web_result>` 감싸기, `WEB_SEARCH_MOCK`을 지원한다 — 차단 도메인·신뢰 도메인 정렬·`WEB_SEARCH_MOCK`은 A-4 완료, 질의 PII·3회 제한·감싸기는 A-7 미들웨어
+- [x] `web_search`는 질의 PII 마스킹, 차단 도메인 필터, 요청당 3회 제한, `<web_result>` 감싸기, `WEB_SEARCH_MOCK`을 지원한다 — 차단 도메인·신뢰 도메인 정렬·`WEB_SEARCH_MOCK`은 A-4, 질의 PII·3회 제한·감싸기는 A-7 미들웨어
 - [x] 도구 docstring이 LLM이 읽기에 명확하다
 
 ### A-5. 가드레일·PII 미들웨어
@@ -308,15 +308,15 @@ LLM 없이 결정적으로 동작하는 순수 함수. `/tasks/generate`와 채�
 - [x] A-5 가드레일·PII 미들웨어
 
 **완료 조건**
-- [ ] 조회 도구와 `web_search`만 갖는다 (쓰기·추천 도구 없음)
-- [ ] 웹 검색 답변에 출처 URL과 "일반 정보이며 수의사 상담을 대체하지 않는다" 안내가 붙는다
-- [ ] 추천 항목 생성·저장을 하지 않는다 (테스트로 확인)
+- [x] 조회 도구와 `web_search`만 갖는다 (쓰기·추천 도구 없음)
+- [x] 웹 검색 답변에 출처 URL과 "일반 정보이며 수의사 상담을 대체하지 않는다" 안내가 붙는다
+- [x] 추천 항목 생성·저장을 하지 않는다 (테스트로 확인)
 
 ### A-8. Supervisor·그래프 (`src/agent.py`)
 
 **의존성**
-- [ ] A-6 전문 Agent 3종
-- [ ] A-7 General Agent
+- [x] A-6 전문 Agent 3종
+- [x] A-7 General Agent
 
 **완료 조건**
 - [ ] `create_supervisor`로 4개 Agent를 묶었다

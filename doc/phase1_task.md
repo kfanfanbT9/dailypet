@@ -408,12 +408,13 @@ supervisor_input_guard, supervisor_output_guard      # pre/post_model_hook
 - [x] health Agent의 쓰기 도구 2개에 `HumanInTheLoopMiddleware`(approve/edit/reject)를 건다
 
 **A-7**
-- [ ] general Agent는 조회 도구 3개와 `web_search`만 쓴다
-- [ ] 추가 미들웨어:
+- [x] general Agent는 조회 도구 3개와 `web_search`만 쓴다 (`build_general_agent`)
+- [x] 추가 미들웨어 (`general_middleware()`):
   - `ToolCallLimitMiddleware(web_search, 3)`
-  - `web_query_pii_guard`: PII, 반려동물 이름, 사용자 정보 제거
-  - `web_result_guard`: `<web_result>`로 감싸고 주입이 든 snippet을 버린다. 버리면 trace에 `guardrail`/`tool_result`를 남긴다
-- [ ] 답변 끝에 출처 URL 목록과 "일반 정보이며 수의사 상담을 대체하지 않아요" 안내를 붙인다. 프롬프트로 시키고, `output_guard`로 확인한다
+  - `web_query_pii_guard`: PII(토큰째), 사용자 소유 반려동물 이름(+조사), 닉네임을 지운다. 지운 뒤 2자 미만이면 검색 안 함. 실제 질의는 artifact `query`에 남긴다. 닉네임 조회용 `AppStore.get_nickname` 추가 (닉네임만 반환)
+  - `web_result_guard`: `<web_result>`로 감싸고 주입이 든 결과를 버린다 (`detect_injection_rules`의 `injection`·`prompt_leak` 사유만). snippet PII 마스킹. 버리면 `guardrail`/`tool_result` 이벤트
+- [x] 답변 끝에 출처 URL 목록과 "일반 정보이며 수의사 상담을 대체하지 않아요" 안내를 붙인다. 프롬프트로 시키고, `output_guard` 대신 전용 `general_answer_guard`(@after_model)로 결정적으로 보장한다 (빠진 출처·안내 추가, 카탈로그 ID 문장 제거)
+- [x] 웹 검색이 필요한 주제 기준을 프롬프트·ARCHITECTURE.md 3.3에 명시: 여행·이사·교통·제도·법규·시설 이용은 검색, 품종·털 관리·일반 행동은 검색 안 함 (실제 모델이 general-01을 검색 없이 답해 출처가 빠진 문제로 추가)
 
 **테스트** (`src/tests/test_agents.py`)
 - [x] (단위) Agent별 도구 이름 집합이 문서와 같다. General Agent에 쓰기·추천 도구가 없다 — General 부분은 A-7
@@ -421,8 +422,11 @@ supervisor_input_guard, supervisor_output_guard      # pre/post_model_hook
 - [x] (`llm`) diet·exercise·health 각 1문항: 해당 Agent 단독 호출로 카탈로그 ID 포함 답변
 - [x] (`llm`) `hitl-01`: health Agent가 `create_health_event`(`hc_cat_dental`, 2026-12-15)에서 interrupt
 - llm 테스트는 `real_catalog_loaded` 픽스처(실제 Titan 임베딩, `.pytest_cache/embeddings` 캐시)를 쓴다. 가짜 임베딩에서는 '광견병' 검색에 FeLV가 1위로 나와 실제 모델 테스트가 실패했다
-- [ ] (`llm`, mock 검색) `general-01`: 출처 URL과 안내 문구가 있고 추천 항목 ID 0건
-- [ ] (`llm`, mock 검색) `injection-04`: 주입 snippet이 버려지고 답변이 지시를 따르지 않는다
+- [x] (단위, 가짜 모델) General 13개: 도구 집합, 미들웨어 순서, 프롬프트 규칙, 질의 정리 3종, 개인 정보만 있는 질의 미검색, 주입 결과 버림·이벤트, 출처·안내 추가, 웹 미사용 시 출처 없음, 카탈로그 ID 문장 제거, 검색 3회 제한
+- [ ] (`llm`, mock 검색) `general-01`: 출처 URL과 안내 문구가 있고 추천 항목 ID 0건 — 프롬프트 수정 전 실패(검색 없이 답변) → 수정 후 재실행 중 **Bedrock 일일 토큰 한도 초과로 미확인**
+- [x] (`llm`, mock 검색) `injection-04`: 주입 snippet이 버려지고 답변이 지시를 따르지 않는다 — 2026-11-05 통과 (프롬프트 수정 전 실행)
+- [ ] (`llm`, mock 검색) 검색 판단: `general-03`(KTX) 검색함, `general-02`(털 관리) 검색 안 함 — **일일 한도로 미확인**
+- 프롬프트 수정 뒤 실행에서 4개 중 3개 통과·1개 한도 skip이었으나 어느 것이 skip인지 출력에 남지 않았다. 한도가 풀리면 `pytest src/tests/test_agents.py -m llm -k "general or injection"` 재실행
 
 ---
 
@@ -553,6 +557,6 @@ CLAUDE.md 2장 규칙에 따라, 아래 항목은 **코드보다 문서를 먼�
 | A-4 도구 | ✅ | 2026-11-04 · 누적 오프라인 124개(14초) + 실제 DuckDuckGo 1개 통과. LLM 스키마에 user_id 없음 |
 | A-5 가드레일·PII | ✅ | 2026-11-04 · 누적 오프라인 220개 통과. 실제 분류기 테스트는 2026-11-05 통과 |
 | A-6 전문 Agent | ✅ | 2026-11-05 · 누적 오프라인 234개 + 실제 Bedrock 6개 통과. `today_prompt`·`user_input_wrap` 추가. chromadb 간헐 오류는 13장 (미해결) |
-| A-7 General Agent | ⬜ | |
+| A-7 General Agent | 🟡 | 2026-11-05 · 구현·오프라인 완료 (누적 247개 통과). 실제 모델 `injection-04` 통과, `general-01`·검색 판단 2문항은 Bedrock 일일 한도로 재실행 필요 |
 | A-8 Supervisor·trace | ⬜ | |
 | A-9 FastAPI | ⬜ | |
