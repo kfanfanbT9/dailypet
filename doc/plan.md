@@ -323,23 +323,23 @@ LLM 없이 결정적으로 동작하는 순수 함수. `/tasks/generate`와 채�
 - [x] `pre_model_hook` / `post_model_hook`에 가드레일이 걸려 있다
 - [x] `SqliteSaver` 체크포인터가 `data/checkpoints/`를 쓰고, `thread_id`가 `thr_{user_id}_{pet_id}_{uuid}` 형식이다
 - [x] `stream_mode="updates"`로 trace(handoff, tool_call, interrupt)를 모은다
-- [ ] 범위 밖·지원하지 않는 동물 질문은 General Agent로 보내지 않고 거절한다 — 규칙 판정분은 `supervisor_input_guard`로 처리, 실제 모델 확인은 Bedrock 일일 한도로 미실행
+- [x] 범위 밖·지원하지 않는 동물 질문은 General Agent로 보내지 않고 거절한다 — 실제 모델 테스트 통과 (2026-11-05)
 
 ### A-9. FastAPI 엔드포인트
 
 **의존성**
-- [ ] A-8 Supervisor·그래프
+- [x] A-8 Supervisor·그래프
 - [x] A-3 추천 엔진 (`/tasks/generate`)
 
 **완료 조건**
-- [ ] `POST /query`가 `question`을 읽고 `answer`·`contexts`·`trace`를 돌려준다 (계약 테스트)
-- [ ] `user_id`가 없으면 `EVAL_MODE=true`일 때만 데모 사용자로 처리하고, 아니면 400
-- [ ] `POST /query/resume`이 thread 소유자를 확인한다 (다르면 403)
-- [ ] 승인 대기 중 새 메시지가 오거나 반려동물을 바꾸면 대기 작업을 자동으로 거절한다
-- [ ] `POST /tasks/generate`가 LLM 없이 동작한다
-- [ ] `AGENT_API_KEY` 헤더가 없으면 거부한다
-- [ ] API 계층에서 입력·출력 가드레일, PII 마스킹을 한 번 더 한다 (다층 방어)
-- [ ] 로그에 자격증명·마스킹 안 된 PII가 없다
+- [x] `POST /query`가 `question`을 읽고 `answer`·`contexts`·`trace`를 돌려준다 (계약 테스트)
+- [x] `user_id`가 없으면 `EVAL_MODE=true`일 때만 데모 사용자로 처리하고, 아니면 400
+- [x] `POST /query/resume`이 thread 소유자를 확인한다 (다르면 403)
+- [x] 승인 대기 중 새 메시지가 오거나 반려동물을 바꾸면 대기 작업을 자동으로 거절한다
+- [x] `POST /tasks/generate`가 LLM 없이 동작한다
+- [x] `AGENT_API_KEY` 헤더가 없으면 거부한다
+- [x] API 계층에서 입력·출력 가드레일, PII 마스킹을 한 번 더 한다 (다층 방어)
+- [x] 로그에 자격증명·마스킹 안 된 PII가 없다 (로그 캡처 테스트)
 
 ---
 

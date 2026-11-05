@@ -425,7 +425,7 @@ supervisor_input_guard, supervisor_output_guard      # pre/post_model_hook
 - [x] (단위, 가짜 모델) General 13개: 도구 집합, 미들웨어 순서, 프롬프트 규칙, 질의 정리 3종, 개인 정보만 있는 질의 미검색, 주입 결과 버림·이벤트, 출처·안내 추가, 웹 미사용 시 출처 없음, 카탈로그 ID 문장 제거, 검색 3회 제한
 - [x] (`llm`, mock 검색) `general-01`: 출처 URL과 안내 문구가 있고 추천 항목 ID 0건 — 프롬프트 수정 후 2026-11-05 통과 (`global.anthropic.claude-sonnet-4-6`)
 - [x] (`llm`, mock 검색) `injection-04`: 주입 snippet이 버려지고 답변이 지시를 따르지 않는다 — 2026-11-05 통과 (위 모델로 재확인)
-- [ ] (`llm`, mock 검색) 검색 판단: `general-03`(KTX) 검색함, `general-02`(털 관리) 검색 안 함 — **새 모델도 일일 토큰 한도에 걸려 미확인**
+- [x] (`llm`, mock 검색) 검색 판단: `general-03`(KTX) 검색함, `general-02`(털 관리) 검색 안 함 — 2026-11-05 통과 (`global.anthropic.claude-sonnet-4-5-20250929-v1:0`)
 - 주의: 셸 환경변수 `AWS_MODEL`이 남아 있으면 `.env`보다 우선한다 (`load_dotenv(override=False)`). 모델을 바꾼 뒤에는 `env -u AWS_MODEL pytest ...`로 실행하거나 셸 변수를 지운다
 
 ---
@@ -460,10 +460,10 @@ supervisor_input_guard, supervisor_output_guard      # pre/post_model_hook
 - [x] (단위) trace 변환: 가짜 업데이트 스트림 → 이벤트 목록 (`args`의 PII 마스킹, `user_id` 없음, 재방출 중복 제거, interrupt 1회)
 - [x] (단위) `thread_id` 생성·검증, 다른 사용자 접두사 거부, chat_logs 소유자 불일치 거부
 - [x] (그래프) diet 라우팅 전체 trace, INSUFFICIENT_INFO → general 재위임, Supervisor의 INSUFFICIENT_INFO 노출 차단, 복합 질문 2개 Agent, 주입 차단·PII 마스킹·출력 가드레일, Supervisor 경유 HITL 승인, 새 질문으로 대기 작업 취소, SqliteSaver 재연결 후 재개
-- [ ] (`llm`) 라우팅: 평가셋 diet·exercise·health·general 각 1문항 → `trace`의 handoff 대상이 `expected_agent`와 같다
-- [ ] (`llm`) `out_of_scope`·`species` 각 1문항 → general Agent handoff 없이 거절
-- [ ] (`llm`) multi 1문항 → 필요한 Agent 2개 이상 호출
-- [ ] (`llm`) 대기 중인 interrupt가 있는 thread에 새 질문 → 대기 작업은 거절되고 일정이 생성되지 않는다
+- [x] (`llm`) 라우팅: 평가셋 diet·exercise·health·general 각 1문항 → `trace`의 handoff 대상이 `expected_agent`와 같다 — 2026-11-05 통과
+- [x] (`llm`) `out_of_scope`·`species` 각 1문항 → general Agent handoff 없이 거절 — 2026-11-05 통과
+- [ ] (`llm`) multi 1문항 → 필요한 Agent 2개 이상 호출 — 가짜 모델 그래프로 흐름은 확인. 실제 모델 라우팅은 Phase 4 평가(E-2, multi 카테고리)에서 확인
+- [x] 대기 중인 interrupt가 있는 thread에 새 질문 → 대기 작업은 거절되고 일정이 생성되지 않는다 — 모델 판단이 없는 결정적 코드라 가짜 모델 그래프 테스트로 확인 (`test_new_question_cancels_pending_approval`)
 
 ---
 
@@ -472,9 +472,9 @@ supervisor_input_guard, supervisor_output_guard      # pre/post_model_hook
 **의존성**: A-8, A-3
 
 **작업**
-- [ ] `app = FastAPI()`. 요청·응답 모델은 Pydantic으로 정의한다. 에러가 나도 3키를 유지한다
-- [ ] 인증 의존성: `X-Agent-Api-Key` 헤더가 `AGENT_API_KEY`와 같은지 확인하고, 다르면 401을 낸다. 헤더 이름은 **ARCHITECTURE.md 4.1에 먼저 적는다**
-- [ ] `POST /query`
+- [x] `app = FastAPI()`. 요청·응답 모델은 Pydantic으로 정의한다. 에러가 나도 3키를 유지한다
+- [x] 인증 의존성: `X-Agent-Api-Key` 헤더가 `AGENT_API_KEY`와 같은지 확인하고, 다르면 401을 낸다. 헤더 이름은 **ARCHITECTURE.md 4.1에 먼저 적는다**
+- [x] `POST /query`
   1. 요청을 검증하고, `question`이 없으면 400을 낸다.
   2. `user_id`가 없으면 `EVAL_MODE`일 때만 `DEMO_USER_ID`를 쓰고, 아니면 400을 낸다.
   3. `pet_id`가 사용자 소유인지 확인한다. 없으면 첫 반려동물을 쓴다.
@@ -483,26 +483,35 @@ supervisor_input_guard, supervisor_output_guard      # pre/post_model_hook
   6. 그래프를 실행한다.
   7. 출력 가드레일과 PII 마스킹을 한 번 더 거친다.
   8. `chat_logs`에 기록한다. 마스킹된 값만 저장한다.
-- [ ] `POST /query/resume`: thread 소유자가 다르면 403을 낸다. `decisions`를 `Command(resume=…)`로 넘긴다
-- [ ] `POST /tasks/generate`: `generate_daily_plan`만 호출하고 LLM은 쓰지 않는다. 응답 형식은 ARCHITECTURE.md 4.1.2를 따른다
-- [ ] 오류 처리 (ARCHITECTURE.md 9장)
+- [x] `POST /query/resume`: thread 소유자가 다르면 403을 낸다. `decisions`를 `Command(resume=…)`로 넘긴다
+- [x] `POST /tasks/generate`: `generate_daily_plan`만 호출하고 LLM은 쓰지 않는다. 응답 형식은 ARCHITECTURE.md 4.1.2를 따른다
+- [x] 오류 처리 (ARCHITECTURE.md 9장)
   - Bedrock 타임아웃은 60초, 재시도는 2회다
   - 실패하면 안내 문구, `contexts: []`, `trace`에 `error`를 넣는다
-- [ ] 로그: 질문은 마스킹해 앞 100자만 남기고, trace 요약과 소요 시간을 남긴다. 키와 프로필 전체는 남기지 않는다
-- [ ] 평가용 `WEB_SEARCH_MOCK` 문항 id 전달: 요청 헤더 `X-Eval-Query-Id`를 `EVAL_MODE`일 때만 받는다. **ARCHITECTURE.md 4.1에 먼저 적는다**
+- [x] 로그: 질문은 마스킹해 앞 100자만 남기고, trace 요약과 소요 시간을 남긴다. 키와 프로필 전체는 남기지 않는다
+- [x] 평가용 `WEB_SEARCH_MOCK` 문항 id 전달: 요청 헤더 `X-Eval-Query-Id`를 `EVAL_MODE`일 때만 받는다. **ARCHITECTURE.md 4.1에 먼저 적는다**
 
 **테스트** (`src/tests/test_api.py`, `TestClient`)
-- [ ] 계약: 응답 키가 정확히 `answer`·`contexts`·`trace`이고 타입이 맞다. 그래프는 가짜로 바꿔 쓴다
-- [ ] 401: 키 헤더가 없거나 틀림
-- [ ] 400: `question`이 없음. `user_id`가 없고 `EVAL_MODE=false`인 경우도 400
-- [ ] `EVAL_MODE=true`이고 `user_id`가 없으면 P3와 보리로 처리한다
-- [ ] 403: 다른 사용자의 thread로 resume
-- [ ] 격리: P3 `user_id` + `pet_mocha` → 거부
-- [ ] 가드레일 차단 시 200과 3키, `trace`에 `guardrail`
-- [ ] `/tasks/generate`: 보리 11/10 → 식단 1개 이상, 활동 1개 이상, 활동 상위 3개 안에 노즈워크. LLM 클라이언트가 호출되지 않는다 (mock으로 확인)
-- [ ] `/tasks/generate` p95 < 1초 (메모리 Chroma, 20회)
-- [ ] 로그 캡처에 PII 원문과 키 값이 없다
-- [ ] (`llm`, `chroma`) 스모크: `uvicorn` 실행 후 평가셋 문항 5개(카테고리별 1개)를 `POST /query`로 보내 3키 응답과 handoff 대상을 확인한다
+- [x] 계약: 응답 키가 정확히 `answer`·`contexts`·`trace`이고 타입이 맞다. 그래프는 가짜로 바꿔 쓴다
+- [x] 401: 키 헤더가 없거나 틀림
+- [x] 400: `question`이 없음. `user_id`가 없고 `EVAL_MODE=false`인 경우도 400
+- [x] `EVAL_MODE=true`이고 `user_id`가 없으면 P3와 보리로 처리한다
+- [x] 403: 다른 사용자의 thread로 resume
+- [x] 격리: P3 `user_id` + `pet_mocha` → 거부
+- [x] 가드레일 차단 시 200과 3키, `trace`에 `guardrail`
+- [x] `/tasks/generate`: 보리 11/10 → 식단 1개 이상, 활동 1개 이상, 활동 상위 3개 안에 노즈워크. LLM 클라이언트가 호출되지 않는다 (mock으로 확인)
+- [x] `/tasks/generate` p95 < 1초 (메모리 Chroma, 20회)
+- [x] 로그 캡처에 PII 원문과 키 값이 없다
+- [x] (`llm`, `chroma`) 스모크: `uvicorn` 실행 후 평가셋 문항 5개(카테고리별 1개)를 `POST /query`로 보내 3키 응답과 handoff 대상을 확인한다 — 2026-11-05 통과 (임시 Chroma 서버 :8011에 카탈로그·지식·시드 적재, uvicorn :8099, `diet-01`·`exercise-01`·`health-01`·`general-02`·`injection-01`)
+
+**구현 중 추가·결정한 것**
+- 그래프는 필요할 때만 만든다 (`graph_provider` 주입). 400·403·입력 차단 요청에서는 그래프를 만들지 않는다
+- 409: resume인데 대기 작업 없음. resume `edit`으로 다른 도구로 바꾸기·결정 개수 불일치는 400
+- 반려동물을 바꾼 경우: 같은 사용자의 최근 thread 5개(chat_logs) 중 다른 thread의 대기 작업도 거절 (`cancel_other_threads`, `AppStore.recent_threads`)
+- 버그 예방: `ModelRetryMiddleware` 기본 `on_failure="continue"`는 실패 시 오류 문구를 AI 메시지로 바꿔 답변에 내보낸다 → `on_failure="error"`, Bedrock 오류는 botocore가 재시도하므로 미들웨어는 그 밖의 오류만 재시도 (`not_bedrock_error`)
+- Bedrock 실패 503 / 그 밖의 예외 500. 응답·로그에는 예외 이름만, 메시지는 넣지 않는다
+- `chat_logs` 기록 (`AppStore.save_chat_log`, 마스킹된 질문·답변·trace)
+- `GET /health` (키 없이, 정보 노출 없음)
 
 ---
 
@@ -517,7 +526,7 @@ CLAUDE.md 2장 규칙에 따라, 아래 항목은 **코드보다 문서를 먼�
 | D3 ✅ | 강도 상한: 시니어 `low`까지, 어린·`activity_level=low`는 `medium`까지 (S04·S07과 충돌하지 않게 조정) | ARCHITECTURE.md 3.8 | A-3 |
 | D4 ✅ | `custom` 신호는 `catalog_item_id`가 있을 때만 반영 (유사 항목 연결은 Version 2) | ARCHITECTURE.md 3.8 | A-3 |
 | D5 ✅ | `needs_history` 일정은 할 일 자동 생성에서도 제외 | ARCHITECTURE.md 4.1.2 | A-3 |
-| D6 | 인증 헤더 이름 `X-Agent-Api-Key`, 평가용 `X-Eval-Query-Id` | ARCHITECTURE.md 4.1 | A-9 |
+| D6 ✅ | 인증 헤더 이름 `X-Agent-Api-Key`, 평가용 `X-Eval-Query-Id` (+ 상태 코드 표, `/query` 처리 순서, resume 규칙, 9장 타임아웃·로그 형식) | ARCHITECTURE.md 4.1, 4.1.1, 4.1.2, 9장 | A-9 |
 | D7 ✅ | 3.8 마지막 줄의 "통계용 익명화 오픈 이슈"를 10장 결정(완전 삭제)과 맞춤 | ARCHITECTURE.md 3.8 | A-3 |
 | D9 ✅ | 추천 세부 규칙: 기본 우선순위, 단골 맨 앞, 다양성은 2개 이상일 때, 👎·👍 기준 테이블, 반복 패널티, 최소·목표 개수, constraint 형식, 시간 배정, `keep_item_ids` 처리 | ARCHITECTURE.md 3.8, 4.1.2 | A-3 |
 | D8 ✅ | 설치된 라이브러리 API가 3.2 골격과 다르면 그 부분 (+ `today_prompt`·`user_input_wrap` 추가, 3.6 표 순서 정리) | ARCHITECTURE.md 3.2, 3.6 | A-6 |
@@ -534,20 +543,21 @@ CLAUDE.md 2장 규칙에 따라, 아래 항목은 **코드보다 문서를 먼�
 | DuckDuckGo 일시 차단 | general 문항 불안정 | 테스트와 평가는 `WEB_SEARCH_MOCK`을 쓴다. 실제 검색이 실패해도 정상 응답을 돌려준다 |
 | Bedrock 비용·지연 | 테스트가 느림 | `llm` 마커로 분리하고 기본 실행에서 제외 |
 | Chroma 메타데이터 제약 (null·빈 리스트 거부) | 필터 오류 | 1.2 저장 형식으로 고정하고 `encode_app_record`·`catalog_metadata`에 단위 테스트 |
-| **chromadb 1.5.9 간헐 오류 — 프로세스 내(메모리) 모드에서만 발생 (2026-11-05)**: 벡터 컬렉션 적재 뒤 **다른 컬렉션에 쓰면** 그 벡터 컬렉션 `query`가 `InternalError: Error finding id`로 계속 실패한다. 메모리 클라이언트에서 카탈로그 적재 → 시드 적재 300회 중 45회 실패, 재시도·대기로 복구 안 됨. 1.5.9가 최신 | 오프라인 테스트(`EphemeralClient`)가 몇 번에 한 번 검색 테스트 1개 실패. **운영 영향 없음**: 운영은 `HttpClient`(서버 모드) | 서버 모드(`chroma run`, 임시 저장소 :8011)에서 재현 안 됨을 확인 — ① 반복마다 새 DB에 적재→시드 쓰기 150회 실패 0, ② 한 DB에 앱 데이터 쓰기 300회 + 카탈로그 3종 검색 900회 실패 0, ③ 쓰기 프로세스와 검색 프로세스 동시 실행 150초 동안 검색 3,180회 실패 0, 서버 로그 오류 0. 저장 구조는 바꾸지 않는다. 테스트 쪽은 해당 오류에만 재실행을 걸지 결정 필요 |
+| **chromadb 1.5.9 간헐 오류 — 프로세스 내(메모리) 모드에서만 발생 (2026-11-05)**: 벡터 컬렉션 적재 뒤 **다른 컬렉션에 쓰면** 그 벡터 컬렉션 `query`가 `InternalError: Error finding id`로 계속 실패한다. 메모리 클라이언트에서 카탈로그 적재 → 시드 적재 300회 중 45회 실패, 재시도·대기로 복구 안 됨. 1.5.9가 최신 | 오프라인 테스트(`EphemeralClient`)가 몇 번에 한 번 검색 테스트 1개 실패. **운영 영향 없음**: 운영은 `HttpClient`(서버 모드) | 서버 모드(`chroma run`, 임시 저장소 :8011)에서 재현 안 됨을 확인 — ① 반복마다 새 DB에 적재→시드 쓰기 150회 실패 0, ② 한 DB에 앱 데이터 쓰기 300회 + 카탈로그 3종 검색 900회 실패 0, ③ 쓰기 프로세스와 검색 프로세스 동시 실행 150초 동안 검색 3,180회 실패 0, 서버 로그 오류 0. 저장 구조는 바꾸지 않는다. 테스트는 `pytest-rerunfailures`로 이 오류에만 최대 2회 재실행 (`pyproject.toml`) |
+| 오프라인 테스트 시간 증가 (286개 약 60초, 목표 30초) | 개발 중 피드백이 느림 | 테스트마다 격리 DB에 시드·카탈로그를 새로 적재(약 0.65초 × 약 80개)하는 비용이 고르게 퍼져 있다. 읽기 전용 테스트끼리 적재 결과를 공유하는 픽스처로 줄일 수 있다 (후속) |
 | 추천 규칙 우선순위 해석 차이 | 개인화 평가 실패 | 3.8 우선순위(안전 > 👎 > 단골 > 다양성)를 테스트 이름에 그대로 쓰고, 시드 시나리오(S05~S07, S21)로 검증 |
 
 ---
 
 ## 14. Phase 1 완료 점검
 
-- [ ] `pytest -m "not llm and not chroma"` 전체 통과 (30초 이내)
-- [ ] `pytest -m "llm or chroma"` 전체 통과 (Chroma 서버·Bedrock 연결 상태)
-- [ ] `python -m src.retriever --ingest`가 카탈로그 107건과 지식 청크를 적재하고, 오염 문서를 거부한다
-- [ ] `uvicorn src.agent:app --port 8000`이 뜨고 스모크 5문항이 3키로 응답한다
-- [ ] `/tasks/generate`가 LLM 없이 시드 기준 결과를 돌려준다 (보리 노즈워크 상위 3개)
-- [ ] 12장 문서 수정 D1~D8이 반영되어 있다
-- [ ] plan.md A-1 ~ A-9 완료 조건이 모두 체크되어 있다
+- [ ] `pytest -m "not llm and not chroma"` 전체 통과 (30초 이내) — 286개 전체 통과, 단 약 60초 (13장)
+- [ ] `pytest -m "llm or chroma"` 전체 통과 (Chroma 서버·Bedrock 연결 상태) — 파일·묶음별로는 모두 통과했으나 한 번에 전체 실행은 아직 안 함 (Bedrock 일일 한도)
+- [ ] `python -m src.retriever --ingest`가 카탈로그 107건과 지식 청크를 적재하고, 오염 문서를 거부한다 — 2026-11-05 임시 서버에서 적재 성공(건수 출력은 확인하지 않음), 오염 문서 거부는 오프라인 테스트로 확인. 지식 문서 8개가 front matter `reviewed`가 true가 아니라는 경고를 낸다 (A-2부터, 검수 표시 필요)
+- [x] `uvicorn src.agent:app`이 뜨고 스모크 5문항이 3키로 응답한다 — 스모크 테스트는 포트 8099 사용
+- [x] `/tasks/generate`가 LLM 없이 시드 기준 결과를 돌려준다 (보리 노즈워크 상위 3개)
+- [x] 12장 문서 수정 D1~D8이 반영되어 있다
+- [x] plan.md A-1 ~ A-9 완료 조건이 모두 체크되어 있다
 - [ ] 로그·`data/checkpoints/`에 마스킹되지 않은 PII와 키 값이 없다 (검색으로 확인)
 - [ ] 산출물을 커밋했다 (`feat:` / `test:`), `.env`·`data/chroma/`·`data/checkpoints/` 제외
 
@@ -562,6 +572,6 @@ CLAUDE.md 2장 규칙에 따라, 아래 항목은 **코드보다 문서를 먼�
 | A-4 도구 | ✅ | 2026-11-04 · 누적 오프라인 124개(14초) + 실제 DuckDuckGo 1개 통과. LLM 스키마에 user_id 없음 |
 | A-5 가드레일·PII | ✅ | 2026-11-04 · 누적 오프라인 220개 통과. 실제 분류기 테스트는 2026-11-05 통과 |
 | A-6 전문 Agent | ✅ | 2026-11-05 · 누적 오프라인 234개 + 실제 Bedrock 6개 통과. `today_prompt`·`user_input_wrap` 추가. chromadb 간헐 오류는 13장 (미해결) |
-| A-7 General Agent | 🟡 | 2026-11-05 · 구현·오프라인 완료. 실제 모델 `general-01`·`injection-04` 통과, 검색 판단 2문항은 일일 한도로 재실행 필요 |
-| A-8 Supervisor·trace | 🟡 | 2026-11-05 · 구현·가짜 모델 그래프 테스트 완료 (누적 오프라인 261개 통과). 실제 모델 라우팅·범위 밖 거절(6개)은 일일 한도로 미실행 |
-| A-9 FastAPI | ⬜ | |
+| A-7 General Agent | ✅ | 2026-11-05 · 오프라인 13개 + 실제 모델 4개(general-01·injection-04·검색 판단 2) 통과 |
+| A-8 Supervisor·trace | ✅ | 2026-11-05 · 가짜 모델 그래프 14개 + 실제 모델 라우팅 4개·범위 밖 거절 2개 통과. multi 실제 라우팅은 E-2에서 |
+| A-9 FastAPI | ✅ | 2026-11-05 · API 테스트 26개 + uvicorn 스모크 5문항 통과. 누적 오프라인 287개 |

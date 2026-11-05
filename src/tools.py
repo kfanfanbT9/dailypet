@@ -113,6 +113,21 @@ class AppStore:
     def list_pets(self, user_id: str) -> list[dict[str, Any]]:
         return self._rows("pets", {"user_id": user_id})
 
+    def save_chat_log(self, row: dict[str, Any]) -> dict[str, Any]:
+        """대화 기록 저장 (Agent API 계층). 값은 호출 쪽에서 PII 마스킹을 마친 것이어야 한다."""
+        self.get_pet(row["user_id"], row["pet_id"])
+        return self._upsert("chat_logs", row)
+
+    def recent_threads(self, user_id: str, limit: int = 5) -> list[str]:
+        """이 사용자의 최근 대화 thread_id (chat_logs 최신순, 중복 제거)."""
+        try:
+            metas = self.client.get_collection("chat_logs").get(where={"user_id": user_id},
+                                                                include=["metadatas"])["metadatas"]
+        except Exception:
+            return []
+        ordered = sorted(metas, key=lambda m: m.get("created_ts", 0), reverse=True)
+        return list(dict.fromkeys(m["thread_id"] for m in ordered if m.get("thread_id")))[:limit]
+
     def thread_owner(self, thread_id: str) -> str | None:
         """chat_logs에 기록된 thread 소유자 user_id (기록이 없으면 None)."""
         try:

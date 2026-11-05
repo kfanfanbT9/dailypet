@@ -252,6 +252,28 @@ CLASSIFIER_PROMPT = (
 )
 
 _guard_model: Any = None
+BEDROCK_READ_TIMEOUT_S = 60
+BEDROCK_TOTAL_ATTEMPTS = 3  # 최초 1회 + 재시도 2회 (ARCHITECTURE.md 9장)
+
+
+def bedrock_client_config() -> Any:
+    """Bedrock 호출 타임아웃·재시도 설정 (botocore)."""
+    from botocore.config import Config
+
+    return Config(read_timeout=BEDROCK_READ_TIMEOUT_S, connect_timeout=10,
+                  retries={"total_max_attempts": BEDROCK_TOTAL_ATTEMPTS, "mode": "standard"})
+
+
+def is_bedrock_error(exc: BaseException) -> bool:
+    """Bedrock 호출 실패(한도 초과·타임아웃·연결 오류 등). botocore가 이미 재시도한 오류다."""
+    from botocore.exceptions import BotoCoreError, ClientError
+
+    return isinstance(exc, (BotoCoreError, ClientError))
+
+
+def not_bedrock_error(exc: Exception) -> bool:
+    """ModelRetryMiddleware retry_on: Bedrock 오류는 다시 재시도하지 않는다 (botocore에서 2회 재시도함)."""
+    return not is_bedrock_error(exc)
 
 
 def get_guard_model() -> Any:
@@ -263,7 +285,8 @@ def get_guard_model() -> Any:
         from src.config import get_settings
 
         s = get_settings().require_agent()
-        _guard_model = ChatBedrockConverse(model=s.aws_model, region_name=s.aws_region, temperature=0)
+        _guard_model = ChatBedrockConverse(model=s.aws_model, region_name=s.aws_region, temperature=0,
+                                           config=bedrock_client_config())
     return _guard_model
 
 
@@ -528,7 +551,8 @@ def get_model() -> Any:
         from src.config import get_settings
 
         s = get_settings().require_agent()
-        _model = ChatBedrockConverse(model=s.aws_model, region_name=s.aws_region, temperature=0.2)
+        _model = ChatBedrockConverse(model=s.aws_model, region_name=s.aws_region, temperature=0.2,
+                                     config=bedrock_client_config())
     return _model
 
 
@@ -616,7 +640,7 @@ def common_middleware(extra: list | None = None, model: Any | None = None) -> li
         SummarizationMiddleware(model=m, trigger=("tokens", 4000), keep=("messages", 20)),  # 3
         ModelCallLimitMiddleware(run_limit=8),                              # 4
         ToolCallLimitMiddleware(run_limit=10),                              # 5
-        ModelRetryMiddleware(max_retries=2),                                # 6
+        ModelRetryMiddleware(max_retries=2, retry_on=not_bedrock_error, on_failure="error"),  # 6
         ToolRetryMiddleware(max_retries=2),                                 # 6
         today_prompt,                                                       # 6.5 오늘 날짜
         user_input_wrap,                                                    # 6.6 <user_input>
@@ -1066,14 +1090,29 @@ def approval_text(pending: list[Any]) -> str:
     return "\n".join([APPROVAL_PREFIX, *lines])
 
 
+def cancel_other_threads(graph: Any, store: Any, ctx: AgentContext, limit: int = 5) -> list[dict[str, Any]]:
+    """같은 사용자의 최근 다른 thread(반려동물을 바꾼 경우 등)에 남은 승인 대기를 거절한다."""
+    events: list[dict[str, Any]] = []
+    for tid in store.recent_threads(ctx.user_id, limit):
+        parsed = parse_thread_id(tid)
+        if tid == ctx.thread_id or parsed is None or parsed[0] != ctx.user_id:
+            continue
+        events += cancel_pending(graph, AgentContext(user_id=ctx.user_id, pet_id=parsed[1], thread_id=tid))
+    return events
+
+
 def run_turn(graph: Any, ctx: AgentContext, *, question: str | None = None, resume: Any | None = None,
-             recursion_limit: int = DEFAULT_RECURSION_LIMIT) -> TurnResult:
+             recursion_limit: int = DEFAULT_RECURSION_LIMIT,
+             pre_events: Iterable[dict[str, Any]] = ()) -> TurnResult:
     """질문 한 턴(또는 HITL 재개)을 실행하고 answer·contexts·trace를 만든다.
 
     새 질문이면 먼저 대기 중인 승인 작업을 거절한다 (ARCHITECTURE.md 3.6 HITL 흐름 5).
-    PII 마스킹·출력 가드레일의 API 계층 적용과 chat_logs 기록은 A-9에서 한다.
+    pre_events: 실행 전에 생긴 이벤트(다른 thread 대기 작업 취소 등)를 trace 앞에 넣는다.
+    PII 마스킹·출력 가드레일의 API 계층 적용과 chat_logs 기록은 API 계층에서 한다.
     """
     collector = TraceCollector(ctx.thread_id)
+    for event in pre_events:
+        collector.add_event(event)
     if question is not None:
         for event in cancel_pending(graph, ctx):
             collector.add_event(event)
@@ -1090,3 +1129,333 @@ def run_turn(graph: Any, ctx: AgentContext, *, question: str | None = None, resu
     answer = _text(messages[-1]) if messages else SAFE_FALLBACK
     collector.add_event({"type": "final", "agent": "supervisor", "thread_id": ctx.thread_id})
     return TurnResult(answer, collector.contexts, collector.trace(), ctx.thread_id)
+
+
+# ================================================================ 8. FastAPI (A-9, ARCHITECTURE.md 4.1·9장)
+
+import hmac  # noqa: E402
+import logging  # noqa: E402
+import time  # noqa: E402
+import uuid as _uuid  # noqa: E402
+from datetime import date as _date  # noqa: E402
+
+from fastapi import Depends, FastAPI, Header, Request  # noqa: E402
+from fastapi.exceptions import RequestValidationError  # noqa: E402
+from fastapi.responses import JSONResponse  # noqa: E402
+
+from typing import TypeVar  # noqa: E402
+
+log = logging.getLogger("dailypet.agent")
+_T = TypeVar("_T")
+
+MSG_MODEL_UNAVAILABLE = "지금은 답변을 만들기 어려워요. 잠시 후 다시 시도해 주세요."
+MSG_INTERNAL = "요청을 처리하는 중에 문제가 생겼어요. 잠시 후 다시 시도해 주세요."
+QUERY_PATHS = ("/query", "/query/resume")
+
+
+class ApiError(Exception):
+    """상태 코드와 사용자 안내 문구를 가진 API 오류 (세 키 응답으로 바꾼다)."""
+
+    def __init__(self, status: int, message: str, reason: str) -> None:
+        super().__init__(reason)
+        self.status, self.message, self.reason = status, message, reason
+
+
+class QueryRequest(BaseModel):
+    question: str = Field(min_length=1, max_length=MAX_INPUT_CHARS)
+    user_id: str | None = None
+    pet_id: str | None = None
+    thread_id: str | None = None
+
+
+class Decision(BaseModel):
+    type: Literal["approve", "edit", "reject"]
+    edited_action: dict[str, Any] | None = None
+    message: str | None = Field(default=None, max_length=300)
+
+
+class ResumeRequest(BaseModel):
+    user_id: str = Field(min_length=1)
+    thread_id: str = Field(min_length=1)
+    decisions: list[Decision] = Field(min_length=1, max_length=10)
+
+
+class TasksRequest(BaseModel):
+    user_id: str = Field(min_length=1)
+    pet_id: str = Field(min_length=1)
+    date: _date | None = None
+    keep_item_ids: list[str] = Field(default_factory=list, max_length=50)
+    category: Literal["diet", "activity"] | None = None
+    exclude_item_ids: list[str] = Field(default_factory=list, max_length=50)
+    limit: int | None = Field(default=None, ge=1, le=5)
+
+
+class QueryResponse(BaseModel):
+    answer: str
+    contexts: list[str]
+    trace: list[dict[str, Any]]
+
+
+def three_keys(answer: str, *, contexts: list[str] | None = None, trace: list[dict[str, Any]] | None = None,
+               status: int = 200) -> JSONResponse:
+    """계약 응답 {answer, contexts, trace} (CLAUDE.md 4.1). 모든 값은 PII 마스킹 후 내보낸다."""
+    body = QueryResponse(answer=mask_pii(answer), contexts=[mask_pii(c) for c in contexts or []],
+                         trace=mask_obj(trace or []))
+    return JSONResponse(body.model_dump(), status_code=status)
+
+
+def _error_body(err: ApiError) -> JSONResponse:
+    return three_keys(err.message, trace=[{"step": 1, "type": "error", "reason": err.reason}], status=err.status)
+
+
+# ---------------------------------------------------------------- 의존성
+
+
+def require_api_key(x_agent_api_key: str | None = Header(default=None)) -> None:
+    """X-Agent-Api-Key 확인 (상수 시간 비교). 서버에 키가 없으면 설정 오류로 모두 거절."""
+    from src.config import get_settings
+
+    expected = get_settings().agent_api_key
+    if not expected:
+        raise ApiError(500, MSG_INTERNAL, "server_misconfigured")
+    if not x_agent_api_key or not hmac.compare_digest(x_agent_api_key.encode(), expected.encode()):
+        raise ApiError(401, "인증에 실패했어요.", "unauthorized")
+
+
+_graph: Any = None
+
+
+def get_graph() -> Any:
+    """프로세스당 한 번 만드는 Supervisor 그래프 (테스트는 dependency_overrides로 바꾼다)."""
+    global _graph
+    if _graph is None:
+        _graph = build_graph()
+    return _graph
+
+
+def graph_provider() -> Callable[[], Any]:
+    """그래프를 실제로 쓸 때만 만들도록 함수를 주입한다 (400·403·입력 차단 요청에서는 만들지 않음)."""
+    return get_graph
+
+
+def get_store() -> Any:
+    return tools.get_resources().store
+
+
+def eval_query_id(x_eval_query_id: str | None = Header(default=None)) -> str | None:
+    """X-Eval-Query-Id: EVAL_MODE일 때만 읽는다 (WEB_SEARCH_MOCK 고정 결과 선택용)."""
+    from src.config import get_settings
+
+    if not get_settings().eval_mode or not x_eval_query_id:
+        return None
+    return x_eval_query_id if re.fullmatch(r"[a-z]+-\d{2}", x_eval_query_id) else None
+
+
+# ---------------------------------------------------------------- 공통 처리
+
+
+def resolve_user(user_id: str | None) -> str:
+    from src.config import get_settings
+
+    if user_id:
+        return user_id
+    s = get_settings()
+    if s.eval_mode and s.demo_user_id:
+        return s.demo_user_id
+    raise ApiError(400, "사용자 정보가 필요해요.", "missing_user_id")
+
+
+def resolve_pet(store: Any, user_id: str, pet_id: str | None) -> str:
+    """요청 pet_id가 그 사용자 소유인지 확인한다. 없으면 첫 반려동물."""
+    if pet_id:
+        try:
+            store.get_pet(user_id, pet_id)
+        except PermissionError:
+            raise ApiError(403, "이 반려동물에는 접근할 수 없어요.", "forbidden_pet") from None
+        return pet_id
+    pets = store.list_pets(user_id)
+    if not pets:
+        raise ApiError(400, "먼저 반려동물을 등록해 주세요.", "no_pet")
+    return pets[0]["id"]
+
+
+def resolve_thread(store: Any, user_id: str, pet_id: str, thread_id: str | None) -> str:
+    if not thread_id:
+        return new_thread_id(user_id, pet_id)
+    parsed = parse_thread_id(thread_id)
+    if parsed is None:
+        raise ApiError(400, "대화 정보가 올바르지 않아요.", "bad_thread_id")
+    if not thread_owned_by(thread_id, user_id, store):
+        raise ApiError(403, "이 대화에는 접근할 수 없어요.", "forbidden_thread")
+    if parsed[1] != pet_id:
+        raise ApiError(400, "다른 반려동물의 대화예요. 새 대화로 시작해 주세요.", "thread_pet_mismatch")
+    return thread_id
+
+
+def finalize(result: TurnResult, user_text: str) -> TurnResult:
+    """API 계층 출력 가드레일 (그래프 안 가드레일에 더한 마지막 방어선). 승인 안내는 그대로 둔다."""
+    if result.interrupted:
+        return result
+    verdict = check_output(result.answer, user_text=user_text)
+    if not verdict.changed:
+        return result
+    event = {"type": "guardrail", "stage": "output", "agent": "api",
+             "reason": ",".join(sorted(set(verdict.violations))) or "hospital_notice"}
+    trace = [e for e in result.trace if e["type"] != "final"]
+    finals = [e for e in result.trace if e["type"] == "final"]
+    events = [{k: v for k, v in e.items() if k != "step"} for e in [*trace, event, *finals]]
+    renumbered = [{"step": i, **e} for i, e in enumerate(events, start=1)]
+    return TurnResult(verdict.text, result.contexts, renumbered, result.thread_id, result.interrupted)
+
+
+def save_chat_log(store: Any, ctx: AgentContext, question: str, result: TurnResult) -> None:
+    """chat_logs 기록 (마스킹된 값만). 기록 실패는 응답을 막지 않는다."""
+    from src.config import now_kst
+
+    row = {"id": f"log_{_uuid.uuid4().hex[:16]}", "user_id": ctx.user_id, "pet_id": ctx.pet_id,
+           "thread_id": ctx.thread_id, "question": mask_pii(question), "answer": mask_pii(result.answer),
+           "trace": mask_obj(result.trace), "created_at": now_kst().isoformat(timespec="seconds")}
+    try:
+        store.save_chat_log(row)
+    except Exception as exc:  # 기록 실패는 로그만 (예외 이름만)
+        log.warning("chat_log_failed error=%s", type(exc).__name__)
+
+
+def _trace_summary(trace: list[dict[str, Any]]) -> str:
+    counts: dict[str, int] = {}
+    for e in trace:
+        counts[e["type"]] = counts.get(e["type"], 0) + 1
+    return ",".join(f"{k}:{v}" for k, v in sorted(counts.items()))
+
+
+def _log_request(endpoint: str, ctx: AgentContext | None, question: str, trace: list[dict[str, Any]],
+                 started: float, status: int) -> None:
+    log.info("endpoint=%s user=%s pet=%s q=%r events=%s ms=%d status=%d", endpoint,
+             ctx.user_id if ctx else "-", ctx.pet_id if ctx else "-", mask_pii(question)[:100],
+             _trace_summary(trace), int((time.perf_counter() - started) * 1000), status)
+
+
+def _run_safely(fn: Callable[[], _T]) -> _T:
+    """그래프 실행 예외를 ApiError로 바꾼다 (예외 메시지는 응답·로그에 넣지 않는다)."""
+    try:
+        return fn()
+    except ApiError:
+        raise
+    except Exception as exc:
+        if is_bedrock_error(exc):
+            log.warning("model_unavailable error=%s", type(exc).__name__)
+            raise ApiError(503, MSG_MODEL_UNAVAILABLE, "model_unavailable") from None
+        log.error("internal_error error=%s", type(exc).__name__)
+        raise ApiError(500, MSG_INTERNAL, "internal") from None
+
+
+# ---------------------------------------------------------------- 앱
+
+app = FastAPI(title="DailyPet Agent", docs_url=None, redoc_url=None, openapi_url=None)
+
+
+@app.exception_handler(ApiError)
+def _api_error_handler(request: Request, exc: ApiError) -> JSONResponse:
+    if request.url.path in QUERY_PATHS:
+        return _error_body(exc)
+    return JSONResponse({"detail": exc.message}, status_code=exc.status)
+
+
+@app.exception_handler(RequestValidationError)
+def _validation_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+    """요청 형식 오류는 422 대신 400 (ARCHITECTURE.md 4.1). 입력 값은 응답에 넣지 않는다."""
+    fields = sorted({".".join(str(p) for p in e.get("loc", [])[1:]) for e in exc.errors()})
+    err = ApiError(400, "요청 형식이 올바르지 않아요.", "bad_request")
+    if request.url.path in QUERY_PATHS:
+        resp = _error_body(err)
+        return resp
+    return JSONResponse({"detail": f"요청 형식 오류: {', '.join(fields)}"}, status_code=400)
+
+
+@app.get("/health")
+def health() -> dict[str, str]:
+    return {"status": "ok"}
+
+
+@app.post("/query", dependencies=[Depends(require_api_key)])
+def query(req: QueryRequest, graph: Callable[[], Any] = Depends(graph_provider), store: Any = Depends(get_store),
+          eval_qid: str | None = Depends(eval_query_id)) -> JSONResponse:
+    started = time.perf_counter()
+    user_id = resolve_user(req.user_id)
+    pet_id = resolve_pet(store, user_id, req.pet_id)
+    thread_id = resolve_thread(store, user_id, pet_id, req.thread_id)
+    ctx = AgentContext(user_id=user_id, pet_id=pet_id, thread_id=thread_id, eval_query_id=eval_qid)
+    verdict = _run_safely(lambda: check_input(req.question))
+    if verdict.action == "block":
+        guard = {"step": 1, "type": "guardrail", "stage": "input", "agent": "api", "reason": verdict.reason}
+        final = {"step": 2, "type": "final", "agent": "api", "thread_id": thread_id}
+        result = TurnResult(verdict.refusal or REFUSALS["injection"], [], [guard, final], thread_id)
+    else:
+        masked_question = mask_pii(req.question)
+        def turn() -> TurnResult:
+            g = graph()
+            cancelled = cancel_other_threads(g, store, ctx)
+            return run_turn(g, ctx, question=masked_question, pre_events=cancelled)
+
+        result = finalize(_run_safely(turn), req.question)
+    save_chat_log(store, ctx, req.question, result)
+    _log_request("/query", ctx, req.question, result.trace, started, 200)
+    return three_keys(result.answer, contexts=result.contexts, trace=result.trace)
+
+
+@app.post("/query/resume", dependencies=[Depends(require_api_key)])
+def query_resume(req: ResumeRequest, graph: Callable[[], Any] = Depends(graph_provider),
+                 store: Any = Depends(get_store),
+                 eval_qid: str | None = Depends(eval_query_id)) -> JSONResponse:
+    from langgraph.types import Command
+
+    started = time.perf_counter()
+    parsed = parse_thread_id(req.thread_id)
+    if parsed is None:
+        raise ApiError(400, "대화 정보가 올바르지 않아요.", "bad_thread_id")
+    if not thread_owned_by(req.thread_id, req.user_id, store):
+        raise ApiError(403, "이 대화에는 접근할 수 없어요.", "forbidden_thread")
+    pet_id = resolve_pet(store, req.user_id, parsed[1])
+    ctx = AgentContext(user_id=req.user_id, pet_id=pet_id, thread_id=req.thread_id, eval_query_id=eval_qid)
+    g = _run_safely(graph)
+    pending = _run_safely(lambda: pending_interrupts(g, ctx))
+    if not pending:
+        raise ApiError(409, "승인을 기다리는 작업이 없어요.", "no_pending_action")
+    requests_ = [r for intr in pending for r in (intr.value or {}).get("action_requests", [])]
+    if len(req.decisions) != len(requests_) or len(pending) != 1:
+        raise ApiError(400, "승인 응답이 대기 중인 작업과 맞지 않아요.", "decision_mismatch")
+    decisions = []
+    for d, original in zip(req.decisions, requests_, strict=True):
+        if d.type == "edit":
+            edited = d.edited_action or {}
+            if edited.get("name") != original.get("name") or not isinstance(edited.get("args"), dict):
+                raise ApiError(400, "수정 내용이 올바르지 않아요.", "bad_edit")
+            decisions.append({"type": "edit", "edited_action": {"name": edited["name"], "args": edited["args"]}})
+        elif d.type == "reject":
+            decisions.append({"type": "reject", "message": mask_pii(d.message or "사용자가 거절함")})
+        else:
+            decisions.append({"type": "approve"})
+    label = "[승인 응답: " + ",".join(d.type for d in req.decisions) + "]"
+    result = finalize(_run_safely(lambda: run_turn(g, ctx, resume=Command(resume={"decisions": decisions}))),
+                      "")
+    save_chat_log(store, ctx, label, result)
+    _log_request("/query/resume", ctx, label, result.trace, started, 200)
+    return three_keys(result.answer, contexts=result.contexts, trace=result.trace)
+
+
+@app.post("/tasks/generate", dependencies=[Depends(require_api_key)])
+def tasks_generate(req: TasksRequest, store: Any = Depends(get_store)) -> dict[str, Any]:
+    """오늘의 할 일 (LLM 없음, 결정적). ARCHITECTURE.md 4.1.2."""
+    from src.config import today_kst
+
+    started = time.perf_counter()
+    try:
+        plan = tools.generate_daily_plan(
+            store, tools.get_resources().catalog, req.user_id, req.pet_id, req.date or today_kst(),
+            keep_item_ids=req.keep_item_ids, category=req.category,
+            exclude_item_ids=req.exclude_item_ids, limit=req.limit)
+    except PermissionError:
+        raise ApiError(403, "이 반려동물에는 접근할 수 없어요.", "forbidden_pet") from None
+    log.info("endpoint=/tasks/generate user=%s pet=%s tasks=%d ms=%d status=200", req.user_id, req.pet_id,
+             len(plan.tasks), int((time.perf_counter() - started) * 1000))
+    return plan.to_response()

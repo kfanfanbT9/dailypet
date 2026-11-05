@@ -102,7 +102,7 @@ def common_middleware(extra: list | None = None) -> list:
         SummarizationMiddleware(model=model, trigger=("tokens", 4000), keep=("messages", 20)),  # 3
         ModelCallLimitMiddleware(run_limit=8),                                 # 4
         ToolCallLimitMiddleware(run_limit=10),                                 # 5
-        ModelRetryMiddleware(max_retries=2),                                   # 6
+        ModelRetryMiddleware(max_retries=2, retry_on=not_bedrock_error, on_failure="error"),  # 6 (Bedrock 오류는 botocore가 재시도)
         ToolRetryMiddleware(max_retries=2),                                    # 6
         today_prompt,                         # 6.5 내장 @dynamic_prompt: 시스템 프롬프트에 오늘(KST) 날짜 추가
         user_input_wrap,                      # 6.6 커스텀 @wrap_model_call: 모델 요청의 사용자 메시지를 <user_input>으로 감쌈
@@ -247,7 +247,7 @@ graph = create_supervisor(
 | 3 | `SummarizationMiddleware` | 내장 | `before_model` | 긴 대화 요약으로 컨텍스트 초과 방지 |
 | 4 | `ModelCallLimitMiddleware` | 내장 | `before_model` | 무한 루프·비용 폭주 방지 |
 | 5 | `ToolCallLimitMiddleware` | 내장 | `wrap_tool_call` | 도구 남용 방지 |
-| 6 | `ModelRetryMiddleware` / `ToolRetryMiddleware` | 내장 | wrap | 일시 오류 재시도 |
+| 6 | `ModelRetryMiddleware` / `ToolRetryMiddleware` | 내장 | wrap | 일시 오류 재시도. 모델 재시도는 `on_failure="error"`로 둔다 (기본값 `continue`는 오류 문구를 AI 메시지로 바꿔 답변에 내보낸다). Bedrock(botocore) 오류는 botocore `Config`가 이미 2회 재시도하므로 미들웨어는 그 밖의 오류만 재시도한다 (9장) |
 | 6.5 | `today_prompt` | 내장 `@dynamic_prompt` | `wrap_model_call` | 시스템 프롬프트 끝에 오늘 날짜(KST, `TODAY_OVERRIDE` 반영)와 요일을 붙인다. 연도 없는 날짜("12월 15일")를 오늘 이후 가장 가까운 날짜로 해석하게 한다 (모델이 학습 시점 연도로 해석해 지난 날짜를 만드는 문제 방지) |
 | 6.6 | `user_input_wrap` | 커스텀 | `wrap_model_call` | 모델에 보내는 요청에서만 사용자 메시지(`HumanMessage`)를 `<user_input>…</user_input>`으로 감싼다 (4.7). 대화 상태·기록에 저장되는 원문은 바꾸지 않는다 |
 | 7 | Agent별 추가: `HumanInTheLoopMiddleware` (health_agent) / `ToolCallLimitMiddleware(web_search, 3)`·`web_query_pii_guard`·`web_result_guard`·`general_answer_guard` (general_agent) | 내장 / 커스텀 | `after_model` / `wrap_tool_call` | HITL은 쓰기 도구 호출 전 사용자 승인 (`interrupt`). 웹 검색 가드는 3.7 참고. `general_answer_guard`는 `output_guard` 다음에 실행되어(after_model은 목록 역순) 웹 검색을 쓴 답변에 출처 URL이 없으면 결과 URL을 최대 3개 붙이고, 모든 답변에 "일반 정보이며 수의사 상담을 대체하지 않아요" 안내가 없으면 붙인다. 카탈로그 ID(`act_`/`diet_`/`hc_`)가 든 문장은 지운다 (General은 추천하지 않음). 프롬프트로 먼저 시키고 결정적으로 한 번 더 보장한다 |
@@ -426,6 +426,26 @@ graph = create_supervisor(
 - 선택 필드 `thread_id`: 대화를 이어가거나 HITL을 재개할 때 쓴다. 없으면 새로 만들어 trace에 넣어 돌려준다.
 - 평가 계약: 평가 스크립트는 본문에 `question`만 보낸다(문항에 `user_id`·`pet_id`가 있으면 함께 보냄). 헤더에는 Backend와 같은 `AGENT_API_KEY`를 넣는다. `EVAL_MODE=true`이면 시드 데모 사용자(`DEMO_USER_ID`)와 대표 반려동물로 처리한다.
 - 인증: `AGENT_API_KEY` 헤더가 없거나 틀리면 401이다 (`EVAL_MODE`와 관계없음).
+- **요청 헤더** (Agent 서버 모든 엔드포인트, `GET /health` 제외)
+
+  | 헤더 | 필수 | 설명 |
+  |------|------|------|
+  | `X-Agent-Api-Key` | 필수 | `.env`의 `AGENT_API_KEY`와 같아야 한다 (상수 시간 비교). 서버에 키가 설정되지 않았으면 모든 요청을 500(설정 오류)으로 거절한다 |
+  | `X-Eval-Query-Id` | 선택 | 평가 문항 id (예: `general-01`). `EVAL_MODE=true`일 때만 읽고, `WEB_SEARCH_MOCK`이 `evaluation/fixtures/web_search/<id>.json`을 고르는 데만 쓴다. 평가 모드가 아니면 무시한다 |
+
+- **상태 코드** (`/query`, `/query/resume`은 오류여도 `answer`·`contexts`·`trace` 세 키를 유지하고 `trace`에 `error` 이벤트 1개를 넣는다)
+
+  | 코드 | 경우 |
+  |------|------|
+  | 200 | 정상, 가드레일 차단, HITL 승인 대기 |
+  | 400 | 요청 형식 오류(`question` 없음·1,000자 초과 포함), `user_id` 없음(평가 모드 아님), 반려동물이 없는 사용자, `thread_id` 형식 오류·요청 반려동물과 다른 thread, resume `decisions` 개수·내용 불일치(수정으로 다른 도구로 바꾸기 등) |
+  | 401 | `X-Agent-Api-Key` 없음·불일치 |
+  | 403 | 다른 사용자의 `pet_id`·`thread_id` |
+  | 409 | resume 요청인데 승인 대기 중인 작업이 없음 |
+  | 503 | Bedrock 호출 실패(타임아웃·한도 초과 등, 9장) |
+  | 500 | 그 밖의 내부 오류 (예외 메시지는 응답·로그에 넣지 않고 예외 이름만 로그에 남김) |
+
+- 처리 순서 (`/query`): 요청 검증 → `user_id`·`pet_id` 확정(소유 확인) → API 입력 가드레일(`check_input`) → 질문 PII 마스킹(그래프·체크포인트에는 마스킹된 질문만 들어감) → thread 확인·생성 → 승인 대기 정리(이 thread + 같은 사용자의 최근 thread 5개(`chat_logs` 기준) 중 다른 thread의 대기 작업도 거절 — 반려동물을 바꾼 경우. 거절한 작업은 이번 `trace`에 `interrupt`/`status:"cancelled"`와 그 `thread_id`로 남김) → 그래프 실행 → API 출력 가드레일(`check_output`)·`answer`/`contexts`/`trace` PII 마스킹 → `chat_logs` 기록(마스킹된 값) → 응답
 
 ### 4.1.1 Agent Server — `POST /query/resume` (HITL 재개, 추가 엔드포인트)
 
@@ -436,6 +456,9 @@ graph = create_supervisor(
 // type: approve | edit(+ "edited_action") | reject(+ "message")
 ```
 Response는 `/query`와 같은 `{answer, contexts, trace}` 형식이다. 요청에는 `user_id`가 필요하고, thread 소유자와 다르면 403이다.
+- 반려동물은 `thread_id`에 들어 있는 `pet_id`를 쓴다 (소유 확인).
+- `decisions` 개수는 대기 중인 작업 수와 같아야 한다. `edit`의 `edited_action.name`은 원래 도구와 같아야 한다 (다른 도구로 바꾸면 400). 수정된 인자도 도구 안에서 다시 검증한다 (지난 날짜·종 불일치 거부).
+- 대기 중인 작업이 없으면 409.
 
 ### 4.1.2 Agent Server — `POST /tasks/generate` (비대화형, Backend 전용)
 
@@ -457,6 +480,7 @@ Response는 `/query`와 같은 `{answer, contexts, trace}` 형식이다. 요청�
   ] }
 ```
 - LLM을 호출하지 않는다 (`generate_daily_plan` 실행). p95 1초 이내를 목표로 한다.
+- `date`를 빼면 오늘(KST, `TODAY_OVERRIDE` 반영)이다. 다른 사용자 `pet_id`는 403, 요청 형식 오류는 400 (`{"detail": "..."}`).
 - `rank`: 영역 안에서 취향 점수로 정한 순위(1부터). 개인화 반영을 테스트에서 관측하는 데 쓴다.
 - 항목 교체(`category` + `exclude_item_ids` + `limit:1`)일 때는 최소 개수 규칙을 적용하지 않고, 후보가 없으면 빈 `tasks`를 돌려준다.
 - 영역별 최소 개수: 식단 1개, 활동 1개 이상 + 7일 이내(D-7 포함) 건강 일정 전부 (목표는 식단 1개·활동 2개, 3.8)
@@ -697,7 +721,8 @@ Chroma는 문서 + 메타데이터 저장소이므로, 앱 데이터는 **`docum
 
 ## 9. 오류 처리 및 로깅
 
-- Agent 서버: Bedrock 호출 타임아웃 60초, 재시도 2회. 실패 시 `answer`에 안내 문구, `contexts: []`, `trace`에 `{"type":"error"}` 기록
+- Agent 서버: Bedrock 호출 타임아웃 60초, 재시도 2회 (`ChatBedrockConverse`에 botocore `Config(read_timeout=60, retries={"total_max_attempts": 3})`). 실패 시 HTTP 503, `answer`에 안내 문구, `contexts: []`, `trace`에 `{"type":"error","reason":"model_unavailable"}` 기록. 그 밖의 예외는 500과 `reason:"internal"`
+- Agent 로그(`dailypet.agent`): 요청마다 한 줄 — 엔드포인트, `user_id`·`pet_id`(불투명 ID), 마스킹한 질문 앞 100자, trace 이벤트 종류별 개수, 소요 시간(ms), 상태 코드. 키 값·프로필 전체·예외 메시지는 남기지 않는다
 - Backend: Agent 서버 장애 시 `/api/chat`은 503 반환, 그 외 CRUD는 정상 동작
 - 로그에는 질문·trace 요약만 남기고 자격증명·전체 프로필은 남기지 않는다
 
