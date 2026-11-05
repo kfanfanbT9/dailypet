@@ -423,10 +423,10 @@ supervisor_input_guard, supervisor_output_guard      # pre/post_model_hook
 - [x] (`llm`) `hitl-01`: health Agent가 `create_health_event`(`hc_cat_dental`, 2026-12-15)에서 interrupt
 - llm 테스트는 `real_catalog_loaded` 픽스처(실제 Titan 임베딩, `.pytest_cache/embeddings` 캐시)를 쓴다. 가짜 임베딩에서는 '광견병' 검색에 FeLV가 1위로 나와 실제 모델 테스트가 실패했다
 - [x] (단위, 가짜 모델) General 13개: 도구 집합, 미들웨어 순서, 프롬프트 규칙, 질의 정리 3종, 개인 정보만 있는 질의 미검색, 주입 결과 버림·이벤트, 출처·안내 추가, 웹 미사용 시 출처 없음, 카탈로그 ID 문장 제거, 검색 3회 제한
-- [ ] (`llm`, mock 검색) `general-01`: 출처 URL과 안내 문구가 있고 추천 항목 ID 0건 — 프롬프트 수정 전 실패(검색 없이 답변) → 수정 후 재실행 중 **Bedrock 일일 토큰 한도 초과로 미확인**
-- [x] (`llm`, mock 검색) `injection-04`: 주입 snippet이 버려지고 답변이 지시를 따르지 않는다 — 2026-11-05 통과 (프롬프트 수정 전 실행)
-- [ ] (`llm`, mock 검색) 검색 판단: `general-03`(KTX) 검색함, `general-02`(털 관리) 검색 안 함 — **일일 한도로 미확인**
-- 프롬프트 수정 뒤 실행에서 4개 중 3개 통과·1개 한도 skip이었으나 어느 것이 skip인지 출력에 남지 않았다. 한도가 풀리면 `pytest src/tests/test_agents.py -m llm -k "general or injection"` 재실행
+- [x] (`llm`, mock 검색) `general-01`: 출처 URL과 안내 문구가 있고 추천 항목 ID 0건 — 프롬프트 수정 후 2026-11-05 통과 (`global.anthropic.claude-sonnet-4-6`)
+- [x] (`llm`, mock 검색) `injection-04`: 주입 snippet이 버려지고 답변이 지시를 따르지 않는다 — 2026-11-05 통과 (위 모델로 재확인)
+- [ ] (`llm`, mock 검색) 검색 판단: `general-03`(KTX) 검색함, `general-02`(털 관리) 검색 안 함 — **새 모델도 일일 토큰 한도에 걸려 미확인**
+- 주의: 셸 환경변수 `AWS_MODEL`이 남아 있으면 `.env`보다 우선한다 (`load_dotenv(override=False)`). 모델을 바꾼 뒤에는 `env -u AWS_MODEL pytest ...`로 실행하거나 셸 변수를 지운다
 
 ---
 
@@ -435,26 +435,31 @@ supervisor_input_guard, supervisor_output_guard      # pre/post_model_hook
 **의존성**: A-6, A-7
 
 **작업**
-- [ ] `create_supervisor`로 그래프를 만든다
+- [x] `create_supervisor`로 그래프를 만든다 (`build_graph`)
   - 설정: `output_mode="last_message"`, `pre_model_hook`/`post_model_hook`
-  - 체크포인터: `SqliteSaver`, 경로는 `CHECKPOINT_PATH`. 폴더가 없으면 만든다
-- [ ] Supervisor 프롬프트: ARCHITECTURE.md 3.3 라우팅 규칙 1~4
-  - 같은 질문을 `INSUFFICIENT_INFO` 때문에 general Agent에 다시 보내는 것은 1회로 제한한다
-- [ ] 하위 Agent에 `AgentContext`를 전달하고, 스트리밍·재개 때도 같은 context를 쓰는지 확인한다
-- [ ] `thread_id`
-  - 형식: `thr_{user_id}_{pet_id}_{uuid4().hex}`
-  - 소유자 확인: 문자열 접두사 비교와 함께 `chat_logs` 기록을 둘 다 쓴다
-- [ ] trace 수집기
-  - `stream_mode="updates"`로 handoff, tool_call, tool_result, guardrail, interrupt, error, final 이벤트를 만든다 (ARCHITECTURE.md 10장)
+  - 체크포인터: `SqliteSaver`, 경로는 `CHECKPOINT_PATH`. 폴더가 없으면 만든다 (`get_checkpointer`)
+  - 재귀 한도 300: 미들웨어 hook마다 노드라 하위 Agent 1회 반복에 약 22스텝. 반복 횟수는 ModelCallLimit·ToolCallLimit이 막는다
+- [x] Supervisor 프롬프트: ARCHITECTURE.md 3.3 라우팅 규칙 1~4 (+ 복합 질문 규칙 5)
+  - 같은 질문을 `INSUFFICIENT_INFO` 때문에 general Agent에 다시 보내는 것은 1회로 제한한다 (General은 `INSUFFICIENT_INFO`를 돌려주지 않음)
+  - 버그 수정: 하위 Agent `output_guard`가 `INSUFFICIENT_INFO`를 내부 이름 노출로 보고 안전 문구로 바꿔 규칙 3이 작동하지 않았다 → 하위 Agent에서만 단독 답변 통과 (ARCHITECTURE.md 3.6)
+- [x] 하위 Agent에 `AgentContext`를 전달하고, 스트리밍·재개 때도 같은 context를 쓰는지 확인한다 — Supervisor 경유 HITL 저장·알레르기 필터로 확인
+- [x] `thread_id`
+  - 형식: `thr_{user_id}_{pet_id}_{uuid4().hex}` (`new_thread_id`, `parse_thread_id`)
+  - 소유자 확인: 문자열 접두사 비교와 함께 `chat_logs` 기록을 둘 다 쓴다 (`thread_owned_by`, `AppStore.thread_owner`)
+- [x] trace 수집기 (`TraceCollector`)
+  - `stream_mode="updates"`, `subgraphs=True`로 handoff, tool_call, tool_result, guardrail, interrupt, final 이벤트를 만든다 (형식은 ARCHITECTURE.md 4.1 표). `error`는 A-9 예외 처리에서 넣는다
   - 도구 인자는 마스킹하고 `user_id`를 뺀다
   - `tool_result`는 본문 대신 건수와 항목 ID 요약만 남긴다
   - `step`은 1부터 센다
-- [ ] contexts 수집: `search_pet_knowledge`·`recommend_from_catalog`·`web_search` 결과를 순서대로 모으고 중복을 뺀다
-- [ ] 승인 대기 정리: thread에 대기 중인 interrupt가 있으면 새 질문을 처리하기 전에 `reject`("사용자가 다른 요청을 함")로 재개한다
+  - 중복 판정은 tool_call id 기준 (handoff 복귀 메시지는 id 없이 한 번, id가 붙어 한 번 더 온다)
+- [x] contexts 수집: `search_pet_knowledge`·`recommend_from_catalog`·`web_search` 결과를 순서대로 모으고 중복을 뺀다 (PII 마스킹)
+- [x] 승인 대기 정리: thread에 대기 중인 interrupt가 있으면 새 질문을 처리하기 전에 `reject`("사용자가 다른 요청을 함")로 재개한다 (`cancel_pending`, trace에 `interrupt`/`status:"cancelled"`)
+- [x] 한 턴 실행기 `run_turn(graph, ctx, question=|resume=)` → `TurnResult(answer, contexts, trace, thread_id, interrupted)`. 승인 대기면 `answer`는 내부 도구 이름 없이 "다음 작업을 승인해 주세요." + 항목·날짜
 
-**테스트** (`src/tests/test_graph.py`)
-- [ ] (단위) trace 변환: 가짜 업데이트 스트림 → 이벤트 목록 (`args`의 PII 마스킹, `user_id` 없음)
-- [ ] (단위) `thread_id` 생성·검증, 다른 사용자 접두사 거부
+**테스트** (`src/tests/test_graph.py`, 가짜 모델로 실제 Supervisor 그래프 실행 14개)
+- [x] (단위) trace 변환: 가짜 업데이트 스트림 → 이벤트 목록 (`args`의 PII 마스킹, `user_id` 없음, 재방출 중복 제거, interrupt 1회)
+- [x] (단위) `thread_id` 생성·검증, 다른 사용자 접두사 거부, chat_logs 소유자 불일치 거부
+- [x] (그래프) diet 라우팅 전체 trace, INSUFFICIENT_INFO → general 재위임, Supervisor의 INSUFFICIENT_INFO 노출 차단, 복합 질문 2개 Agent, 주입 차단·PII 마스킹·출력 가드레일, Supervisor 경유 HITL 승인, 새 질문으로 대기 작업 취소, SqliteSaver 재연결 후 재개
 - [ ] (`llm`) 라우팅: 평가셋 diet·exercise·health·general 각 1문항 → `trace`의 handoff 대상이 `expected_agent`와 같다
 - [ ] (`llm`) `out_of_scope`·`species` 각 1문항 → general Agent handoff 없이 거절
 - [ ] (`llm`) multi 1문항 → 필요한 Agent 2개 이상 호출
@@ -557,6 +562,6 @@ CLAUDE.md 2장 규칙에 따라, 아래 항목은 **코드보다 문서를 먼�
 | A-4 도구 | ✅ | 2026-11-04 · 누적 오프라인 124개(14초) + 실제 DuckDuckGo 1개 통과. LLM 스키마에 user_id 없음 |
 | A-5 가드레일·PII | ✅ | 2026-11-04 · 누적 오프라인 220개 통과. 실제 분류기 테스트는 2026-11-05 통과 |
 | A-6 전문 Agent | ✅ | 2026-11-05 · 누적 오프라인 234개 + 실제 Bedrock 6개 통과. `today_prompt`·`user_input_wrap` 추가. chromadb 간헐 오류는 13장 (미해결) |
-| A-7 General Agent | 🟡 | 2026-11-05 · 구현·오프라인 완료 (누적 247개 통과). 실제 모델 `injection-04` 통과, `general-01`·검색 판단 2문항은 Bedrock 일일 한도로 재실행 필요 |
-| A-8 Supervisor·trace | ⬜ | |
+| A-7 General Agent | 🟡 | 2026-11-05 · 구현·오프라인 완료. 실제 모델 `general-01`·`injection-04` 통과, 검색 판단 2문항은 일일 한도로 재실행 필요 |
+| A-8 Supervisor·trace | 🟡 | 2026-11-05 · 구현·가짜 모델 그래프 테스트 완료 (누적 오프라인 261개 통과). 실제 모델 라우팅·범위 밖 거절(6개)은 일일 한도로 미실행 |
 | A-9 FastAPI | ⬜ | |

@@ -454,12 +454,20 @@ def injection_guard(state: Mapping[str, Any], runtime: Any) -> dict[str, Any] | 
     return {"messages": [_refusal_message(verdict)], "jump_to": "end"}
 
 
-def _guard_last_ai(messages: list[AnyMessage]) -> AIMessage | None:
-    """마지막 AI 메시지(도구 호출이 아닌 최종 답변)에 출력 가드레일을 적용한 교체 메시지."""
+INSUFFICIENT_INFO = "INSUFFICIENT_INFO"
+
+
+def _guard_last_ai(messages: list[AnyMessage], *, allow_insufficient: bool = False) -> AIMessage | None:
+    """마지막 AI 메시지(도구 호출이 아닌 최종 답변)에 출력 가드레일을 적용한 교체 메시지.
+
+    allow_insufficient: 하위 Agent의 'INSUFFICIENT_INFO' 단독 답변은 Supervisor 신호이므로 통과시킨다.
+    """
     if not messages or not isinstance(messages[-1], AIMessage):
         return None
     ai = messages[-1]
     if ai.tool_calls:
+        return None
+    if allow_insufficient and _text(ai).strip() == INSUFFICIENT_INFO:
         return None
     human = _last_human(messages)
     verdict = check_output(_text(ai), user_text=_text(human) if human else "")
@@ -475,7 +483,7 @@ def _guard_last_ai(messages: list[AnyMessage]) -> AIMessage | None:
 @after_model(name="output_guard")
 def output_guard(state: Mapping[str, Any], runtime: Any) -> dict[str, Any] | None:
     """하위 Agent 출력 가드레일. 같은 id로 메시지를 교체한다 (add_messages 리듀서)."""
-    replaced = _guard_last_ai(list(state.get("messages", [])))
+    replaced = _guard_last_ai(list(state.get("messages", [])), allow_insufficient=True)
     return {"messages": [replaced]} if replaced else None
 
 
@@ -625,20 +633,24 @@ def hitl_middleware() -> HumanInTheLoopMiddleware:
                                     description_prefix="건강 일정 저장 전에 사용자 승인이 필요해요")
 
 
-def build_specialist_agents(model: Any | None = None, checkpointer: Any | None = None) -> dict[str, Any]:
-    """식단·운동·건강 전문 Agent (웹 검색 없음). checkpointer는 단독 테스트용 (그래프에서는 Supervisor가 가진다)."""
-    m = model or get_model()
+def build_specialist_agents(model: Any | None = None, checkpointer: Any | None = None,
+                            models: Mapping[str, Any] | None = None) -> dict[str, Any]:
+    """식단·운동·건강 전문 Agent (웹 검색 없음). checkpointer는 단독 테스트용 (그래프에서는 Supervisor가 가진다).
+
+    models: Agent 이름별 모델 (테스트에서 Agent마다 다른 가짜 모델을 줄 때). 없으면 model을 같이 쓴다.
+    """
     specs = {
         "diet_agent": (tools.DIET_TOOLS, DIET_PROMPT, []),
         "exercise_agent": (tools.EXERCISE_TOOLS, EXERCISE_PROMPT, []),
         "health_agent": (tools.HEALTH_TOOLS, HEALTH_PROMPT, [hitl_middleware()]),
     }
-    return {
-        name: create_agent(model=m, tools=list(tool_list), system_prompt=prompt,
-                           middleware=common_middleware(extra, m), context_schema=AgentContext,
-                           checkpointer=checkpointer, name=name)
-        for name, (tool_list, prompt, extra) in specs.items()
-    }
+    built = {}
+    for name, (tool_list, prompt, extra) in specs.items():
+        m = (models or {}).get(name) or model or get_model()
+        built[name] = create_agent(model=m, tools=list(tool_list), system_prompt=prompt,
+                                   middleware=common_middleware(extra, m), context_schema=AgentContext,
+                                   checkpointer=checkpointer, name=name)
+    return built
 
 
 # ================================================================ 6. General Agent (A-7, ARCHITECTURE.md 3.2·3.6·3.7)
@@ -789,3 +801,292 @@ def build_general_agent(model: Any | None = None, checkpointer: Any | None = Non
     return create_agent(model=m, tools=list(tools.GENERAL_TOOLS), system_prompt=GENERAL_PROMPT,
                         middleware=common_middleware(general_middleware(), m), context_schema=AgentContext,
                         checkpointer=checkpointer, name="general_agent")
+
+
+# ================================================================ 7. Supervisor·그래프·trace (A-8, ARCHITECTURE.md 3.1·3.3·4.1)
+
+AGENT_NAMES = ("diet_agent", "exercise_agent", "health_agent", "general_agent")
+
+SUPERVISOR_PROMPT = f"""너는 DailyPet의 안내 데스크(Supervisor)다. 사용자의 질문을 알맞은 전문 도우미에게 넘기고, 돌아온 답을 사용자에게 전한다.
+[라우팅 규칙]
+1. 식단·칼로리·급여량·간식 → transfer_to_diet_agent / 운동·산책·놀이 → transfer_to_exercise_agent / 접종·검진·구충 일정, 일정 등록·변경 → transfer_to_health_agent
+2. 강아지·고양이 관련이지만 1에 해당하지 않는 질문(품종, 행동·훈련, 여행·이사, 미용, 입양, 제도 등) → transfer_to_general_agent
+3. 전문 도우미가 INSUFFICIENT_INFO를 돌려주면 같은 질문을 transfer_to_general_agent로 한 번만 다시 보낸다. 다시 같은 곳으로 보내거나 반복하지 않는다.
+4. 반려동물과 무관한 질문, 강아지·고양이가 아닌 동물, 병명 진단·약 처방 요청은 아무에게도 넘기지 않고 직접 정중히 거절한다. 증상 진단 요청이면 동물병원 진료를 권한다.
+5. 한 질문에 여러 영역이 섞여 있으면 필요한 도우미를 차례로 부르고, 결과를 하나의 답으로 합친다.
+[답변] 도우미의 답을 바꾸거나 지어내지 않는다. 항목 ID·숫자·날짜·출처 URL·안내 문구는 그대로 둔다. 도우미 이름이나 넘긴 과정은 말하지 않는다.
+{_GENERAL_RULES}"""
+
+
+def get_checkpointer(settings: Any | None = None) -> Any:
+    """LangGraph SqliteSaver (CHECKPOINT_PATH). 폴더가 없으면 만든다 (CLAUDE.md 4.2 예외 저장소)."""
+    import sqlite3
+
+    from langgraph.checkpoint.sqlite import SqliteSaver
+
+    from src.config import get_settings
+
+    path = (settings or get_settings()).checkpoint_path
+    path.parent.mkdir(parents=True, exist_ok=True)
+    return SqliteSaver(sqlite3.connect(str(path), check_same_thread=False))
+
+
+def build_graph(model: Any | None = None, *, agent_models: Mapping[str, Any] | None = None,
+                checkpointer: Any | None = None) -> Any:
+    """Supervisor + 하위 Agent 4종 그래프. 하위 Agent는 checkpointer 없이 만들어 Supervisor 것을 같이 쓴다."""
+    from langgraph_supervisor import create_supervisor
+
+    m = model or get_model()
+    agent_models = agent_models or {}
+    agents = [*build_specialist_agents(model=m, models=agent_models).values(),
+              build_general_agent(model=agent_models.get("general_agent") or m)]
+    workflow = create_supervisor(
+        agents, model=m, prompt=SUPERVISOR_PROMPT, context_schema=AgentContext,
+        pre_model_hook=supervisor_input_guard, post_model_hook=supervisor_output_guard,
+        output_mode="last_message", supervisor_name="supervisor",
+    )
+    return workflow.compile(checkpointer=checkpointer if checkpointer is not None else get_checkpointer())
+
+
+# ---------------------------------------------------------------- thread_id (ARCHITECTURE.md 3.7)
+
+THREAD_ID = re.compile(r"^thr_(usr_[A-Za-z0-9]+)_(pet_[A-Za-z0-9]+)_([0-9a-f]{8,32})$")
+
+
+def new_thread_id(user_id: str, pet_id: str) -> str:
+    import uuid
+
+    return f"thr_{user_id}_{pet_id}_{uuid.uuid4().hex}"
+
+
+def parse_thread_id(thread_id: str) -> tuple[str, str] | None:
+    """(user_id, pet_id). 형식이 틀리면 None."""
+    m = THREAD_ID.match(thread_id or "")
+    return (m.group(1), m.group(2)) if m else None
+
+
+def thread_owned_by(thread_id: str, user_id: str, store: Any | None = None) -> bool:
+    """thread 소유자 확인: 접두사의 user_id가 같고, chat_logs 기록이 있으면 그 소유자도 같아야 한다."""
+    parsed = parse_thread_id(thread_id)
+    if parsed is None or parsed[0] != user_id:
+        return False
+    owner = (store or tools.get_resources().store).thread_owner(thread_id)
+    return owner in (None, user_id)
+
+
+# ---------------------------------------------------------------- trace 수집 (4.1 표)
+
+CONTEXT_SOURCE_TOOLS = frozenset({"search_pet_knowledge", "recommend_from_catalog", "web_search"})
+_HIDDEN_ARGS = frozenset({"user_id", "runtime"})
+
+
+def safe_args(args: Mapping[str, Any]) -> dict[str, Any]:
+    """trace용 도구 인자: user_id 제외 + PII 마스킹."""
+    return mask_obj({k: v for k, v in dict(args).items() if k not in _HIDDEN_ARGS})
+
+
+def _message_key(m: BaseMessage) -> str:
+    """중복 판정 키. 메시지 id는 처음 나올 때 비어 있다가 상위 노드가 다시 내보낼 때 붙기도 하므로
+    도구 호출·결과는 tool_call id로 판정한다 (handoff 복귀 메시지가 이렇게 두 번 온다)."""
+    if isinstance(m, ToolMessage):
+        return f"tool:{m.tool_call_id}"
+    if isinstance(m, AIMessage) and m.tool_calls:
+        return "calls:" + ",".join(str(c.get("id")) for c in m.tool_calls)
+    if m.id:
+        return m.id
+    return f"{type(m).__name__}:{m.name}:{hash(str(m.content))}"
+
+
+def _agent_of(namespace: tuple[str, ...], node: str) -> str:
+    return namespace[0].split(":", 1)[0] if namespace else node
+
+
+def _tool_status(m: ToolMessage) -> str:
+    if m.status == "error":
+        return "error"
+    try:
+        body = json.loads(m.content) if isinstance(m.content, str) and m.content.startswith("{") else {}
+    except json.JSONDecodeError:
+        body = {}
+    return "error" if isinstance(body, dict) and body.get("error") else "ok"
+
+
+class TraceCollector:
+    """`stream(stream_mode="updates", subgraphs=True)` 출력을 trace 이벤트·contexts로 바꾼다.
+
+    상위 노드가 전체 기록을 다시 내보내므로 메시지 키로 중복을 거르고,
+    가드레일은 (메시지, 사유)로 따로 거른다 (가드레일 교체 메시지는 같은 id로 다시 오기 때문).
+    """
+
+    def __init__(self, thread_id: str) -> None:
+        self.thread_id = thread_id
+        self.events: list[dict[str, Any]] = []
+        self.contexts: list[str] = []
+        self._seen: set[str] = set()
+        self._seen_guard: set[tuple[str, str]] = set()
+        self._seen_interrupts: set[str] = set()
+
+    def add(self, namespace: tuple[str, ...], update: Mapping[str, Any] | None) -> None:
+        for node, value in (update or {}).items():
+            if node == "__interrupt__":
+                self._interrupts(namespace, value)
+                continue
+            if not isinstance(value, Mapping):
+                continue
+            agent = _agent_of(namespace, node)
+            for m in value.get("messages", []) or []:
+                self._message(agent, m)
+
+    def _message(self, agent: str, m: BaseMessage) -> None:
+        key = _message_key(m)
+        guard = m.additional_kwargs.get("guardrail") if isinstance(m.additional_kwargs, dict) else None
+        if guard and (key, str(guard.get("reason"))) not in self._seen_guard:
+            self._seen_guard.add((key, str(guard.get("reason"))))
+            self.events.append({**mask_obj(dict(guard)), "type": "guardrail", "agent": agent})
+        if key in self._seen:
+            return
+        self._seen.add(key)
+        if isinstance(m, AIMessage):
+            for call in m.tool_calls:
+                name = call["name"]
+                if name.startswith("transfer_back_to_"):
+                    self.events.append({"type": "handoff", "from": agent, "to": name.removeprefix("transfer_back_to_")})
+                elif name.startswith("transfer_to_"):
+                    self.events.append({"type": "handoff", "from": agent, "to": name.removeprefix("transfer_to_")})
+                else:
+                    self.events.append({"type": "tool_call", "agent": agent, "tool": name,
+                                        "args": safe_args(call.get("args", {}))})
+        elif isinstance(m, ToolMessage) and not (m.name or "").startswith("transfer_"):
+            self._tool_result(agent, m)
+
+    def _tool_result(self, agent: str, m: ToolMessage) -> None:
+        event: dict[str, Any] = {"type": "tool_result", "agent": agent, "tool": m.name, "status": _tool_status(m)}
+        art = m.artifact if isinstance(m.artifact, dict) else {}
+        if "item_ids" in art:
+            event.update(count=len(art["item_ids"]), item_ids=list(art["item_ids"]))
+        elif "sources" in art:
+            event.update(count=len(art["sources"]), sources=list(art["sources"]))
+            for k in ("dropped", "blocked"):
+                if art.get(k):
+                    event[k] = art[k]
+            if art.get("query"):
+                event["query"] = mask_pii(art["query"])
+        elif "contexts" in art:
+            event["count"] = len(art["contexts"])
+        self.events.append(event)
+        if m.name in CONTEXT_SOURCE_TOOLS:
+            for text in art.get("contexts", []):
+                masked = mask_pii(str(text))
+                if masked not in self.contexts:
+                    self.contexts.append(masked)
+
+    def _interrupts(self, namespace: tuple[str, ...], interrupts: Any) -> None:
+        for intr in interrupts or ():
+            if intr.id in self._seen_interrupts:
+                continue
+            self._seen_interrupts.add(intr.id)
+            value = intr.value if isinstance(intr.value, Mapping) else {}
+            for req in value.get("action_requests", []):
+                self.events.append({"type": "interrupt", "agent": _agent_of(namespace, "health_agent"),
+                                    "tool": req.get("name"), "args": safe_args(req.get("args", {})),
+                                    "thread_id": self.thread_id})
+
+    def add_event(self, event: dict[str, Any]) -> None:
+        self.events.append(event)
+
+    def trace(self) -> list[dict[str, Any]]:
+        """step(1부터)을 붙인 이벤트 목록."""
+        return [{"step": i, **e} for i, e in enumerate(self.events, start=1)]
+
+
+# ---------------------------------------------------------------- 한 턴 실행 (A-9 /query·/query/resume이 쓴다)
+
+PENDING_REJECT_MESSAGE = "사용자가 다른 요청을 함"
+APPROVAL_PREFIX = "다음 작업을 승인해 주세요."
+# 미들웨어 hook마다 노드 1개라 하위 Agent 1회 반복에 약 22스텝을 쓴다. 반복 횟수는
+# ModelCallLimit(8)·ToolCallLimit(10)이 막으므로 그래프 재귀 한도는 넉넉히 둔다.
+DEFAULT_RECURSION_LIMIT = 300
+_ACTION_LABELS = {"create_health_event": "건강 일정 등록", "update_health_event": "건강 일정 날짜 변경"}
+
+
+@dataclass
+class TurnResult:
+    answer: str
+    contexts: list[str]
+    trace: list[dict[str, Any]]
+    thread_id: str
+    interrupted: bool = False
+
+
+def _config(ctx: AgentContext, recursion_limit: int = DEFAULT_RECURSION_LIMIT) -> dict[str, Any]:
+    return {"configurable": {"thread_id": ctx.thread_id}, "recursion_limit": recursion_limit}
+
+
+def pending_interrupts(graph: Any, ctx: AgentContext) -> list[Any]:
+    """thread에서 승인 대기 중인 interrupt 목록 (하위 Agent 것 포함)."""
+    state = graph.get_state(_config(ctx))
+    return [i for task in state.tasks for i in task.interrupts]
+
+
+def _reject_all(pending: list[Any]) -> Any:
+    from langgraph.types import Command
+
+    def decisions(intr: Any) -> dict[str, Any]:
+        n = len((intr.value or {}).get("action_requests", [])) or 1
+        return {"decisions": [{"type": "reject", "message": PENDING_REJECT_MESSAGE}] * n}
+
+    if len(pending) == 1:
+        return Command(resume=decisions(pending[0]))
+    return Command(resume={i.id: decisions(i) for i in pending})
+
+
+def cancel_pending(graph: Any, ctx: AgentContext) -> list[dict[str, Any]]:
+    """대기 중인 승인 작업을 '사용자가 다른 요청을 함'으로 거절하고, 취소된 작업의 trace 이벤트를 돌려준다."""
+    pending = pending_interrupts(graph, ctx)
+    if not pending:
+        return []
+    events = [{"type": "interrupt", "status": "cancelled", "tool": req.get("name"),
+               "args": safe_args(req.get("args", {})), "thread_id": ctx.thread_id}
+              for intr in pending for req in (intr.value or {}).get("action_requests", [])]
+    graph.invoke(_reject_all(pending), _config(ctx), context=ctx)
+    return events
+
+
+def approval_text(pending: list[Any]) -> str:
+    """승인 요청 안내 문구 (내부 도구 이름은 쓰지 않는다)."""
+    catalog = tools.get_resources().catalog
+    lines = []
+    for intr in pending:
+        for req in (intr.value or {}).get("action_requests", []):
+            args = req.get("args", {})
+            label = _ACTION_LABELS.get(req.get("name"), "작업")
+            item = catalog.get(args.get("catalog_item_id", ""), {})
+            what = f"{item['name']}({args['catalog_item_id']})" if item else args.get("event_id", "")
+            lines.append(f"- {label}: {what} {args.get('due_date', '')}".rstrip())
+    return "\n".join([APPROVAL_PREFIX, *lines])
+
+
+def run_turn(graph: Any, ctx: AgentContext, *, question: str | None = None, resume: Any | None = None,
+             recursion_limit: int = DEFAULT_RECURSION_LIMIT) -> TurnResult:
+    """질문 한 턴(또는 HITL 재개)을 실행하고 answer·contexts·trace를 만든다.
+
+    새 질문이면 먼저 대기 중인 승인 작업을 거절한다 (ARCHITECTURE.md 3.6 HITL 흐름 5).
+    PII 마스킹·출력 가드레일의 API 계층 적용과 chat_logs 기록은 A-9에서 한다.
+    """
+    collector = TraceCollector(ctx.thread_id)
+    if question is not None:
+        for event in cancel_pending(graph, ctx):
+            collector.add_event(event)
+        graph_input: Any = {"messages": [HumanMessage(question)]}
+    else:
+        graph_input = resume
+    config = _config(ctx, recursion_limit)
+    for namespace, update in graph.stream(graph_input, config, context=ctx, stream_mode="updates", subgraphs=True):
+        collector.add(namespace, update)
+    pending = pending_interrupts(graph, ctx)
+    if pending:
+        return TurnResult(approval_text(pending), collector.contexts, collector.trace(), ctx.thread_id, True)
+    messages = graph.get_state(config).values.get("messages", [])
+    answer = _text(messages[-1]) if messages else SAFE_FALLBACK
+    collector.add_event({"type": "final", "agent": "supervisor", "thread_id": ctx.thread_id})
+    return TurnResult(answer, collector.contexts, collector.trace(), ctx.thread_id)

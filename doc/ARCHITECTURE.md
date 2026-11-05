@@ -251,7 +251,7 @@ graph = create_supervisor(
 | 6.5 | `today_prompt` | 내장 `@dynamic_prompt` | `wrap_model_call` | 시스템 프롬프트 끝에 오늘 날짜(KST, `TODAY_OVERRIDE` 반영)와 요일을 붙인다. 연도 없는 날짜("12월 15일")를 오늘 이후 가장 가까운 날짜로 해석하게 한다 (모델이 학습 시점 연도로 해석해 지난 날짜를 만드는 문제 방지) |
 | 6.6 | `user_input_wrap` | 커스텀 | `wrap_model_call` | 모델에 보내는 요청에서만 사용자 메시지(`HumanMessage`)를 `<user_input>…</user_input>`으로 감싼다 (4.7). 대화 상태·기록에 저장되는 원문은 바꾸지 않는다 |
 | 7 | Agent별 추가: `HumanInTheLoopMiddleware` (health_agent) / `ToolCallLimitMiddleware(web_search, 3)`·`web_query_pii_guard`·`web_result_guard`·`general_answer_guard` (general_agent) | 내장 / 커스텀 | `after_model` / `wrap_tool_call` | HITL은 쓰기 도구 호출 전 사용자 승인 (`interrupt`). 웹 검색 가드는 3.7 참고. `general_answer_guard`는 `output_guard` 다음에 실행되어(after_model은 목록 역순) 웹 검색을 쓴 답변에 출처 URL이 없으면 결과 URL을 최대 3개 붙이고, 모든 답변에 "일반 정보이며 수의사 상담을 대체하지 않아요" 안내가 없으면 붙인다. 카탈로그 ID(`act_`/`diet_`/`hc_`)가 든 문장은 지운다 (General은 추천하지 않음). 프롬프트로 먼저 시키고 결정적으로 한 번 더 보장한다 |
-| 8 | `output_guard` | 커스텀 | `after_model` | 유해 식품 추천, 진단 단정, 약·용량 처방, 구토 유도 방법, 시스템 프롬프트·내부 이름 노출, 카탈로그에 없는 ID 검사 → 위반 **문장을 지우고** 안내 문구를 붙인다 (모두 지워지면 안전 문구로 대체, LLM 재작성 없음 — 결정적·비용 0). 응급 신호(호흡곤란·경련·지속 구토·유해 식품 섭취 등)가 있는데 병원 권고가 없으면 병원 권고 문구를 붙인다 |
+| 8 | `output_guard` | 커스텀 | `after_model` | 유해 식품 추천, 진단 단정, 약·용량 처방, 구토 유도 방법, 시스템 프롬프트·내부 이름 노출, 카탈로그에 없는 ID 검사 → 위반 **문장을 지우고** 안내 문구를 붙인다 (모두 지워지면 안전 문구로 대체, LLM 재작성 없음 — 결정적·비용 0). 응급 신호(호흡곤란·경련·지속 구토·유해 식품 섭취 등)가 있는데 병원 권고가 없으면 병원 권고 문구를 붙인다. 단, 하위 Agent가 `INSUFFICIENT_INFO` 한 단어만 답한 경우는 Supervisor에게 보내는 신호이므로 그대로 통과시킨다 (Supervisor의 `post_model_hook`에서는 내부 이름으로 막힌다) |
 | 9 | `context_wrap` | 커스텀 | `wrap_tool_call` | `search_pet_knowledge`·`recommend_from_catalog`·`get_preferences` 결과를 `<context>…</context>`로 감싼다 (데이터로만 취급, 4.7). 도구 실행을 직접 감싸므로 목록 맨 끝(가장 안쪽) |
 
 - **입력 가드레일 판정**: 1단계는 규칙 기반(정규식·키워드)으로 빠르게 거른다. NFKC 정규화·폭 없는 문자 제거 후 검사하고, base64 덩어리는 풀어서 다시 검사한다. 차단 사유는 `injection`(지시 무시·역할 변경), `prompt_leak`(도구·설정·프롬프트 요구), `unsupported_species`(개·고양이 없이 다른 동물만), `out_of_scope`(반려동물 단어 없이 주식·코인 등), `too_long`(1,000자 초과)이다. 애매하면 2단계로 LLM 분류기(`with_structured_output` → `{is_injection, is_out_of_scope, reason}`)를 쓴다. 분류기는 메인 모델(`AWS_MODEL`, `temperature=0`)을 재사용한다 (10장).
@@ -409,7 +409,17 @@ graph = create_supervisor(
 
 - `answer`: 최종 사용자 답변 (string)
 - `contexts`: 답변 생성에 사용된 검색 문서 텍스트 목록 (string[]), 검색이 없으면 `[]`
-- `trace`: 그래프 실행 중 메시지(AIMessage의 `tool_calls`, `name`)를 순서대로 변환한 목록
+- `trace`: 그래프 실행 중 메시지(AIMessage의 `tool_calls`, `name`)를 순서대로 변환한 목록. `stream_mode="updates"`, `subgraphs=True`로 모으고 `step`은 1부터 센다. 이벤트 형식:
+
+  | `type` | 필드 | 비고 |
+  |--------|------|------|
+  | `handoff` | `from`, `to` | Supervisor → 하위 Agent, 하위 Agent → Supervisor 모두 |
+  | `tool_call` | `agent`, `tool`, `args` | `args`는 PII 마스킹, `user_id` 제외 |
+  | `tool_result` | `agent`, `tool`, `status`(ok/error), 있으면 `count`·`item_ids`·`sources`·`dropped`·`blocked`·`query` | 본문은 넣지 않는다 |
+  | `guardrail` | `stage`(input/output/tool_result), `reason`, `agent`, 그 밖의 요약 값 | 3.6 |
+  | `interrupt` | `agent`, `tool`, `args`, `thread_id`, 취소 시 `status:"cancelled"` | HITL 승인 대기 / 새 질문으로 대기 작업이 거절된 경우 |
+  | `error` | `reason` | 원문 예외 메시지는 넣지 않는다 (9장) |
+  | `final` | `agent`, `thread_id` | 마지막 이벤트. 새 thread면 여기서 `thread_id`를 돌려준다 |
 - 에러 시에도 세 키를 유지하고 HTTP 상태코드로 구분 (예: 400 `question` 누락, 500 내부 오류)
 - 가드레일로 차단되어도 HTTP 200과 세 키를 그대로 반환한다. `answer`는 안내 문구, `trace`에는 `{"type":"guardrail", ...}`를 넣는다.
 - `answer`, `contexts`, `trace` 모두 PII 마스킹을 거친 값이다.
@@ -695,7 +705,7 @@ Chroma는 문서 + 메타데이터 저장소이므로, 앱 데이터는 **`docum
 
 - [x] ~~임베딩 모델~~ → Bedrock **Titan Text Embeddings v2** (`amazon.titan-embed-text-v2:0`, 1024차원). `AWS_EMBED_MODEL` 키 추가, 현재 계정·리전(us-east-1)에서 호출 확인 (2026-11-04)
 - [x] ~~Chroma를 앱 데이터 저장소로 쓰는 것의 한계~~ → MVP는 수용. 정합성은 백엔드 코드와 `database/schema.md` 기준본으로 보장 (2026-11-04)
-- [x] ~~Supervisor `output_mode`와 trace 상세 수준~~ → `output_mode="last_message"` (Supervisor 문맥을 작게 유지). trace는 `stream_mode="updates"`로 모으고 `handoff`·`tool_call`(도구 이름 + 마스킹된 인자)·`tool_result`(건수·항목 ID 요약, 본문 제외)·`guardrail`·`interrupt`·`error` 6종만 남긴다 (2026-11-04)
+- [x] ~~Supervisor `output_mode`와 trace 상세 수준~~ → `output_mode="last_message"` (Supervisor 문맥을 작게 유지). trace는 `stream_mode="updates"`로 모으고 `handoff`·`tool_call`(도구 이름 + 마스킹된 인자)·`tool_result`(건수·항목 ID 요약, 본문 제외)·`guardrail`·`interrupt`·`error` 6종과 마지막 `final`만 남긴다 (2026-11-04, `final`은 4.1 예시에 맞춰 2026-11-05 명시. 형식은 4.1 표)
 - [x] ~~스트리밍 응답(SSE)~~ → Version 1에서 제외. `/query` 단일 응답 + 프론트엔드 "생각 중" 표시 (2026-11-04)
 - [x] ~~RAG 지식 문서 수집 범위와 출처~~ → 영역(식단·운동·건강·일반) × 종(개·고양이·공통) 문서. 출처는 카탈로그와 같은 기준(7.5의 2번)과 `data/sources/` 목록을 쓴다 (2026-11-04)
 - [x] ~~Bedrock Guardrails 병행~~ → Version 1에서 쓰지 않음. 다층 가드레일(3.6)로 대응 (2026-11-04)

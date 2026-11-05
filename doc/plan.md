@@ -319,11 +319,11 @@ LLM 없이 결정적으로 동작하는 순수 함수. `/tasks/generate`와 채�
 - [x] A-7 General Agent
 
 **완료 조건**
-- [ ] `create_supervisor`로 4개 Agent를 묶었다
-- [ ] `pre_model_hook` / `post_model_hook`에 가드레일이 걸려 있다
-- [ ] `SqliteSaver` 체크포인터가 `data/checkpoints/`를 쓰고, `thread_id`가 `thr_{user_id}_{pet_id}_{uuid}` 형식이다
-- [ ] `stream_mode="updates"`로 trace(handoff, tool_call, interrupt)를 모은다
-- [ ] 범위 밖·지원하지 않는 동물 질문은 General Agent로 보내지 않고 거절한다
+- [x] `create_supervisor`로 4개 Agent를 묶었다
+- [x] `pre_model_hook` / `post_model_hook`에 가드레일이 걸려 있다
+- [x] `SqliteSaver` 체크포인터가 `data/checkpoints/`를 쓰고, `thread_id`가 `thr_{user_id}_{pet_id}_{uuid}` 형식이다
+- [x] `stream_mode="updates"`로 trace(handoff, tool_call, interrupt)를 모은다
+- [ ] 범위 밖·지원하지 않는 동물 질문은 General Agent로 보내지 않고 거절한다 — 규칙 판정분은 `supervisor_input_guard`로 처리, 실제 모델 확인은 Bedrock 일일 한도로 미실행
 
 ### A-9. FastAPI 엔드포인트
 

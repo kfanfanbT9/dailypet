@@ -113,6 +113,15 @@ class AppStore:
     def list_pets(self, user_id: str) -> list[dict[str, Any]]:
         return self._rows("pets", {"user_id": user_id})
 
+    def thread_owner(self, thread_id: str) -> str | None:
+        """chat_logs에 기록된 thread 소유자 user_id (기록이 없으면 None)."""
+        try:
+            metas = self.client.get_collection("chat_logs").get(where={"thread_id": thread_id}, limit=1,
+                                                                include=["metadatas"])["metadatas"]
+        except Exception:  # chat_logs 컬렉션이 없는 환경
+            return None
+        return metas[0].get("user_id") if metas else None
+
     def get_nickname(self, user_id: str) -> str | None:
         """사용자 닉네임만 돌려준다 (웹 검색 질의에서 지우는 용도). 이메일·비밀번호 해시는 꺼내지 않는다."""
         try:
