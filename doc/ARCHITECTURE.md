@@ -494,6 +494,9 @@ Response는 `/query`와 같은 `{answer, contexts, trace}` 형식이다. 요청�
 
 `/api/auth/*`를 뺀 모든 API는 로그인이 필요하고, 본인 데이터만 다룬다.
 - 상태 코드: 로그인 안 됨 401 · 다른 사용자의 리소스 404(존재 여부를 알리지 않음) · 다른 사용자의 thread resume 403 · 이메일 중복 409 · 입력 오류 400 · Agent 서버 장애 503
+- 오류 본문: `{ "error": { "code": "...", "message": "한국어 안내", "fields"?: [{ "field": "..." }] } }`. 입력 값·예외 메시지는 넣지 않는다.
+- 응답 규칙: 프로필·체중 변경 응답에는 `tasks_outdated: true`(오늘 할 일은 자동으로 바꾸지 않고 "할 일 다시 제안" 안내). 할 일 조회에서 Agent 장애로 목록을 못 만들면 200 `{ date, tasks: [], notice, retryable: true }`. 교체 결과가 없으면 200 `{ swapped: false, notice }`. 반려동물 응답의 `age_group`은 조회 시점(KST 오늘)으로 계산하고 저장하지 않는다. `done`·`neutered`는 저장은 0/1, 응답은 boolean.
+- **신호 기록 위치**: 완료(`complete`)·교체(`swap`)·삭제(`remove`)·카탈로그 항목 직접 추가(`custom`) 신호는 할 일 API가 **내부에서** 기록한다. `/api/pets/:id/feedback`은 👍/👎(+ 할 일과 무관한 직접 신호)용이다. Frontend가 할 일 조작 뒤에 따로 보내지 않는다 (중복 기록 방지). 완료를 되돌리면 같은 날 그 항목의 마지막 `complete` 신호를 지운다.
 
 | Method | Path | 설명 |
 |--------|------|------|
@@ -629,6 +632,29 @@ Chroma는 문서 + 메타데이터 저장소이므로, 앱 데이터는 **`docum
 - `/api/notifications`는 오늘 기준 D-7 / D-1 / D-day / overdue 일정을 반환
 - Frontend는 대시보드 진입 시 호출하여 배너로 표시 (푸시 알림은 범위 밖)
 - `needs_history` 일정은 알림에 넣지 않는다. 건강 일정 화면 상단에 "이력 확인 필요"로 따로 보여준다.
+- 알림 종류: `scheduled`이고 D-7 → `d7`, D-1 → `d1`, D-day → `today`, `overdue` → `overdue`. 순서는 지연 → 오늘 → D-1 → D-7.
+
+### 6.1 건강 일정표 규칙 (Backend `services/healthSchedule.js`)
+
+**초기 일정표** — 반려동물을 등록할 때 (`health_history`: 최근 접종·검진 이력 `[{catalog_item_id, last_done_date, dose_no?}]`, 저장하지 않고 계산에만 씀)
+
+| 경우 | 규칙 |
+|------|------|
+| 대상 항목 | 카탈로그 `health` 중 종이 맞고, 현재 연령 구간이 `age_groups`에 있는 항목. `dose_schedule`·`interval_days`·`start_age_weeks`가 모두 없는 항목은 계산 근거가 없어 만들지 않는다 |
+| 항목당 일정 수 | 다음에 할 회차 **1건만** 만든다 (완료하면 그다음을 만든다) |
+| `dose_schedule` 이력 없음 | 1차 `due = 생일 + at_age_weeks주`. 지났으면 `needs_history`, 아니면 `scheduled` |
+| `dose_schedule` 이력 있음 | 다음 회차 `due = last_done_date + after_prev_weeks주`. 마지막 회차였으면 `last_done_date + booster_interval_days` (추가접종, `dose_no` 없음). 추가접종도 없으면 만들지 않음 |
+| `interval_days` 항목 이력 없음 | 어린 동물: `due = max(생일 + start_age_weeks주, 오늘)` → `scheduled`. 성체·시니어이고 시작 주령이 지났거나 시작 주령이 없으면 `needs_history` (`due`는 시작 주령 날짜, 없으면 오늘) |
+| `interval_days` 항목 이력 있음 | `due = last_done_date + interval_days` |
+| 1회성 항목 (`start_age_weeks`만 있음) | 이력 없으면 `due = max(생일 + start_age_weeks주, 오늘)`, 이력 있으면 만들지 않음 |
+| 이력으로 계산한 `due`가 지났으면 | `overdue` |
+
+**다음 일정** — 완료(`complete`)·이력 입력(`last_done_date`) 때. **예정일이 아니라 실제 완료일 기준** (F5)
+- `dose_schedule` 다음 회차 → 없으면 `booster_interval_days` → 없으면 `interval_days` → 모두 없으면 다음 일정 없음.
+- 회차(`dose_no`)를 모르는 `dose_schedule` 일정(이력 확인 필요 등)은 **완료일 당시 주령**으로 회차를 추정한다: 누적 권장 주령이 완료 주령 이하인 마지막 회차 (최소 1차). 예: 콩이(7/10생)가 10/25(15주령)에 구충 → 퍼피 구충 5차(12주)로 보고 6차 `due = 10/25 + 4주 = 11/22`.
+- 새 일정의 `due`가 이미 지났으면 `overdue`, 아니면 `scheduled`.
+
+**시드와의 관계** — 규칙으로 재현되는 시드: 콩이 DHPP 3차(1·2차 완료 이력 → 11/13), 호두 노령 검진(06/10 + 180일 → 12/07). 콩이 광견병(11/17)은 보호자가 날짜를 정한 상태, 콩이 구충(`needs_history`, 회차 없음)은 이력 입력 전 상태, 나비·코코 정기검진은 과거 이력 입력 결과를 나타낸 것이라 규칙을 다시 적용하지 않는다. 규칙 검증은 새 등록(S01 두부)과 완료·이력 입력(S11)으로 한다.
 
 ## 7. 환경변수
 

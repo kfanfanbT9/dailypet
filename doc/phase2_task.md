@@ -306,38 +306,38 @@ repos.users.getById(userId) / getByEmail(email) / create(row) / remove(userId)  
 **의존성**: B-2
 
 **작업**
-- [ ] `GET /api/pets`: 내 반려동물을 `created_at` 순서로. 응답에 `age_group`(오늘 기준 계산)을 붙인다 (저장하지 않음)
-- [ ] `POST /api/pets`
+- [x] `GET /api/pets`: 내 반려동물을 `created_at` 순서로. 응답에 `age_group`(오늘 기준 계산)을 붙인다 (저장하지 않음)
+- [x] `POST /api/pets`
   - 필수: `name`, `species`(dog/cat), `birth_date`, `weight_kg`. 빠지면 400과 **필드별** 안내 (S01 예외 4가지)
   - 선택: `breed`, `sex`, `neutered`, `size`, `activity_level`, `allergies`, `conditions`, `memo`, `default_times`, `health_history`
   - `birth_date`가 오늘보다 뒤면 400
   - `health_history`(최근 접종·검진 이력, `[{ catalog_item_id, last_done_date, dose_no? }]`)는 B-5 초기 일정표에만 쓰고 `pets`에 저장하지 않는다
   - 저장 후 B-5 `healthSchedule.createInitial(pet, history)` 호출. 일정 생성이 실패하면 방금 만든 반려동물을 지운다
   - id: `pet_` + 무작위 10자리 (시드 id와 겹치지 않게)
-- [ ] `GET /api/pets/:id`, `PUT /api/pets/:id`
+- [x] `GET /api/pets/:id`, `PUT /api/pets/:id`
   - `species`는 수정할 수 없다 (400). 바꾸려면 새로 등록
   - 수정해도 오늘 할 일은 바꾸지 않고, 응답에 `tasks_outdated: true`를 넣어 "할 일 다시 제안" 안내를 띄우게 한다 (SERVICE.md F1, S05 4단계)
-- [ ] `DELETE /api/pets/:id` `{ confirm_name }`: 이름이 같아야 실행 → `cascade.deletePet`
-- [ ] `services/cascade.js`
+- [x] `DELETE /api/pets/:id` `{ confirm_name }`: 이름이 같아야 실행 → `cascade.deletePet`
+- [x] `services/cascade.js`
   - `deletePet(userId, petId)`: `tasks` → `health_events` → `weight_logs` → `interactions` → `preferences`(그 반려동물 것만, 사용자 공통은 남김) → `chat_logs` + 그 thread들의 checkpoint → `pets` (ARCHITECTURE.md 5장 순서)
   - `deleteUser(userId)`: 모든 반려동물에 `deletePet` → 사용자 공통 `preferences` → `users`. 끝나면 쿠키 삭제
   - 각 단계 사이에 `FAULT_INJECT=delete_after:<컬렉션>`을 확인해 오류를 던진다 (테스트 전용). 반려동물 행은 마지막에 지우므로 실패해도 프로필이 남는다 (S20)
   - 같은 반려동물을 다시 삭제하면 남은 단계부터 끝까지 진행한다 (멱등)
-- [ ] `checkpoints.js`: `deleteThreads(threadIds)` — `CHECKPOINT_PATH`의 SQLite를 열어 `checkpoints`·`writes` 테이블에서 `thread_id IN (...)` 삭제. 파일이 없으면 아무것도 하지 않는다. 테이블 이름은 `langgraph-checkpoint-sqlite==3.1.3`에서 확인해 상수로 둔다
-- [ ] 고아 정리 `cascade.cleanupOrphans()`: 시작 시 1회
+- [x] `checkpoints.js`: `deleteThreads(threadIds)` — `CHECKPOINT_PATH`의 SQLite를 열어 `checkpoints`·`writes` 테이블에서 `thread_id IN (...)` 삭제. 파일이 없으면 아무것도 하지 않는다. 테이블 이름은 `langgraph-checkpoint-sqlite==3.1.3`에서 확인해 상수로 둔다
+- [x] 고아 정리 `cascade.cleanupOrphans()`: 시작 시 1회
   - `pets`의 `user_id`가 `users`에 없으면 그 반려동물을 `deletePet`
   - 하위 컬렉션의 `pet_id`가 `pets`에 없으면 그 행을 지운다 (사용자 공통 `preferences`는 `user_id`로 판단)
   - 정리 건수만 로그에 남긴다
 
 **테스트** (`test/pets.test.js`, `test/cascade.test.js`)
-- [ ] 격리: mallory로 `GET/PUT/DELETE /api/pets/pet_bori` → 404, 보리 데이터 변화 없음 (isolation-01)
-- [ ] `species:"rabbit"` 400, 필수값 4개 각각 빠지면 400 (필드 이름 포함)
-- [ ] `PUT`으로 `activity_level` 변경 → 오늘 `tasks` 그대로, `tasks_outdated: true`
-- [ ] `DELETE pet_coco`(leaver) → 모든 컬렉션·checkpoint에 `pet_coco` 행 0건, 다른 사용자 행 수 변화 없음 (S20 1단계)
-- [ ] `DELETE /api/me` → `usr_3263e0395d81` 행 0건, 같은 이메일로 다시 가입 성공 (S20 2·3단계)
-- [ ] `confirm_name`·`confirm_email`이 틀리면 400, 아무것도 지우지 않는다
-- [ ] `FAULT_INJECT=delete_after:health_events` → 500, 프로필은 남음 → 해제 후 다시 삭제하면 끝까지 완료
-- [ ] 같은 상태에서 `cleanupOrphans()`를 돌리고, 반려동물 행을 지운 뒤 다시 돌리면 남은 하위 데이터가 정리된다
+- [x] 격리: mallory로 `GET/PUT/DELETE /api/pets/pet_bori` → 404, 보리 데이터 변화 없음 (isolation-01)
+- [x] `species:"rabbit"` 400, 필수값 4개 각각 빠지면 400 (필드 이름 포함)
+- [x] `PUT`으로 `activity_level` 변경 → 오늘 `tasks` 그대로, `tasks_outdated: true`
+- [x] `DELETE pet_coco`(leaver) → 모든 컬렉션·checkpoint에 `pet_coco` 행 0건, 다른 사용자 행 수 변화 없음 (S20 1단계)
+- [x] `DELETE /api/me` → `usr_3263e0395d81` 행 0건, 같은 이메일로 다시 가입 성공 (S20 2·3단계)
+- [x] `confirm_name`·`confirm_email`이 틀리면 400, 아무것도 지우지 않는다
+- [x] `FAULT_INJECT=delete_after:health_events` → 500, 프로필은 남음 → 해제 후 다시 삭제하면 끝까지 완료
+- [x] 같은 상태에서 `cleanupOrphans()`를 돌리고, 반려동물 행을 지운 뒤 다시 돌리면 남은 하위 데이터가 정리된다
 
 ---
 
@@ -361,28 +361,28 @@ repos.users.getById(userId) / getByEmail(email) / create(row) / remove(userId)  
 - 위 규칙으로 시드 `health_events`(USER_SCENARIO.md 2.3)를 다시 만들어 보고, 다르면 규칙이나 시드 중 하나를 고친다 (어느 쪽을 고칠지는 문서에 적는다).
 
 **작업**
-- [ ] `healthSchedule.createInitial(pet, history, today)`: 위 규칙. id `evt_` + 무작위, `type`은 카탈로그에서, `due_ts`는 `kstMidnightEpoch`
-- [ ] `healthSchedule.nextAfter(event, completedDate)`: `dose_schedule` 다음 회차 → 없으면 `booster_interval_days` → `interval_days` → 없으면 다음 일정 없음. **예정일이 아니라 완료일 기준** (SERVICE.md F5)
-- [ ] `GET /api/pets/:id/health-events`: `{ needs_history: [...], upcoming: [...], done: [...] }`로 나눠 `d_day`를 붙인다
-- [ ] `PATCH /api/health-events/:id/complete` `{ completed_date }`: 미래 날짜 400. `done` + `completed_date` 저장 → `nextAfter`로 다음 일정 생성. 이미 `done`이면 409
-- [ ] `PATCH /api/health-events/:id`
+- [x] `healthSchedule.createInitial(pet, history, today)`: 위 규칙. id `evt_` + 무작위, `type`은 카탈로그에서, `due_ts`는 `kstMidnightEpoch`
+- [x] `healthSchedule.nextAfter(event, completedDate)`: `dose_schedule` 다음 회차 → 없으면 `booster_interval_days` → `interval_days` → 없으면 다음 일정 없음. **예정일이 아니라 완료일 기준** (SERVICE.md F5)
+- [x] `GET /api/pets/:id/health-events`: `{ needs_history: [...], upcoming: [...], done: [...] }`로 나눠 `d_day`를 붙인다
+- [x] `PATCH /api/health-events/:id/complete` `{ completed_date }`: 미래 날짜 400. `done` + `completed_date` 저장 → `nextAfter`로 다음 일정 생성. 이미 `done`이면 409
+- [x] `PATCH /api/health-events/:id`
   - `{ due_date }`: 날짜 변경 → `scheduled` (과거 날짜 400)
   - `{ last_done_date }`: 이 일정을 `done`(`completed_date = last_done_date`)으로 바꾸고 다음 일정 생성 → `needs_history` 해소 (ARCHITECTURE.md 4.2)
   - 둘 다 오거나 둘 다 없으면 400
-- [ ] 건강 일정을 바꾸면 그 일정의 오늘 할 일(`category=health`, `health_event_id`)도 맞춘다: 완료 → 할 일 `done: true`, 날짜 변경으로 7일 밖 → 미완료 할 일 삭제
-- [ ] `jobs/overdue.js` `markOverdue(today)`: `status=scheduled`이고 `due_ts < kstMidnightEpoch(today)`인 일정 → `overdue`. 모든 사용자 대상의 유일한 작업이라 `repos`의 `userId` 강제를 우회하는 **내부 전용 함수**로 두고 라우트에서 import하지 않는다
-- [ ] cron `5 0 * * *` (`timezone: "Asia/Seoul"`) + 서버 시작 시 1회 + 시드 리셋 끝에 1회
-- [ ] `GET /api/notifications`: 내 모든 반려동물의 일정 중 `dDay ∈ {7, 1, 0}`(scheduled) 또는 `overdue`. `needs_history`·`done`은 제외. 항목 `{ event_id, pet_id, pet_name, name, due_date, d_day, kind: "d7"|"d1"|"today"|"overdue" }`, 지연 → 오늘 → D-1 → D-7 순서
+- [x] 건강 일정을 바꾸면 그 일정의 오늘 할 일(`category=health`, `health_event_id`)도 맞춘다: 완료 → 할 일 `done: true`, 날짜 변경으로 7일 밖 → 미완료 할 일 삭제
+- [x] `jobs/overdue.js` `markOverdue(today)`: `status=scheduled`이고 `due_ts < kstMidnightEpoch(today)`인 일정 → `overdue`. 모든 사용자 대상의 유일한 작업이라 `repos`의 `userId` 강제를 우회하는 **내부 전용 함수**로 두고 라우트에서 import하지 않는다
+- [x] cron `5 0 * * *` (`timezone: "Asia/Seoul"`) + 서버 시작 시 1회 + 시드 리셋 끝에 1회
+- [x] `GET /api/notifications`: 내 모든 반려동물의 일정 중 `dDay ∈ {7, 1, 0}`(scheduled) 또는 `overdue`. `needs_history`·`done`은 제외. 항목 `{ event_id, pet_id, pet_name, name, due_date, d_day, kind: "d7"|"d1"|"today"|"overdue" }`, 지연 → 오늘 → D-1 → D-7 순서
 
 **테스트** (`test/healthSchedule.test.js`, `test/notifications.test.js`)
-- [ ] S01: 두부(개, 2026-08-01생, 이력 없음, 11/10 등록) → `hc_dog_dhpp` dose_no 1이 `needs_history`, `hc_dog_rabies` 있음
-- [ ] S11: 11/14에 `evt_kongi_dhpp3` 완료 → DHPP 4차 `due_date=2026-12-12`
-- [ ] S11: `evt_kongi_deworm`에 `last_done_date=2026-10-25` → `needs_history` 아님, 다음 구충 일정 생성
-- [ ] 마지막 회차 완료 → `booster_interval_days` 뒤 추가접종 1건
-- [ ] S03 알림: 11/10 → 광견병(D-7)만, DHPP(D-3) 없음 / 11/06 → DHPP "d7" / 11/12 → "d1" / 11/13 → "today" / 11/14(markOverdue 후) → "overdue"
-- [ ] `needs_history` 일정은 어떤 날짜에도 알림에 없다
-- [ ] mallory로 `PATCH /api/health-events/evt_kongi_dhpp3/complete` → 404
-- [ ] `markOverdue`를 두 번 돌려도 결과가 같다
+- [x] S01: 두부(개, 2026-08-01생, 이력 없음, 11/10 등록) → `hc_dog_dhpp` dose_no 1이 `needs_history`, `hc_dog_rabies` 있음
+- [x] S11: 11/14에 `evt_kongi_dhpp3` 완료 → DHPP 4차 `due_date=2026-12-12`
+- [x] S11: `evt_kongi_deworm`에 `last_done_date=2026-10-25` → `needs_history` 아님, 다음 구충 일정 생성
+- [x] 마지막 회차 완료 → `booster_interval_days` 뒤 추가접종 1건
+- [x] S03 알림: 11/10 → 광견병(D-7)만, DHPP(D-3) 없음 / 11/06 → DHPP "d7" / 11/12 → "d1" / 11/13 → "today" / 11/14(markOverdue 후) → "overdue"
+- [x] `needs_history` 일정은 어떤 날짜에도 알림에 없다
+- [x] mallory로 `PATCH /api/health-events/evt_kongi_dhpp3/complete` → 404
+- [x] `markOverdue`를 두 번 돌려도 결과가 같다
 
 ---
 
@@ -391,32 +391,32 @@ repos.users.getById(userId) / getByEmail(email) / create(row) / remove(userId)  
 **의존성**: B-4 (B-6이 `signals.js`를 쓰므로 B-6보다 먼저 한다)
 
 **작업**
-- [ ] `GET /api/pets/:id/weights`: 날짜 오름차순 (추이 그래프용)
-- [ ] `POST /api/pets/:id/weights` `{ date, weight_kg, overwrite? }`
+- [x] `GET /api/pets/:id/weights`: 날짜 오름차순 (추이 그래프용)
+- [x] `POST /api/pets/:id/weights` `{ date, weight_kg, overwrite? }`
   - 종별 범위 밖 400 (개 0.5~100 / 고양이 0.3~15), 미래 날짜 400
   - 같은 날짜 기록이 있으면 409, `overwrite: true`면 같은 id로 덮어씀 (하루 1건)
   - 저장 후 **가장 최근 날짜** 기록으로 `pets.weight_kg` 갱신. 응답에 `tasks_outdated: true`
-- [ ] `DELETE /api/weights/:weightId`: 지운 뒤 남은 최신 기록으로 `pets.weight_kg` 갱신 (S05: 33.2 삭제 → 34.0). 기록이 하나도 없으면 프로필 체중은 그대로 둔다
-- [ ] `services/signals.js` `recordSignal(userId, petId, { itemId, signal, today })`
+- [x] `DELETE /api/weights/:weightId`: 지운 뒤 남은 최신 기록으로 `pets.weight_kg` 갱신 (S05: 33.2 삭제 → 34.0). 기록이 하나도 없으면 프로필 체중은 그대로 둔다
+- [x] `services/signals.js` `recordSignal(userId, petId, { itemId, signal, today })`
   - `interactions`에 원본 기록 (`int_` + 무작위, `created_at`=KST 지금)
   - `like`: `preferences` like 행 upsert (id는 1.3 `prefId`, score 3). 같은 대상의 dislike 행이 있으면 지운다
   - `dislike`: dislike 행 upsert (score −3, `excluded_until = today + 6`). 같은 대상의 like 행이 있으면 지운다
   - `complete`·`swap`·`remove`·`custom`: `interactions`만 기록 (점수 계산은 Python이 한다)
   - `itemId`는 카탈로그에 있어야 한다 (`custom`이고 자유 입력이면 null 허용)
-- [ ] `POST /api/pets/:id/feedback` `{ itemId, signal }` → `recordSignal`. 할 일 버튼(👍/👎)은 이 API를 쓴다. 완료·교체·삭제 신호는 B-6 할 일 API가 **내부에서** 기록하므로 Frontend가 따로 보내지 않는다 (중복 기록 방지, D6)
-- [ ] `GET /api/pets/:id/preferences`: `{ like: [...], dislike: [...](excluded_until, 오늘 기준 제외 중 여부), constraint: [...] }`. 사용자 공통 행(`pet_id` 없음)은 `scope: "all_pets"`로 표시하고 함께 돌려준다. 카탈로그 ID면 이름을 붙인다
-- [ ] `DELETE /api/pets/:id/preferences/:prefId`: 그 반려동물 또는 사용자 공통 행만. 공통 행 삭제는 응답에 `scope: "all_pets"`를 넣는다 (확인 창은 Frontend)
-- [ ] `DELETE /api/pets/:id/preferences`: 그 반려동물의 `preferences`와 `interactions`를 모두 지운다 (ARCHITECTURE.md 3.8: 완료 횟수도 0). 사용자 공통 행은 남긴다
+- [x] `POST /api/pets/:id/feedback` `{ itemId, signal }` → `recordSignal`. 할 일 버튼(👍/👎)은 이 API를 쓴다. 완료·교체·삭제 신호는 B-6 할 일 API가 **내부에서** 기록하므로 Frontend가 따로 보내지 않는다 (중복 기록 방지, D6)
+- [x] `GET /api/pets/:id/preferences`: `{ like: [...], dislike: [...](excluded_until, 오늘 기준 제외 중 여부), constraint: [...] }`. 사용자 공통 행(`pet_id` 없음)은 `scope: "all_pets"`로 표시하고 함께 돌려준다. 카탈로그 ID면 이름을 붙인다
+- [x] `DELETE /api/pets/:id/preferences/:prefId`: 그 반려동물 또는 사용자 공통 행만. 공통 행 삭제는 응답에 `scope: "all_pets"`를 넣는다 (확인 창은 Frontend)
+- [x] `DELETE /api/pets/:id/preferences`: 그 반려동물의 `preferences`와 `interactions`를 모두 지운다 (ARCHITECTURE.md 3.8: 완료 횟수도 0). 사용자 공통 행은 남긴다
 
 **테스트** (`test/weights.test.js`, `test/preferences.test.js`)
-- [ ] S05: 보리 11/10 33.2kg 추가 → 프로필 33.2, 목록 35.0 → 34.0 → 33.2. 개 `0`·`150` → 400. 같은 날 다시 → 409, `overwrite` → 덮어씀
-- [ ] 과거 날짜(최신이 아닌) 기록을 추가하면 프로필 체중은 바뀌지 않는다
-- [ ] 33.2 삭제 → 프로필 34.0
-- [ ] S04: 모카 `act_cat_kibble_chase_01` 👍 → like 행, 그 id가 Python `remember_preference`가 만드는 id와 같다
-- [ ] 11/08 👎 → `excluded_until=2026-11-14`. 👍 후 👎 → like 행 없음
-- [ ] S21: 보리 전체 초기화 → `GET .../preferences`가 빈 목록(공통 행 제외), 보리 `interactions` 0건, 나비 데이터 그대로
-- [ ] 박서준 공통 제약 "19:00 이후"가 모카 취향 화면에 `scope: "all_pets"`로 나온다
-- [ ] 없는 카탈로그 ID로 feedback → 400
+- [x] S05: 보리 11/10 33.2kg 추가 → 프로필 33.2, 목록 35.0 → 34.0 → 33.2. 개 `0`·`150` → 400. 같은 날 다시 → 409, `overwrite` → 덮어씀
+- [x] 과거 날짜(최신이 아닌) 기록을 추가하면 프로필 체중은 바뀌지 않는다
+- [x] 33.2 삭제 → 프로필 34.0
+- [x] S04: 모카 `act_cat_kibble_chase_01` 👍 → like 행, 그 id가 Python `remember_preference`가 만드는 id와 같다
+- [x] 11/08 👎 → `excluded_until=2026-11-14`. 👍 후 👎 → like 행 없음
+- [x] S21: 보리 전체 초기화 → `GET .../preferences`가 빈 목록(공통 행 제외), 보리 `interactions` 0건, 나비 데이터 그대로
+- [x] 박서준 공통 제약 "19:00 이후"가 모카 취향 화면에 `scope: "all_pets"`로 나온다
+- [x] 없는 카탈로그 ID로 feedback → 400
 
 ---
 
@@ -518,8 +518,8 @@ CLAUDE.md 2장 규칙에 따라, 아래 항목은 **코드보다 문서를 먼�
 | D2 ✅ | Python ↔ Node 공유 기준 사례 목록 (1.3, `app_records.json`·`prefId` 규칙 포함) | ARCHITECTURE.md 5.1 | B-0 |
 | D3 ✅ | 테스트 전용 `CHROMA_DATABASE` 키 | ARCHITECTURE.md 7장, `.env.example` | B-0 |
 | D4 ✅ | 가입 입력 규칙 (비밀번호 8자 이상, 닉네임 1~20자) | SERVICE.md F0 | B-2 |
-| D5 | 건강 초기 일정표 규칙 (8장 표), 시드와 맞는지 확인 결과 | ARCHITECTURE.md 6장, 필요하면 USER_SCENARIO.md 2.3 | B-5 |
-| D6 | 완료·교체·삭제 신호는 할 일 API가 기록, `/feedback`은 👍/👎(+직접 신호)용 | ARCHITECTURE.md 4.2 | B-7 |
+| D5 ✅ | 건강 초기 일정표 규칙 (8장 표), 시드와 맞는지 확인 결과 | ARCHITECTURE.md 6장, 필요하면 USER_SCENARIO.md 2.3 | B-5 |
+| D6 ✅ | 완료·교체·삭제 신호는 할 일 API가 기록, `/feedback`은 👍/👎(+직접 신호)용 | ARCHITECTURE.md 4.2 | B-7 |
 | D7 | `tasks`에 선택 필드 `reason`, `rank`, `relaxed` 추가 | ARCHITECTURE.md 5장, ERD.md, `database/schema.md` | B-6 |
 | D8 | `chat_logs`는 Agent만 쓰고 Backend는 읽기·삭제만 | ARCHITECTURE.md 5장, plan.md B-8 문구 | B-8 |
 | D9 | 응답 필드 `tasks_outdated`, 할 일 `notice`·`retryable`, 교체 `swapped`, 오류 본문 형식 | ARCHITECTURE.md 4.2 | B-4·B-6 |
@@ -564,8 +564,8 @@ CLAUDE.md 2장 규칙에 따라, 아래 항목은 **코드보다 문서를 먼�
 | B-1 골격·저장소 | ✅ | 2026-11-05 · 시드 52행 인코딩이 Python과 같음, 같은 조회 10종이 메모리·실제 Chroma에서 같은 결과. 단위 51개 + Chroma 12개 |
 | B-2 인증 | ✅ | 2026-11-05 · bcryptjs cost 10, JWT 7일 httpOnly 쿠키. 모든 /api 라우트가 구조적으로 requireAuth (라우터 순회 테스트) |
 | B-3 시드 리셋 | ✅ | 2026-11-05 · checkpoint는 테이블 비우기. 실제 `data/chroma`에 기본 시드 적재 확인. **발견: Chroma upsert가 metadata를 합침 → Python·Node 모두 delete→add로 수정** |
-| B-4 반려동물·연쇄 삭제 | ⬜ | |
-| B-5 건강 일정·알림 | ⬜ | |
+| B-4 반려동물·연쇄 삭제 | ✅ | 2026-11-05 · 연쇄 삭제는 반려동물 행을 마지막에, 멱등 재실행·고아 정리. checkpoint thread 삭제 확인 |
+| B-5 건강 일정·알림 | ✅ | 2026-11-05 · 규칙은 ARCHITECTURE.md 6.1. 회차 모르는 이력은 완료 주령으로 추정(콩이 구충 → 6차 11/22). 시드는 규칙 재현분·사용자 조정분을 문서에 구분 |
 | B-6 할 일 | ⬜ | 가짜 Agent로 먼저, A-9 후 통합 |
-| B-7 체중·취향 | ⬜ | |
+| B-7 체중·취향 | ✅ | 2026-11-05 · prefId가 Python과 같아 채팅 취향·버튼 👍/👎가 한 행 |
 | B-8 채팅·기록 | ⬜ | 가짜 Agent로 먼저, A-9 후 통합 |

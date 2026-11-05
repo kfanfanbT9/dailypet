@@ -2,10 +2,13 @@
 // /api/auth/*를 뺀 모든 /api 라우트는 apiRouter 안에 있어 requireAuth를 구조적으로 거친다.
 import express from "express";
 import { authRouter, requireAuth } from "../auth/index.js";
+import { healthRouter } from "./health.js";
 import { meRouter } from "./me.js";
+import { petsRouter } from "./pets.js";
+import { prefsRouter } from "./prefs.js";
 
-/** 인증이 필요한 하위 라우터들 (B-4~B-8에서 추가) */
-export const PROTECTED = [meRouter];
+/** 인증이 필요한 하위 라우터들 */
+export const PROTECTED = [meRouter, petsRouter, healthRouter, prefsRouter];
 
 export function apiRouter(deps) {
   const r = express.Router();

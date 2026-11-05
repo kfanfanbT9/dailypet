@@ -49,3 +49,12 @@ describe("오늘·epoch", () => {
     expect(nowKstIso(new Date(Date.UTC(2026, 10, 9, 22, 30)))).toBe("2026-11-10T07:30:00+09:00");
   });
 });
+
+describe("nowKstIsoOn", () => {
+  it("설정상 오늘 날짜 + 지금 시각", async () => {
+    const { nowKstIsoOn } = await import("../src/lib/dates.js");
+    expect(nowKstIsoOn("2026-11-10", new Date(Date.UTC(2026, 10, 4, 22, 30)))).toBe(
+      "2026-11-10T07:30:00+09:00",
+    );
+  });
+});

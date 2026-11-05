@@ -105,6 +105,12 @@ export function nowKstIso(now = new Date()) {
   return `${k.toISOString().slice(0, 19)}+09:00`;
 }
 
+/** 설정상 오늘(today, TODAY_OVERRIDE 반영) 날짜 + 지금 KST 시각. 신호·취향 시각에 쓴다
+ *  (평가 기준일이 실제 날짜와 달라도 같은 날 판정·시간 감쇠가 기준일 기준으로 맞게). */
+export function nowKstIsoOn(today, now = new Date()) {
+  return `${today}${nowKstIso(now).slice(10)}`;
+}
+
 /** 'HH:MM' 형식이면 true. */
 export function isValidTime(value) {
   return typeof value === "string" && /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
