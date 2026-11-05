@@ -43,7 +43,8 @@ def empty_chroma() -> Iterator[ClientAPI]:
 
     알려진 문제: chromadb 1.5.9에서 벡터 컬렉션 적재 뒤 다른 컬렉션에 쓰면 그 벡터 컬렉션 검색이
     간헐적으로 'Error finding id'(InternalError)로 실패한다 (phase1_task.md 13장). 전체 실행 몇 번에 한 번
-    검색 테스트 1개가 이 오류로 떨어질 수 있다. DB 삭제·재사용 방식과는 무관함을 확인했다.
+    검색 테스트 1개가 이 오류로 떨어질 수 있다. DB 삭제·재사용 방식과는 무관하고,
+    서버 모드(HttpClient, 운영 경로)에서는 재현되지 않음을 확인했다.
     """
     admin = chromadb.AdminClient()
     db = f"test_{uuid.uuid4().hex}"
