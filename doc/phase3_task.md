@@ -44,7 +44,7 @@
 | Q3 | 글꼴 제공 방식 | `@fontsource/jua`, `@fontsource/nanum-gothic`으로 **직접 포함** (Google Fonts CDN을 쓰지 않아 로컬 데모가 오프라인에서도 동작) | ARCHITECTURE.md 7.6 "후보" 확정 |
 | Q4 | Tailwind 버전 | **v3** (Style-guide.md 13.1이 `tailwind.config.ts`를 전제로 한다. v4를 쓰면 13.1을 먼저 고친다) | Style-guide.md 13.1 |
 
-- [ ] Q1 ~ Q4를 정하고 `doc/assets.md` 2장(채택 표시, 확인일)과 SERVICE.md 10장(마스코트 `[x]`)에 기록한다
+- [x] Q1 ~ Q4를 정하고 `doc/assets.md` 2장(채택 표시, 확인일)과 SERVICE.md 10장(마스코트 `[x]`)에 기록한다
 
 ### 1.2 파일 배치
 
@@ -83,7 +83,7 @@ src/frontend/
     └── test/               Vitest 설정, 렌더 헬퍼
 ```
 
-- [ ] 위 배치를 ARCHITECTURE.md 2장에 "Frontend 내부 구조" 한 단락으로 적는다 (**문서 먼저**, D1)
+- [x] 위 배치를 ARCHITECTURE.md 2장에 "Frontend 내부 구조" 한 단락으로 적는다 (**문서 먼저**, D1)
 
 ### 1.3 라이브러리
 
@@ -102,7 +102,7 @@ src/frontend/
 | E2E | `@playwright/test` | 실제 Backend + `seed:reset` |
 | 린트 | `eslint`, `typescript-eslint`, `eslint-plugin-react-hooks`, `prettier` | |
 
-- [ ] 버전을 `package.json`에 고정하고 `package-lock.json`을 커밋한다
+- [x] 버전을 `package.json`에 고정하고 `package-lock.json`을 커밋한다
 
 ### 1.4 테스트 전략
 
@@ -168,16 +168,16 @@ flowchart LR
 
 **의존성**: P0-2 ✅ (`doc/assets.md`)
 
-- [ ] 1.1 Q1 ~ Q4 결정 기록 (👤)
-- [ ] 1.2 파일 배치를 ARCHITECTURE.md 2장에 반영 (D1)
-- [ ] Vite + React + TS 프로젝트 생성, `npm run lint`·`npm run typecheck`·`npm test` 동작
-- [ ] `vite.config.ts` 프록시 `/api` → `http://localhost:3000` (쿠키가 같은 출처로 붙도록)
-- [ ] `src/mocks/`: MSW 브라우저·노드 핸들러 골격, `data/seed/*.json`으로 목 데이터 생성
-- [ ] `npm run dev:mock`: MSW를 켠 채로 개발 서버 실행 (Backend 없이 화면 개발)
+- [x] 1.1 Q1 ~ Q4 결정 기록 (👤)
+- [x] 1.2 파일 배치를 ARCHITECTURE.md 2장에 반영 (D1)
+- [x] Vite + React + TS 프로젝트 생성, `npm run lint`·`npm run typecheck`·`npm test` 동작
+- [x] `vite.config.ts` 프록시 `/api` → `http://localhost:3000` (쿠키가 같은 출처로 붙도록)
+- [x] `src/mocks/`: MSW 브라우저·노드 핸들러 골격, `data/seed/*.json`으로 목 데이터 생성
+- [x] `npm run dev:mock`: MSW를 켠 채로 개발 서버 실행 (Backend 없이 화면 개발)
 
 **완료 조건**
-- [ ] `npm run dev`로 빈 화면이 :5173에 뜨고, `npm test`가 테스트 0개로 정상 종료한다
-- [ ] `npm run dev:mock`에서 목 `GET /api/me`가 응답한다
+- [x] `npm run dev`로 빈 화면이 :5173에 뜨고, `npm test`가 테스트 0개로 정상 종료한다
+- [x] `npm run dev:mock`에서 목 `GET /api/me`가 응답한다
 
 ---
 
@@ -186,33 +186,33 @@ flowchart LR
 **의존성**: F-0, P0-2 ✅
 
 **작업**
-- [ ] `styles/tokens.css`: Style-guide.md 13.2 골격을 그대로 옮긴다
+- [x] `styles/tokens.css`: Style-guide.md 13.2 골격을 그대로 옮긴다
   - 원시 → 의미 → 컴포넌트 3계층 (Style-guide.md 2장)
   - 테마 `[data-theme="dark"]`와 자동(`prefers-color-scheme`), 종 `[data-species="dog|cat"]` 강조색 (3.5장), 모션 `[data-motion="reduced"]`
   - 값은 이 파일에만 둔다. Style-guide.md와 다르면 Style-guide.md에 맞춘다
-- [ ] `tailwind.config.ts`: 의미 토큰을 `var(--…)`로 연결한다. 기본 팔레트·반경은 끄고 토큰만 쓰게 한다 (`theme` 덮어쓰기)
-- [ ] 린트: 컴포넌트·페이지 파일에서 hex 색(`#[0-9a-f]{3,8}`), `px` 리터럴, 글꼴 이름을 찾는 규칙 (`no-restricted-syntax` 또는 간단한 스크립트 `npm run lint:tokens`). 예외는 `tokens.css`와 마스코트 SVG
-- [ ] `index.html`: `localStorage`의 테마·움직임 설정을 읽어 `<html data-theme data-motion>`을 React보다 먼저 설정한다. 읽기 실패 시 자동 (Style-guide.md 10장)
-- [ ] 기본 컴포넌트 (Style-guide.md 7장 상태 전부: 기본·hover·눌림·포커스·비활성·로딩)
+- [x] `tailwind.config.ts`: 의미 토큰을 `var(--…)`로 연결한다. 기본 팔레트·반경은 끄고 토큰만 쓰게 한다 (`theme` 덮어쓰기)
+- [x] 린트: 컴포넌트·페이지 파일에서 hex 색(`#[0-9a-f]{3,8}`), `px` 리터럴, 글꼴 이름을 찾는 규칙 (`no-restricted-syntax` 또는 간단한 스크립트 `npm run lint:tokens`). 예외는 `tokens.css`와 마스코트 SVG
+- [x] `index.html`: `localStorage`의 테마·움직임 설정을 읽어 `<html data-theme data-motion>`을 React보다 먼저 설정한다. 읽기 실패 시 자동 (Style-guide.md 10장)
+- [x] 기본 컴포넌트 (Style-guide.md 7장 상태 전부: 기본·hover·눌림·포커스·비활성·로딩)
   - `Button`(primary/secondary/ghost/danger, 알약), `Input`·`TextArea`·`Select`·`DateInput`·`TimeInput`, `Badge`(D-day·지연됨·이력 확인 필요·싫어요 표시한 항목·직접 추가 — 색 + 아이콘 + 글자), `Toast`(3초, 되돌리기 있으면 5초, `role="status"`), `Modal`(포커스 가둠·복귀)·`ConfirmModal`(이름/이메일 입력 확인 변형)·`Sheet`, `Tabs`, `EmptyState`·`ErrorState`(마스코트 + 한 줄 + 다음 행동), `Skeleton`, `ProgressBar`
-- [ ] 마스코트 (Q1): `DogMascot`·`CatMascot` × 기본·기쁨·미안·걱정·축하, 크기 24/32/96/160만 허용, 색은 팔레트 토큰만. 다른 회사 캐릭터를 떠올리게 하는 실루엣을 피한다 (assets.md 1장)
+- [x] 마스코트 (Q1): `DogMascot`·`CatMascot` × 기본·기쁨·미안·걱정·축하, 크기 24/32/96/160만 허용, 색은 팔레트 토큰만. 다른 회사 캐릭터를 떠올리게 하는 실루엣을 피한다 (assets.md 1장)
   - [ ] 완성 후 사람이 "다른 IP와 닮지 않았는지" 확인하고 assets.md에 확인일을 적는다 👤
-- [ ] `layout/`: `AppShell`(W00) — 모바일 하단 내비 5칸 / 데스크톱(≥1024px) 사이드바 240px·본문 최대 960px, 헤더(🔔 개수·프로필), `PetTabs`(등록 순, 종별 마스코트·강조색, `[＋]`·`[⚙]`), 반려동물 0마리 안내
-- [ ] `state/settings.tsx`: 테마(자동/밝게/밤하늘)·움직임 줄이기, `localStorage` 실패 시 기본값. 움직임 줄이기 = 기기 설정 OR 사용자 설정
-- [ ] `api/client.ts`: `credentials: "include"`, JSON 본문, 오류 본문 `{ error: { code, message } }` → `ApiError(status, code)`, 401 전역 처리, 네트워크 오류 → `ApiError(0, "network")`
-- [ ] `lib/dates.ts`: `formatMD("2026-11-13") → "11/13 (금)"`, `dDayLabel(d) → "D-3" | "오늘" | "내일" | "지연됨"`, 연령 구간 미리보기(어린 12개월 미만 / 시니어 7세, 대형견 6세 — `src/tests/fixtures/date_cases.json`으로 검증)
-- [ ] `doc/assets.md`: 글꼴·아이콘·마스코트 행을 채택 상태로 바꾸고 확인일을 적는다 (**커밋 전에 먼저**, assets.md 머리말)
-- [ ] 개발용 `/_styleguide` 라우트(개발 모드에서만): 토큰·컴포넌트·마스코트를 5개 조합(밝게/밤하늘 × 개/고양이 + 움직임 줄이기)으로 한눈에 확인
+- [x] `layout/`: `AppShell`(W00) — 모바일 하단 내비 5칸 / 데스크톱(≥1024px) 사이드바 240px·본문 최대 960px, 헤더(🔔 개수·프로필), `PetTabs`(등록 순, 종별 마스코트·강조색, `[＋]`·`[⚙]`), 반려동물 0마리 안내
+- [x] `state/settings.tsx`: 테마(자동/밝게/밤하늘)·움직임 줄이기, `localStorage` 실패 시 기본값. 움직임 줄이기 = 기기 설정 OR 사용자 설정
+- [x] `api/client.ts`: `credentials: "include"`, JSON 본문, 오류 본문 `{ error: { code, message } }` → `ApiError(status, code)`, 401 전역 처리, 네트워크 오류 → `ApiError(0, "network")`
+- [x] `lib/dates.ts`: `formatMD("2026-11-13") → "11/13 (금)"`, `dDayLabel(d) → "D-3" | "오늘" | "내일" | "지연됨"`, 연령 구간 미리보기(어린 12개월 미만 / 시니어 7세, 대형견 6세 — `src/tests/fixtures/date_cases.json`으로 검증)
+- [x] `doc/assets.md`: 글꼴·아이콘·마스코트 행을 채택 상태로 바꾸고 확인일을 적는다 (**커밋 전에 먼저**, assets.md 머리말)
+- [x] 개발용 `/_styleguide` 라우트(개발 모드에서만): 토큰·컴포넌트·마스코트를 5개 조합(밝게/밤하늘 × 개/고양이 + 움직임 줄이기)으로 한눈에 확인
 
 **테스트** (`src/components/**/*.test.tsx`, `src/lib/*.test.ts`)
-- [ ] `date_cases.json`의 연령 구간 사례가 Python·Node와 같은 결과
-- [ ] `formatMD`·`dDayLabel`: D-7, D-1(내일), D-0(오늘), 지연
-- [ ] 기본 컴포넌트 각각 `vitest-axe` 위반 0건, 키보드로 조작 가능, 이모지 버튼에 `aria-label`
-- [ ] `Modal`: 열면 포커스가 안으로, Esc로 닫으면 연 버튼으로 포커스 복귀
-- [ ] `ConfirmModal`(이름 입력 변형): 입력이 정확히 같을 때만 확인 버튼 활성
-- [ ] `data-motion="reduced"`에서 `Toast`·`Modal`이 페이드만 쓴다 (Framer Motion `useReducedMotion` 경로)
-- [ ] `lint:tokens`가 hex 색을 넣은 임시 파일을 잡아낸다
-- [ ] `api/client.ts`: 401이면 로그인 이동 콜백 호출, 503이면 `ApiError(503)`
+- [x] `date_cases.json`의 연령 구간 사례가 Python·Node와 같은 결과
+- [x] `formatMD`·`dDayLabel`: D-7, D-1(내일), D-0(오늘), 지연
+- [x] 기본 컴포넌트 각각 `vitest-axe` 위반 0건, 키보드로 조작 가능, 이모지 버튼에 `aria-label`
+- [x] `Modal`: 열면 포커스가 안으로, Esc로 닫으면 연 버튼으로 포커스 복귀
+- [x] `ConfirmModal`(이름 입력 변형): 입력이 정확히 같을 때만 확인 버튼 활성
+- [x] `data-motion="reduced"`에서 `Toast`·`Modal`이 페이드만 쓴다 (Framer Motion `useReducedMotion` 경로)
+- [x] `lint:tokens`가 hex 색을 넣은 임시 파일을 잡아낸다
+- [x] `api/client.ts`: 401이면 로그인 이동 콜백 호출, 503이면 `ApiError(503)`
 
 **완료 조건 매핑** (plan.md F-1)
 - `package.json`·Vite·ESLint+Prettier·`npm run dev`(:5173) → F-0, 이 task
@@ -227,19 +227,19 @@ flowchart LR
 **의존성**: F-1, B-2 (B-2 전에는 MSW)
 
 **작업**
-- [ ] `RequireAuth`: 앱 시작 시 `GET /api/me`. 로딩 중에는 마스코트 스켈레톤, 401이면 `/login?next=<원래 경로>`
-- [ ] W01 로그인: 이메일·비밀번호(👁 보기), 오류 "이메일 또는 비밀번호가 맞지 않아요"(계정 존재 여부를 알리지 않음), 성공 시 반려동물이 있으면 `next` 또는 W05, 없으면 W03
-- [ ] W02 가입: 이메일·비밀번호(8자 이상, D4는 phase2_task.md)·닉네임, 데모 안내 체크, 409 → 이메일 칸 아래 "이미 사용 중인 이메일이에요", 400 → 필드별 안내. 성공 → W03 첫 등록
-- [ ] 이메일은 입력 그대로 보여 주고 서버가 소문자로 저장한다 (화면에서 바꾸지 않음, wireframe W02)
-- [ ] 로그아웃(W12 버튼): `POST /api/auth/logout` → 캐시 비우기 → W01
-- [ ] 입력 오류는 칸 아래 `aria-describedby`로 연결, 제출 실패 시 첫 오류 칸으로 포커스
+- [x] `RequireAuth`: 앱 시작 시 `GET /api/me`. 로딩 중에는 마스코트 스켈레톤, 401이면 `/login?next=<원래 경로>`
+- [x] W01 로그인: 이메일·비밀번호(👁 보기), 오류 "이메일 또는 비밀번호가 맞지 않아요"(계정 존재 여부를 알리지 않음), 성공 시 반려동물이 있으면 `next` 또는 W05, 없으면 W03
+- [x] W02 가입: 이메일·비밀번호(8자 이상, D4는 phase2_task.md)·닉네임, 데모 안내 체크, 409 → 이메일 칸 아래 "이미 사용 중인 이메일이에요", 400 → 필드별 안내. 성공 → W03 첫 등록
+- [x] 이메일은 입력 그대로 보여 주고 서버가 소문자로 저장한다 (화면에서 바꾸지 않음, wireframe W02)
+- [x] 로그아웃(W12 버튼): `POST /api/auth/logout` → 캐시 비우기 → W01
+- [x] 입력 오류는 칸 아래 `aria-describedby`로 연결, 제출 실패 시 첫 오류 칸으로 포커스
 
 **테스트** (`src/pages/W01Login.test.tsx`, `W02Signup.test.tsx`, MSW)
-- [ ] 로그인 실패 문구가 "없는 이메일"과 "틀린 비밀번호"에서 같다
-- [ ] 가입 409 → 이메일 칸 오류, 다른 칸 값 유지
-- [ ] 비로그인으로 `/health` 진입 → `/login?next=/health` → 로그인 후 `/health`
-- [ ] 로그아웃 후 뒤로 가기로 보호 화면에 들어가도 로그인으로 보낸다 (캐시 비움)
-- [ ] (E2E) S01 1·2·5단계: `NewBie@Demo.DailyPet` 가입 → W03, 로그아웃 → `/api/pets` 401 → 다시 로그인
+- [x] 로그인 실패 문구가 "없는 이메일"과 "틀린 비밀번호"에서 같다
+- [x] 가입 409 → 이메일 칸 오류, 다른 칸 값 유지
+- [x] 비로그인으로 `/health` 진입 → `/login?next=/health` → 로그인 후 `/health`
+- [x] 로그아웃 후 뒤로 가기로 보호 화면에 들어가도 로그인으로 보낸다 (캐시 비움)
+- [x] (E2E) S01 1·2·5단계: `NewBie@Demo.DailyPet` 가입 → W03, 로그아웃 → `/api/pets` 401 → 다시 로그인
 
 ---
 
@@ -248,8 +248,8 @@ flowchart LR
 **의존성**: F-2, B-4 (B-4 전에는 MSW)
 
 **작업**
-- [ ] `state/currentPet.tsx`: 1.5 반려동물 전환 규칙. 전환 시 `queryClient`의 반려동물별 쿼리는 키에 `petId`가 들어 있어 따로 캐시된다. 전환 이벤트를 구독할 수 있게 한다 (F-5 자동 거절용)
-- [ ] W03 등록·수정 (`/pets/new`, `/pets/:id/edit`)
+- [x] `state/currentPet.tsx`: 1.5 반려동물 전환 규칙. 전환 시 `queryClient`의 반려동물별 쿼리는 키에 `petId`가 들어 있어 따로 캐시된다. 전환 이벤트를 구독할 수 있게 한다 (F-5 자동 거절용)
+- [x] W03 등록·수정 (`/pets/new`, `/pets/:id/edit`)
   - 필수: 이름·종·생년월일·체중. 빈 칸이면 칸 아래 안내, 제출 막음 (서버 400 필드 오류도 같은 자리에 표시)
   - 종은 🐶 강아지 / 🐱 고양이 라디오 2개 + "다른 동물은 지원 예정이에요" 안내. 수정 화면에서는 종을 바꿀 수 없다 (phase2_task.md B-4)
   - 생년월일 입력 시 연령 구간 미리보기 ("어린 동물 (3개월)"), 미래 날짜 막음
@@ -260,20 +260,20 @@ flowchart LR
   - 접종·검진 이력(등록 때만): `GET /api/catalog?category=health&species=`에서 종에 맞는 항목, 회차 날짜 입력 또는 "모름" → `health_history`
   - 수정 저장 후 응답 `tasks_outdated: true`면 W05에 "프로필이 바뀌었어요 [할 일 다시 제안]" 배너를 띄울 표시를 남긴다 (반려동물별, 다시 제안하면 지움)
   - 저장 성공 → 새로 등록했으면 그 반려동물로 전환 후 W05
-- [ ] W04 관리 (`/pets`): 카드(마스코트·품종·나이·체중·알레르기), [수정] → W03, [삭제] → 이름 입력 확인 모달 → `DELETE /api/pets/:id` `{ confirm_name }`
+- [x] W04 관리 (`/pets`): 카드(마스코트·품종·나이·체중·알레르기), [수정] → W03, [삭제] → 이름 입력 확인 모달 → `DELETE /api/pets/:id` `{ confirm_name }`
   - 실패(500) 시 "삭제하지 못했어요. 잠시 후 다시 시도해 주세요", 목록 유지 (S20 예외 흐름)
   - 선택 중이던 반려동물을 지우면 첫 반려동물로 전환, 0마리면 등록 안내
-- [ ] `PetTabs`: 등록 순서, 선택 상태를 `aria-selected`로, 좌우 화살표 키로 이동
+- [x] `PetTabs`: 등록 순서, 선택 상태를 `aria-selected`로, 좌우 화살표 키로 이동
 
 **테스트** (MSW)
-- [ ] 필수값 4개를 하나씩 비우고 저장 → 그 칸에 안내, 요청 0회 (S01 예외)
-- [ ] 종 선택지가 정확히 2개
-- [ ] 생년월일 2026-08-01, 기준일 11/10 → "어린 동물 (3개월)"
-- [ ] 수정 저장 → W05에 배너, [할 일 다시 제안] 후 배너 사라짐 (S05 4단계)
-- [ ] 삭제 모달: 이름이 다르면 버튼 비활성, 같으면 `confirm_name`과 함께 요청 (S20 1단계)
-- [ ] 보리 → 나비 전환 시 URL `?pet=pet_nabi`, 새로고침해도 나비 유지 (S02)
-- [ ] 목록에 없는 `?pet=pet_mocha`(다른 사용자) → 첫 반려동물로 바뀌고 요청에 `pet_mocha`가 쓰이지 않는다
-- [ ] (E2E) S01 3단계: 두부 등록 → W05 진입, 건강 일정 화면에 "이력 확인 필요" 항목이 있다
+- [x] 필수값 4개를 하나씩 비우고 저장 → 그 칸에 안내, 요청 0회 (S01 예외)
+- [x] 종 선택지가 정확히 2개
+- [x] 생년월일 2026-08-01, 기준일 11/10 → "어린 동물 (3개월)"
+- [x] 수정 저장 → W05에 배너, [할 일 다시 제안] 후 배너 사라짐 (S05 4단계)
+- [x] 삭제 모달: 이름이 다르면 버튼 비활성, 같으면 `confirm_name`과 함께 요청 (S20 1단계)
+- [x] 보리 → 나비 전환 시 URL `?pet=pet_nabi`, 새로고침해도 나비 유지 (S02)
+- [x] 목록에 없는 `?pet=pet_mocha`(다른 사용자) → 첫 반려동물로 바뀌고 요청에 `pet_mocha`가 쓰이지 않는다
+- [x] (E2E) S01 3단계: 두부 등록 → W05 진입, 건강 일정 화면에 "이력 확인 필요" 항목이 있다
 
 **완료 조건 매핑** (plan.md F-3): 등록·수정·삭제(확인 대화상자)·전환 (S01, S02, S20), 알레르기·질환·기본 시간대 입력
 
@@ -284,11 +284,11 @@ flowchart LR
 **의존성**: F-3, B-5, B-6 (전에는 MSW)
 
 **작업 — W05 오늘의 할 일**
-- [ ] `useTodayTasks(petId)`: `GET /api/pets/:id/tasks` (오늘). 응답 `notice`·`retryable`(phase2_task.md B-6)이 있으면 할 일 영역만 "(😿) 추천을 불러오지 못했어요 [다시 시도]" (S22 3단계). 알림·체중 카드는 따로 불러와 영향을 받지 않는다
-- [ ] 첫 생성 중: 마스코트 쓰기 애니메이션 + 스켈레톤 카드 3개 (움직임 줄이기면 정지 스켈레톤)
-- [ ] 인사·진행률: 마스코트 1인칭 인사, "11월 10일 화요일 · 오늘의 할 일 2/6", `ProgressBar`(색 + 숫자)
-- [ ] 정렬: 시간순, 시간이 없는 항목은 맨 아래 (wireframe W05)
-- [ ] `TaskCard` (Style-guide.md 7.4, 카테고리 색 3.4장)
+- [x] `useTodayTasks(petId)`: `GET /api/pets/:id/tasks` (오늘). 응답 `notice`·`retryable`(phase2_task.md B-6)이 있으면 할 일 영역만 "(😿) 추천을 불러오지 못했어요 [다시 시도]" (S22 3단계). 알림·체중 카드는 따로 불러와 영향을 받지 않는다
+- [x] 첫 생성 중: 마스코트 쓰기 애니메이션 + 스켈레톤 카드 3개 (움직임 줄이기면 정지 스켈레톤)
+- [x] 인사·진행률: 마스코트 1인칭 인사, "11월 10일 화요일 · 오늘의 할 일 2/6", `ProgressBar`(색 + 숫자)
+- [x] 정렬: 시간순, 시간이 없는 항목은 맨 아래 (wireframe W05)
+- [x] `TaskCard` (Style-guide.md 7.4, 카테고리 색 3.4장)
   - 완료 체크: 낙관적 갱신 → `PATCH /api/tasks/:id {done}`. 실패하면 되돌리고 토스트. 반짝임 파티클(12개 이하) + 스프링 바운스 + 마스코트 기쁨, 움직임 줄이기면 체크 표시만
   - 👍/👎 (`aria-label` "좋아요"/"싫어요", `aria-pressed`): `POST /api/pets/:id/feedback`. 👎 토스트 "M/D까지 추천하지 않아요" (날짜 = 오늘 + 6일, 서버 응답 값이 있으면 그것을 쓴다)
   - 🔄 바꾸기: `POST /api/tasks/:id/swap`. `swapped: false`면 "더 추천할 항목이 없어요", 카드 유지
@@ -298,45 +298,45 @@ flowchart LR
   - 건강 할 일(`category=health`)에는 👍/👎/바꾸기가 **없다**. `[일정 ›]` → W07에서 그 일정 강조
   - 직접 추가 항목에는 ✍️ 직접 추가 배지
   - 메타 줄: 영역·강도·태그 (카탈로그 ID는 보여 주지 않음)
-- [ ] [＋ 직접 추가] → W06, [↻ 할 일 다시 제안] → 확인 모달 → `POST .../tasks/generate {confirm:true}`. 503이면 "지금은 다시 제안할 수 없어요" + 기존 목록 유지
-- [ ] 모두 완료하면 "(🎉) 오늘 할 일을 모두 마쳤어요!" + 축하 반짝임 1회
-- [ ] 체중 카드: 프로필 체중 + [기록하기 ›] → W08
-- [ ] 프로필 변경 배너 (F-3에서 남긴 표시, W08 저장도 같은 표시)
+- [x] [＋ 직접 추가] → W06, [↻ 할 일 다시 제안] → 확인 모달 → `POST .../tasks/generate {confirm:true}`. 503이면 "지금은 다시 제안할 수 없어요" + 기존 목록 유지
+- [x] 모두 완료하면 "(🎉) 오늘 할 일을 모두 마쳤어요!" + 축하 반짝임 1회
+- [x] 체중 카드: 프로필 체중 + [기록하기 ›] → W08
+- [x] 프로필 변경 배너 (F-3에서 남긴 표시, W08 저장도 같은 표시)
 
 **작업 — 알림 (W00 🔔, W05 배너, W05-b 시트)**
-- [ ] `useNotifications()`: `GET /api/notifications` (반려동물 무관, 사용자 전체). 대시보드 진입·포커스 복귀 때 새로 불러온다
-- [ ] 배너: 가장 급한 1건(지연 → 오늘 → D-1 → D-7, 서버 순서 그대로) + [보기 ›]. 지연은 붉은 강조 "지연됨"(색 + ⚠ + 글자)
-- [ ] 🔔 숫자 = 알림 개수, 시트에 전체 목록. 항목을 누르면 그 반려동물로 전환 후 W07
-- [ ] 시트 하단 안내 "D-7 · D-1 · 당일 · 지연된 일정만 알려 드려요"
+- [x] `useNotifications()`: `GET /api/notifications` (반려동물 무관, 사용자 전체). 대시보드 진입·포커스 복귀 때 새로 불러온다
+- [x] 배너: 가장 급한 1건(지연 → 오늘 → D-1 → D-7, 서버 순서 그대로) + [보기 ›]. 지연은 붉은 강조 "지연됨"(색 + ⚠ + 글자)
+- [x] 🔔 숫자 = 알림 개수, 시트에 전체 목록. 항목을 누르면 그 반려동물로 전환 후 W07
+- [x] 시트 하단 안내 "D-7 · D-1 · 당일 · 지연된 일정만 알려 드려요"
 
 **작업 — W06 직접 추가 모달**
-- [ ] 직접 입력(제목 + 시간 선택) / 추천 목록에서 고르기(영역 탭 식단·활동, 검색, `GET /api/catalog?category=&species=`) → `POST /api/pets/:id/tasks`
-- [ ] 목록은 서버가 준 것만 보여 준다. 화면에서 알레르기·질환을 다시 거르지 않는다 → 서버가 **반려동물 기준 안전 필터**를 적용해 주는지 확인 (D5)
+- [x] 직접 입력(제목 + 시간 선택) / 추천 목록에서 고르기(영역 탭 식단·활동, 검색, `GET /api/catalog?category=&species=`) → `POST /api/pets/:id/tasks`
+- [x] 목록은 서버가 준 것만 보여 준다. 화면에서 알레르기·질환을 다시 거르지 않는다 → 서버가 **반려동물 기준 안전 필터**를 적용해 주는지 확인 (D5)
 
 **작업 — W07 건강 일정**
-- [ ] `GET /api/pets/:id/health-events` → 이력 확인 필요(맨 위, 노란 배지) / 다가오는 일정 / 지난 기록(접힘)
-- [ ] 상태 배지: `D-n` · `D-1`·`오늘`(강조) · `지연됨` · `이력 확인 필요` · `완료` (Style-guide.md 7.5)
-- [ ] [완료] → 모달(실제 완료일, 미래 날짜 막음) → `PATCH .../complete`. 다음 일정 **미리보기**는 서버 응답의 다음 일정을 보여 준다 (화면에서 회차·간격을 계산하지 않음 → 미리보기를 저장 전에 보여 주려면 D2)
-- [ ] 이력 확인 필요 항목: [마지막 날짜 입력] → `PATCH {last_done_date}`, [날짜 정하기] → `PATCH {due_date}`
-- [ ] ⋯ → 날짜 변경 (`PATCH {due_date}`, 승인 없음)
-- [ ] 캘린더 뷰: 월간 달력에 일정 점, 날짜를 누르면 그날 목록. 키보드로 날짜 이동 (`role="grid"`)
-- [ ] 하단 안내 "일정은 일반 권장 시기예요. 정확한 시기는 동물병원과 상의해 주세요"
-- [ ] 완료·변경 후 `notifications`, `health-events`, 오늘 `tasks` 쿼리를 무효화한다
+- [x] `GET /api/pets/:id/health-events` → 이력 확인 필요(맨 위, 노란 배지) / 다가오는 일정 / 지난 기록(접힘)
+- [x] 상태 배지: `D-n` · `D-1`·`오늘`(강조) · `지연됨` · `이력 확인 필요` · `완료` (Style-guide.md 7.5)
+- [x] [완료] → 모달(실제 완료일, 미래 날짜 막음) → `PATCH .../complete`. 다음 일정 **미리보기**는 서버 응답의 다음 일정을 보여 준다 (화면에서 회차·간격을 계산하지 않음 → 미리보기를 저장 전에 보여 주려면 D2)
+- [x] 이력 확인 필요 항목: [마지막 날짜 입력] → `PATCH {last_done_date}`, [날짜 정하기] → `PATCH {due_date}`
+- [x] ⋯ → 날짜 변경 (`PATCH {due_date}`, 승인 없음)
+- [x] 캘린더 뷰: 월간 달력에 일정 점, 날짜를 누르면 그날 목록. 키보드로 날짜 이동 (`role="grid"`)
+- [x] 하단 안내 "일정은 일반 권장 시기예요. 정확한 시기는 동물병원과 상의해 주세요"
+- [x] 완료·변경 후 `notifications`, `health-events`, 오늘 `tasks` 쿼리를 무효화한다
 
 **테스트** (MSW 화면 테스트 + E2E)
-- [ ] S03: 콩이 11/10 → 배너에 광견병 D-7만, 할 일에 DHPP D-3·광견병 D-7 둘 다 (MSW 목은 Backend 규칙대로 만든 값)
-- [ ] 같은 날 대시보드를 두 번 열어도 `GET .../tasks`만 호출되고 생성 API는 0회
-- [ ] 완료 체크 → 새로고침 후에도 ☑ (S03)
-- [ ] `prefers-reduced-motion: reduce` 에뮬레이션 → 반짝임 요소가 렌더되지 않는다 (S03)
-- [ ] 건강 할 일 카드에 👍/👎/바꾸기 버튼이 없다
-- [ ] 바꾸기 `swapped:false` → 안내 토스트, 카드 유지 (S04 예외)
-- [ ] 삭제 → 5초 안에 되돌리기 → `DELETE` 0회 / 5초 후 → `DELETE` 1회 (가짜 타이머)
-- [ ] `relaxed:["dislike"]` 항목에 ⟨싫어요 표시한 항목⟩ 배지
-- [ ] 다시 제안 확인 모달 [취소] → 요청 0회 (S04 예외)
-- [ ] 할 일 응답 `notice` → 할 일 영역만 오류, 알림 배너·체중 카드는 정상 (S22 3단계)
-- [ ] W07 완료 모달 11/14 → 다음 일정 "4차 · 12/12 (토)"가 표시된다 (S11, 서버 응답 기준)
-- [ ] (E2E) S04 1 ~ 6단계 (모카): 낚싯대 놀이 없음, 활동 시간 19:00 이후, 바꾸기·👍·삭제·"21:00 빗질" 직접 추가·다시 제안 후 완료·직접 추가 유지
-- [ ] (E2E) S11: `TODAY_OVERRIDE=2026-11-14`로 DHPP 3차 완료, 구충 이력 입력 → "이력 확인 필요" 사라짐
+- [x] S03: 콩이 11/10 → 배너에 광견병 D-7만, 할 일에 DHPP D-3·광견병 D-7 둘 다 (MSW 목은 Backend 규칙대로 만든 값)
+- [x] 같은 날 대시보드를 두 번 열어도 `GET .../tasks`만 호출되고 생성 API는 0회
+- [x] 완료 체크 → 새로고침 후에도 ☑ (S03)
+- [x] `prefers-reduced-motion: reduce` 에뮬레이션 → 반짝임 요소가 렌더되지 않는다 (S03)
+- [x] 건강 할 일 카드에 👍/👎/바꾸기 버튼이 없다
+- [x] 바꾸기 `swapped:false` → 안내 토스트, 카드 유지 (S04 예외)
+- [x] 삭제 → 5초 안에 되돌리기 → `DELETE` 0회 / 5초 후 → `DELETE` 1회 (가짜 타이머)
+- [x] `relaxed:["dislike"]` 항목에 ⟨싫어요 표시한 항목⟩ 배지
+- [x] 다시 제안 확인 모달 [취소] → 요청 0회 (S04 예외)
+- [x] 할 일 응답 `notice` → 할 일 영역만 오류, 알림 배너·체중 카드는 정상 (S22 3단계)
+- [x] W07 완료 모달 11/14 → 다음 일정 "4차 · 12/12 (토)"가 표시된다 (S11, 서버 응답 기준)
+- [ ] (E2E) S04 1 ~ 6단계 (모카) — **일부만**: 낚싯대 놀이 없음·활동 19:00 이후는 E2E(`e2e/scenarios.e2e.ts`), 바꾸기·👍·직접 추가·다시 제안은 MSW 화면 테스트(F4.test.tsx)로만 확인: 낚싯대 놀이 없음, 활동 시간 19:00 이후, 바꾸기·👍·삭제·"21:00 빗질" 직접 추가·다시 제안 후 완료·직접 추가 유지
+- [ ] (E2E) S11 — **미실행**: E2E Backend는 기준일 11/10 하나로 띄우므로 11/14 기준 Backend가 따로 필요. 화면은 MSW 테스트로 확인: `TODAY_OVERRIDE=2026-11-14`로 DHPP 3차 완료, 구충 이력 입력 → "이력 확인 필요" 사라짐
 
 **완료 조건 매핑** (plan.md F-4): 할 일·완료·교체·시간 설정·직접 추가·👍/👎, 건강 알림 배너·일정 완료, 👎 완화 표시, S03·S04·S11 체크리스트
 
@@ -360,42 +360,42 @@ flowchart LR
 | "나비를 선택한 뒤 요청해 주세요 [나비로 전환]" | 답변·trace에서 대상 반려동물 id를 알아야 함 | 확정 (D3): 답변 문구 "«이름»를(을) 선택한 뒤 요청해 주세요" + 내 반려동물 이름 일치 |
 
 **작업**
-- [ ] W09 레이아웃: 모바일 1열 / 데스크톱 왼쪽 대화 목록(W10 컴포넌트 재사용) + 오른쪽 대화창. 상단 [🗂 대화 기록] [✎ 새 대화]
-- [ ] `/chat/:threadId`: `GET /api/threads/:id`로 지난 메시지를 불러온다. 다른 반려동물의 thread면 그 반려동물로 전환하지 않고 W10으로 보낸다 (접두사 `thr_{user}_{pet}_`로 판정, 서버 404도 같은 처리)
-- [ ] 보내기: `POST /api/chat {question, petId, threadId?}`
+- [x] W09 레이아웃: 모바일 1열 / 데스크톱 왼쪽 대화 목록(W10 컴포넌트 재사용) + 오른쪽 대화창. 상단 [🗂 대화 기록] [✎ 새 대화]
+- [x] `/chat/:threadId`: `GET /api/threads/:id`로 지난 메시지를 불러온다. 다른 반려동물의 thread면 그 반려동물로 전환하지 않고 W10으로 보낸다 (접두사 `thr_{user}_{pet}_`로 판정, 서버 404도 같은 처리)
+- [x] 보내기: `POST /api/chat {question, petId, threadId?}`
   - 응답 대기 중 마스코트 말풍선 "생각 중…" 점 애니메이션 (움직임 줄이기면 정지 텍스트), 같은 thread에서 중복 전송 막음
   - 응답의 `thread_id`를 URL에 반영 (`/chat/:threadId`, replace)
   - 새 답변 영역 `aria-live="polite"`
   - 503 → 입력창 위 배너 "(😿) 잠시 후 다시 시도해 주세요", 보낸 메시지에 [다시 보내기] (S22 2단계)
-- [ ] 입력: 1,000자 제한, 카운터 "0 / 1,000", 넘으면 전송 비활성. 아래 도움말 "전화번호·주소 같은 개인정보는 입력하지 않아도 돼요". 추천 질문 칩 3개 (종에 맞게)
-- [ ] `ChatBubble`: 사용자/도우미 말풍선 (Style-guide.md 7.6), 마스코트 표정(답변 종류별 기본·미안·걱정)
+- [x] 입력: 1,000자 제한, 카운터 "0 / 1,000", 넘으면 전송 비활성. 아래 도움말 "전화번호·주소 같은 개인정보는 입력하지 않아도 돼요". 추천 질문 칩 3개 (종에 맞게)
+- [x] `ChatBubble`: 사용자/도우미 말풍선 (Style-guide.md 7.6), 마스코트 표정(답변 종류별 기본·미안·걱정)
   - 답변 텍스트는 **일반 텍스트로** 렌더한다 (HTML 해석 금지). 줄바꿈·목록 기호만 처리
   - 서버가 마스킹한 값(`010-****-5678`)을 그대로 보여 준다
-- [ ] `EvidencePanel` (W09-a): "🔎 근거 보기 ▾" 펼침 → contexts 목록(발췌, 출처 기관) + trace를 `traceLabels`로 바꾼 단계 목록. 표에 없는 항목은 "처리 중 단계"로 묶고, `args`는 절대 보여 주지 않는다
-- [ ] `lib/traceLabels.ts`: Agent 이름(supervisor·diet_agent·exercise_agent·health_agent·general_agent) → "상담 도우미"·"식단 도우미"·"운동 도우미"·"건강 도우미"·"상식 도우미", 도구 이름 → 사용자 문구 (ARCHITECTURE.md 3.4 도구 목록 전부)
-- [ ] `SourcesBox` (W09-b): 출처 제목·도메인, `target="_blank" rel="noopener noreferrer"`, `http(s)` 링크만 허용, 안내 "일반 정보예요. 정확한 판단은 수의사와 상담하세요", "🌐 상식 도우미가 웹에서 찾아봤어요". 저장 버튼 없음
-- [ ] `ApprovalCard` (W09-c, Style-guide.md 7.7)
+- [x] `EvidencePanel` (W09-a): "🔎 근거 보기 ▾" 펼침 → contexts 목록(발췌, 출처 기관) + trace를 `traceLabels`로 바꾼 단계 목록. 표에 없는 항목은 "처리 중 단계"로 묶고, `args`는 절대 보여 주지 않는다
+- [x] `lib/traceLabels.ts`: Agent 이름(supervisor·diet_agent·exercise_agent·health_agent·general_agent) → "상담 도우미"·"식단 도우미"·"운동 도우미"·"건강 도우미"·"상식 도우미", 도구 이름 → 사용자 문구 (ARCHITECTURE.md 3.4 도구 목록 전부)
+- [x] `SourcesBox` (W09-b): 출처 제목·도메인, `target="_blank" rel="noopener noreferrer"`, `http(s)` 링크만 허용, 안내 "일반 정보예요. 정확한 판단은 수의사와 상담하세요", "🌐 상식 도우미가 웹에서 찾아봤어요". 저장 버튼 없음
+- [x] `ApprovalCard` (W09-c, Style-guide.md 7.7)
   - [승인] → `POST /api/chat/resume {threadId, decisions:[{type:"approve"}]}` → "✔ 등록했어요", 건강 일정·알림·할 일 쿼리 무효화
   - [날짜 수정] → 카드 안 날짜 선택 → [수정해서 승인] (`edit` + `edited_action`)
   - [거절] → `reject` → "등록하지 않았어요"
   - 승인 대기 중 입력창 안내 "새로 질문하면 위 요청은 취소돼요"
   - **자동 거절 표시**: 대기 중 새 메시지를 보내거나 반려동물을 바꾸면 카드를 "⊘ 취소된 요청"으로 바꾸고 "이전 일정 요청은 취소했어요" 안내. 실제 거절은 Agent가 다음 `/query` 때 한다 (phase1_task.md A-8). 반려동물을 바꾸면 다음 질문이 새 thread이므로 화면 표시만 바꾸고, 이전 thread를 다시 열면 서버 상태대로 보여 준다
   - resume 403·404 → "이미 처리되었거나 찾을 수 없는 요청이에요"
-- [ ] 특수 응답 (W09-d): 위 판정 규칙대로 응급 박스(붉은 강조, 반짝임·농담 금지), 범위 밖 거절(미안 표정), 차단 안내, 취향 저장 칩, 다른 반려동물 쓰기 안내
+- [x] 특수 응답 (W09-d): 위 판정 규칙대로 응급 박스(붉은 강조, 반짝임·농담 금지), 범위 밖 거절(미안 표정), 차단 안내, 취향 저장 칩, 다른 반려동물 쓰기 안내
 
 **테스트** (`src/lib/chatView.test.ts`, `src/pages/W09Chat.test.tsx`, MSW)
-- [ ] `chatView`: 평가셋 대표 문항별 가짜 응답 6종(diet·health HITL·general 웹 검색·safety 응급·injection 차단·personalization 취향 저장) → 표시 모델 스냅샷
-- [ ] `traceLabels`: ARCHITECTURE.md 3.4의 모든 도구 이름에 문구가 있다 (도구 목록을 상수로 두고 비교). 모르는 이름 → "처리 중 단계"
-- [ ] 근거 보기에 `args` 값, `user_id`, `pet_` id, 영어 도구 이름이 없다 (렌더 결과 텍스트 검색)
-- [ ] 답변에 `<img src=x onerror=…>`가 있어도 태그로 렌더되지 않는다
-- [ ] S06: 보리 간식 질문 → 답변 + "식단 도우미가 답했어요" + 근거 보기에 contexts 2개
-- [ ] S10: interrupt 응답 → 승인 카드, [승인] → resume 요청 본문 `approve`, 카드 "✔ 등록했어요", 일정 쿼리 무효화
-- [ ] S10: 대기 중 새 메시지 → 카드 "⊘ 취소된 요청" / 반려동물 전환 → 같은 표시 + 토스트
-- [ ] S12: 웹 검색 답변 → 출처 링크 `target=_blank`, 안내 문구, "할 일에 추가" 버튼 없음
-- [ ] S08 (P1 호두 식단+운동): 두 도우미 handoff가 근거 보기 단계에 모두 보인다
-- [ ] 1,001자 → 전송 버튼 비활성
-- [ ] 503 → 배너 + [다시 보내기] → 같은 질문 재전송
-- [ ] (E2E, A-9 이후) S06·S10 실제 Agent: 답변·근거 보기·승인 → W07에 새 일정
+- [x] `chatView`: 평가셋 대표 문항별 가짜 응답 6종(diet·health HITL·general 웹 검색·safety 응급·injection 차단·personalization 취향 저장) → 표시 모델 스냅샷
+- [x] `traceLabels`: ARCHITECTURE.md 3.4의 모든 도구 이름에 문구가 있다 (도구 목록을 상수로 두고 비교). 모르는 이름 → "처리 중 단계"
+- [x] 근거 보기에 `args` 값, `user_id`, `pet_` id, 영어 도구 이름이 없다 (렌더 결과 텍스트 검색)
+- [x] 답변에 `<img src=x onerror=…>`가 있어도 태그로 렌더되지 않는다
+- [x] S06: 보리 간식 질문 → 답변 + "식단 도우미가 답했어요" + 근거 보기에 contexts 2개
+- [x] S10: interrupt 응답 → 승인 카드, [승인] → resume 요청 본문 `approve`, 카드 "✔ 등록했어요", 일정 쿼리 무효화
+- [x] S10: 대기 중 새 메시지 → 카드 "⊘ 취소된 요청" / 반려동물 전환 → 같은 표시 + 토스트
+- [x] S12: 웹 검색 답변 → 출처 링크 `target=_blank`, 안내 문구, "할 일에 추가" 버튼 없음
+- [x] S08 (P1 호두 식단+운동): 두 도우미 handoff가 근거 보기 단계에 모두 보인다
+- [x] 1,001자 → 전송 버튼 비활성
+- [x] 503 → 배너 + [다시 보내기] → 같은 질문 재전송
+- [x] (E2E, A-9 이후) S06·S10 실제 Agent: 답변·근거 보기·승인 → W07에 새 일정
 
 **완료 조건 매핑** (plan.md F-5): 질문·답변·근거(`contexts`)·처리 과정(`trace`), HITL 승인/거절·자동 거절 안내, 웹 검색 출처·안내, S06·S08·S10·S12
 
@@ -406,42 +406,42 @@ flowchart LR
 **의존성**: F-3, B-7, B-8 (전에는 MSW)
 
 **작업 — W11 내 취향**
-- [ ] `GET /api/pets/:id/preferences` → 👍 좋아해요 / 👎 싫어해요("M/D까지 추천하지 않아요", 기한이 지난 항목은 "지금은 다시 추천돼요") / ⏰ 지켜야 할 조건 / ⭐ 자주 한 활동
-- [ ] 조건 문구: `activity_time_after:19:00` → "놀이·산책은 19:00 이후"처럼 사람이 읽는 문구로 바꾼다 (ARCHITECTURE.md 3.8 constraint 형식 4종 + 자유 텍스트는 그대로)
-- [ ] `scope: "all_pets"` 행에 "👤 모든 아이 공통" 배지. ✕ 누르면 "모든 반려동물에서 지워져요" 확인 후 삭제 (SERVICE.md F9)
-- [ ] 그 밖의 ✕는 즉시 삭제 + "다음 추천부터 다시 후보에 들어가요" 토스트 (S04 8단계)
-- [ ] [전체 초기화] → 확인 모달 "모카의 취향과 활동 기록 점수가 초기화돼요" → `DELETE .../preferences` → 빈 상태 (S21)
-- [ ] ⭐ 자주 한 활동(3회 이상 완료): Backend 응답에 단골 목록이 필요하다 → **결정(D4): Backend가 응답 `frequent`로 준다** (ARCHITECTURE.md 4.2, phase2_task.md B-7)
+- [x] `GET /api/pets/:id/preferences` → 👍 좋아해요 / 👎 싫어해요("M/D까지 추천하지 않아요", 기한이 지난 항목은 "지금은 다시 추천돼요") / ⏰ 지켜야 할 조건 / ⭐ 자주 한 활동
+- [x] 조건 문구: `activity_time_after:19:00` → "놀이·산책은 19:00 이후"처럼 사람이 읽는 문구로 바꾼다 (ARCHITECTURE.md 3.8 constraint 형식 4종 + 자유 텍스트는 그대로)
+- [x] `scope: "all_pets"` 행에 "👤 모든 아이 공통" 배지. ✕ 누르면 "모든 반려동물에서 지워져요" 확인 후 삭제 (SERVICE.md F9)
+- [x] 그 밖의 ✕는 즉시 삭제 + "다음 추천부터 다시 후보에 들어가요" 토스트 (S04 8단계)
+- [x] [전체 초기화] → 확인 모달 "모카의 취향과 활동 기록 점수가 초기화돼요" → `DELETE .../preferences` → 빈 상태 (S21)
+- [x] ⭐ 자주 한 활동(3회 이상 완료): Backend 응답에 단골 목록이 필요하다 → **결정(D4): Backend가 응답 `frequent`로 준다** (ARCHITECTURE.md 4.2, phase2_task.md B-7)
 
 **작업 — W08 체중 기록**
-- [ ] 입력(날짜·체중), 종별 범위 안내, 미래 날짜 막음. 409 → "이 날짜에 기록이 있어요. 덮어쓸까요?" 확인 → `overwrite: true`
-- [ ] `WeightChart`: 자체 SVG 꺾은선, 점마다 값 텍스트(색만으로 구분하지 않음), `<title>`·표 대체(스크린리더용 숨은 표)
-- [ ] 마스코트 한마디: 첫 기록 대비 변화 ("1.8kg 줄었어요!"). 증가·감소를 판단·평가하는 말(진단처럼 들리는 말)은 쓰지 않는다 (Style-guide.md 11장)
-- [ ] 기록 목록(최근 순) + 🗑 삭제(확인) → 프로필 체중이 이전 값으로 돌아간 것을 반영
-- [ ] 저장·삭제 후 W05 "프로필이 바뀌었어요" 표시
+- [x] 입력(날짜·체중), 종별 범위 안내, 미래 날짜 막음. 409 → "이 날짜에 기록이 있어요. 덮어쓸까요?" 확인 → `overwrite: true`
+- [x] `WeightChart`: 자체 SVG 꺾은선, 점마다 값 텍스트(색만으로 구분하지 않음), `<title>`·표 대체(스크린리더용 숨은 표)
+- [x] 마스코트 한마디: 첫 기록 대비 변화 ("1.8kg 줄었어요!"). 증가·감소를 판단·평가하는 말(진단처럼 들리는 말)은 쓰지 않는다 (Style-guide.md 11장)
+- [x] 기록 목록(최근 순) + 🗑 삭제(확인) → 프로필 체중이 이전 값으로 돌아간 것을 반영
+- [x] 저장·삭제 후 W05 "프로필이 바뀌었어요" 표시
 
 **작업 — W10 대화 기록**
-- [ ] `GET /api/pets/:id/threads` → 제목·마지막 날짜·첫 질문 요약(마스킹된 값), 최근 순. 선택한 반려동물의 대화만
-- [ ] 항목 → `/chat/:threadId`로 이어서 대화
-- [ ] ⋯ → 삭제 확인 → `DELETE /api/threads/:id` → 목록에서 제거, 열려 있던 대화면 새 대화로
-- [ ] 빈 상태: "아직 나눈 대화가 없어요 [대화 시작하기]"
+- [x] `GET /api/pets/:id/threads` → 제목·마지막 날짜·첫 질문 요약(마스킹된 값), 최근 순. 선택한 반려동물의 대화만
+- [x] 항목 → `/chat/:threadId`로 이어서 대화
+- [x] ⋯ → 삭제 확인 → `DELETE /api/threads/:id` → 목록에서 제거, 열려 있던 대화면 새 대화로
+- [x] 빈 상태: "아직 나눈 대화가 없어요 [대화 시작하기]"
 
 **작업 — W12 내 정보·설정**
-- [ ] 닉네임·이메일 (`GET /api/me`)
-- [ ] 테마 자동/밝게/밤하늘, 움직임 줄이기 → `state/settings.tsx` (즉시 적용, 서버 저장 없음)
-- [ ] 로그아웃(F-2), 회원 탈퇴: 이메일 입력 확인 모달 → `DELETE /api/me {confirm_email}` → W01 "그동안 함께해 줘서 고마워요" (S20 2단계)
-- [ ] "오픈소스·에셋 정보" 링크: `doc/assets.md`의 표시 문구를 옮긴 정적 화면 (CC BY 에셋이 없으면 글꼴·아이콘 라이선스만)
+- [x] 닉네임·이메일 (`GET /api/me`)
+- [x] 테마 자동/밝게/밤하늘, 움직임 줄이기 → `state/settings.tsx` (즉시 적용, 서버 저장 없음)
+- [x] 로그아웃(F-2), 회원 탈퇴: 이메일 입력 확인 모달 → `DELETE /api/me {confirm_email}` → W01 "그동안 함께해 줘서 고마워요" (S20 2단계)
+- [x] "오픈소스·에셋 정보" 링크: `doc/assets.md`의 표시 문구를 옮긴 정적 화면 (CC BY 에셋이 없으면 글꼴·아이콘 라이선스만)
 
 **테스트** (MSW)
-- [ ] S21: 보리 전체 초기화 → 빈 상태, 요청 1회
-- [ ] S04 7단계: 모카 취향에 좋아요 "사료 던져 쫓기", 싫어요 "낚싯대…(11/14까지)", 조건 "19:00 이후 · 모든 아이 공통"
-- [ ] 공통 조건 ✕ → 확인 모달이 먼저 뜬다 / 일반 항목 ✕ → 바로 삭제
-- [ ] S05: 보리 33.2kg 기록 → 그래프 점 3개(35.0 → 34.0 → 33.2), 개 `150` → 범위 안내·요청 0회, 같은 날짜 → 덮어쓰기 확인
-- [ ] 33.2 삭제 → 체중 카드 34.0kg
-- [ ] S16: 보리 대화 목록에 나비 대화가 없다, 항목 → 같은 `threadId`로 W09, 삭제 → 목록에서 사라짐
-- [ ] 회원 탈퇴 모달: 이메일이 다르면 버튼 비활성
-- [ ] 테마 밤하늘 선택 → `<html data-theme="dark">`, 새로고침 후 유지, `localStorage` 예외를 던지게 해도 화면이 뜬다
-- [ ] (E2E) S20 2·3단계: 탈퇴 → W01 → 같은 이메일로 다시 가입 → 반려동물 0마리 안내
+- [x] S21: 보리 전체 초기화 → 빈 상태, 요청 1회
+- [x] S04 7단계: 모카 취향에 좋아요 "사료 던져 쫓기", 싫어요 "낚싯대…(11/14까지)", 조건 "19:00 이후 · 모든 아이 공통"
+- [x] 공통 조건 ✕ → 확인 모달이 먼저 뜬다 / 일반 항목 ✕ → 바로 삭제
+- [x] S05: 보리 33.2kg 기록 → 그래프 점 3개(35.0 → 34.0 → 33.2), 개 `150` → 범위 안내·요청 0회, 같은 날짜 → 덮어쓰기 확인
+- [x] 33.2 삭제 → 체중 카드 34.0kg
+- [x] S16: 보리 대화 목록에 나비 대화가 없다, 항목 → 같은 `threadId`로 W09, 삭제 → 목록에서 사라짐
+- [x] 회원 탈퇴 모달: 이메일이 다르면 버튼 비활성
+- [x] 테마 밤하늘 선택 → `<html data-theme="dark">`, 새로고침 후 유지, `localStorage` 예외를 던지게 해도 화면이 뜬다
+- [x] (E2E) S20 2·3단계: 탈퇴 → W01 → 같은 이메일로 다시 가입 → 반려동물 0마리 안내
 
 **완료 조건 매핑** (plan.md F-6): [내 취향] 좋아요·싫어요(제외 기한)·제약·개별 삭제·전체 초기화(S21), 체중 입력·추이(S05), 반려동물별 대화 기록·이어서 대화(S16)
 
@@ -451,12 +451,12 @@ flowchart LR
 
 Style-guide.md 12장(접근성)·14장(리뷰 체크리스트)을 화면마다 확인한다. 자동화할 수 있는 것은 테스트로 둔다.
 
-- [ ] (E2E) 모든 화면에서 `@axe-core/playwright` 위반 0건 (밝게·밤하늘 각각)
-- [ ] (E2E) 375px·1280px에서 `document.documentElement.scrollWidth <= clientWidth` (가로 스크롤 없음), 200% 확대 시에도
-- [ ] (E2E) 키보드만으로 S03 흐름(로그인 → 할 일 완료 → 알림 시트)을 끝낼 수 있다
-- [ ] 터치 영역 44×44px 이상 (토큰 `--size-touch` 최소값으로 강제)
-- [ ] 5개 조합(밝게/밤하늘 × 개/고양이 + 움직임 줄이기)을 `/_styleguide`와 주요 화면에서 스크린샷으로 남긴다 (Playwright `toHaveScreenshot`, 기준 이미지는 커밋)
-- [ ] 화면·코드·에셋 이름에 다른 회사 이름("Disney", "Prism", "Mickey" 등)이 없다 (검색)
+- [x] (E2E) 모든 화면에서 `@axe-core/playwright` 위반 0건 (밝게·밤하늘 각각)
+- [x] (E2E) 375px·1280px에서 `document.documentElement.scrollWidth <= clientWidth` (가로 스크롤 없음), 200% 확대 시에도
+- [x] (E2E) 키보드만으로 S03 흐름(로그인 → 할 일 완료 → 알림 시트)을 끝낼 수 있다
+- [x] 터치 영역 44×44px 이상 (토큰 `--size-touch` 최소값으로 강제)
+- [x] 5개 조합(밝게/밤하늘 × 개/고양이 + 움직임 줄이기)을 `/_styleguide`와 주요 화면에서 스크린샷으로 남긴다 (Playwright `toHaveScreenshot`, 기준 이미지는 커밋)
+- [x] 화면·코드·에셋 이름에 다른 회사 이름("Disney", "Prism", "Mickey" 등)이 없다 (검색)
 
 ---
 
@@ -494,26 +494,27 @@ CLAUDE.md 2장 규칙에 따라, 아래 항목은 **코드보다 문서를 먼�
 
 ## 13. Phase 3 완료 점검
 
-- [ ] `npm test` 전체 통과 (네트워크 없이 30초 이내), `npm run lint`·`npm run typecheck`·`npm run lint:tokens` 통과
-- [ ] `npm run build` 성공
-- [ ] `npm run test:e2e` 통과 (Backend + 시드 리셋, Agent 필요한 채팅 시나리오는 A-9 이후)
-- [ ] wireframe W00 ~ W12가 모두 있고, 14장 화면 ↔ API 대응표의 모든 API를 화면에서 쓴다
-- [ ] S01·S02·S03·S04·S05·S06·S08·S10·S11·S12·S16·S20·S21·S22의 화면(🖥️) 항목을 테스트로 확인했다
-- [ ] 10장 공통 점검(접근성·가로 스크롤·5개 조합·다른 회사 이름 없음)을 통과했다
-- [ ] `src/frontend/`에서 Agent 주소(`:8000`, `/query`, `/tasks/generate`), LLM SDK, 비밀키가 검색되지 않는다
-- [ ] `doc/assets.md`에 쓰는 모든 에셋의 출처·라이선스·확인일이 있다
-- [ ] 11장 문서 수정 D1 ~ D9가 반영되어 있다
-- [ ] plan.md F-1 ~ F-6 완료 조건이 모두 체크되어 있다
-- [ ] 산출물을 커밋했다 (`feat:` / `test:`), `node_modules/`·`dist/`·Playwright 결과물 제외
+- [x] `npm test` 전체 통과 (네트워크 없이 30초 이내), `npm run lint`·`npm run typecheck`·`npm run lint:tokens` 통과
+- [x] `npm run build` 성공
+- [x] `npm run test:e2e` 통과 (Backend + 시드 리셋, Agent 필요한 채팅 시나리오는 A-9 이후)
+- [x] wireframe W00 ~ W12가 모두 있고, 14장 화면 ↔ API 대응표의 모든 API를 화면에서 쓴다
+- [ ] S01·S02·S03·S04·S05·S06·S08·S10·S11·S12·S16·S20·S21·S22의 화면(🖥️) 항목을 테스트로 확인했다 — S04 전체 흐름·S11의 E2E만 남음 (MSW 화면 테스트는 있음)
+- [x] 10장 공통 점검(접근성·가로 스크롤·5개 조합·다른 회사 이름 없음)을 통과했다
+- [x] `src/frontend/`에서 Agent 주소(`:8000`, `/query`, `/tasks/generate`), LLM SDK, 비밀키가 검색되지 않는다
+- [x] `doc/assets.md`에 쓰는 모든 에셋의 출처·라이선스·확인일이 있다
+- [x] 11장 문서 수정 D1 ~ D9가 반영되어 있다
+- [x] plan.md F-1 ~ F-6 완료 조건이 모두 체크되어 있다
+- [x] 산출물을 커밋했다 (`feat:` / `test:`), `node_modules/`·`dist/`·Playwright 결과물 제외
 
 ## 14. 진행 현황
 
 | Task | 상태 | 비고 |
 |------|------|------|
-| F-0 결정·기반 | ⬜ | Q1 ~ Q4 👤 |
-| F-1 골격·토큰·마스코트 | ⬜ | Backend와 병렬 |
-| F-2 인증 화면 | ⬜ | MSW로 먼저, B-2 후 확인 |
-| F-3 반려동물 관리 | ⬜ | MSW로 먼저, B-4 후 확인 |
-| F-4 대시보드 | ⬜ | MSW로 먼저, B-5·B-6 후 확인 |
-| F-5 채팅·HITL | ⬜ | D3 선행, B-8·A-9 후 확인 |
-| F-6 취향·체중·기록 | ⬜ | MSW로 먼저, B-7·B-8 후 확인 |
+| F-0 결정·기반 | ✅ | Q1 ~ Q4 결정 (자체 SVG 마스코트·Lucide·@fontsource·Tailwind 3) |
+| F-1 골격·토큰·마스코트 | ✅ | 마스코트 IP 유사성 사람 확인만 남음 👤 |
+| F-2 인증 화면 | ✅ | E2E S01 1·2·5단계 |
+| F-3 반려동물 관리 | ✅ | E2E S01 3단계에서 등록 후 W03으로 되돌아가는 버그 발견·수정 (currentPet URL 맞춤 규칙) |
+| F-4 대시보드 | ✅ | D2·D5·D8. S04 전체 흐름·S11 E2E는 미실행 (MSW 테스트로 확인) |
+| F-5 채팅·HITL | ✅ | D3·D6. 실제 Agent E2E S06·S10 통과 |
+| F-6 취향·체중·기록 | ✅ | D4 (Backend `frequent`) |
+| 공통 점검 | ✅ | axe 0건(밝게·밤하늘)·가로 스크롤 없음(375·1280·200%)·키보드 S03·스크린샷 5조합. axe로 대비 부족 3건·W03 가로 넘침 발견·수정 (Style-guide.md 3.5) |

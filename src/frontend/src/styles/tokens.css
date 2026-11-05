@@ -17,10 +17,10 @@
   --palette-sky-100: #e3f2ff;
   --palette-gold-300: #ffc94d;
   --palette-pink-200: #ffb8c9;
-  --palette-pink-100: #ffe3ea;
+  --palette-pink-100: #fff0f3;
   --palette-pink-700: #b83a64;
   --palette-mint-200: #a8e6cf;
-  --palette-mint-100: #ddf5ea;
+  --palette-mint-100: #e8f8f0;
   --palette-butter-100: #fff1c9;
   --palette-night-900: #1b1f3b;
   --palette-night-800: #262b52;
@@ -192,12 +192,19 @@
   --shadow-2: 0 0 0 1px var(--palette-night-line);
   --shadow-3: 0 0 0 1px var(--palette-night-line);
   --button-primary-bg-hover: color-mix(in srgb, var(--color-primary) 88%, white);
+  /* 종 강조 (3.5) — 밤하늘에서는 어두운 면 + 밝은 강조색 (밝은 하늘색 배경에 밝은 글자가 겹치지 않게) */
+  --color-species: var(--palette-night-700);
+  --color-species-strong: var(--palette-sky-200);
 }
 
 /* 종 — 고양이 (3.5) */
 :root[data-species="cat"] {
   --color-species: var(--palette-pink-200);
   --color-species-strong: var(--palette-pink-700);
+}
+:root[data-theme="dark"][data-species="cat"] {
+  --color-species: var(--palette-night-700);
+  --color-species-strong: var(--palette-pink-200);
 }
 
 /* 움직임 줄이기 (9장) — 한 번만 적는다. 모달·시트는 120ms 페이드만 남긴다 */

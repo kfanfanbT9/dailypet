@@ -71,7 +71,7 @@ function PetTabs() {
               onClick={() => select(p.id)}
               onKeyDown={(e) => onKey(e, i)}
               className={`flex min-h-touch shrink-0 items-center gap-2 rounded-pill px-3 text-body font-bold ${
-                selected ? "bg-species text-species-strong" : "bg-surface text-text shadow-1"
+                selected ? "bg-species text-text [box-shadow:inset_0_calc(-1*var(--border-band))_0_var(--color-species-strong)]" : "bg-surface text-text shadow-1"
               }`}
             >
               <Mascot species={p.species} size={24} decorative />

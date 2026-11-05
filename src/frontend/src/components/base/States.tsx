@@ -118,7 +118,7 @@ export function Tabs<T extends string>({
           onClick={() => onChange(t.value)}
           onKeyDown={(e) => onKey(e, i)}
           className={`min-h-touch rounded-pill px-4 text-small font-bold ${
-            t.value === value ? "bg-species text-species-strong" : "bg-surface text-muted"
+            t.value === value ? "bg-species text-text [box-shadow:inset_0_calc(-1*var(--border-band))_0_var(--color-species-strong)]" : "bg-surface text-muted"
           }`}
         >
           {t.label}

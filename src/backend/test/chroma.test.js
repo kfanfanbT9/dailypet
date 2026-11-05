@@ -102,4 +102,12 @@ describe("Chroma 통합 (dailypet_test)", () => {
     await expect(chroma.get("catalog_activity")).rejects.toThrow();
     await expect(chroma.resetCollections(["pet_knowledge"])).rejects.toThrow();
   });
+
+  it("다른 프로세스가 컬렉션을 다시 만들어도(seed:reset) 캐시한 핸들이 자동으로 다시 열린다", async () => {
+    const other = createChromaStore({ host, port, database });
+    expect((await chroma.get("pets")).length).toBeGreaterThan(0); // 핸들 캐시
+    await other.resetCollections(["pets"]);
+    await loadSeedIntoStore(other, catalog);
+    expect((await chroma.get("pets")).length).toBe(7);
+  });
 });

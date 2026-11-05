@@ -20,7 +20,6 @@ import {
   SIZE_LABELS,
 } from "@/lib/labels";
 import { errorMessage } from "@/lib/messages";
-import { useCurrentPet } from "@/state/currentPet";
 import { markOutdated } from "@/state/outdated";
 
 type Req = "name" | "species" | "birth_date" | "weight_kg";
@@ -80,7 +79,7 @@ function Radios<T extends string>({
   required?: boolean;
 }) {
   return (
-    <fieldset aria-describedby={error ? `${name}-err` : undefined} aria-required={required || undefined}>
+    <fieldset aria-describedby={error ? `${name}-err` : undefined}>
       <legend className="mb-1 text-small font-bold">
         {legend}
         {required && (
@@ -94,7 +93,7 @@ function Radios<T extends string>({
         {options.map((o) => (
           <label
             key={o.value}
-            className={`flex min-h-touch cursor-pointer items-center gap-2 rounded-pill px-4 ${value === o.value ? "bg-species text-species-strong font-bold" : "bg-surface shadow-1"}`}
+            className={`flex min-h-touch cursor-pointer items-center gap-2 rounded-pill px-4 ${value === o.value ? "bg-species text-text [box-shadow:inset_0_calc(-1*var(--border-band))_0_var(--color-species-strong)] font-bold" : "bg-surface shadow-1"}`}
           >
             <input
               type="radio"
@@ -102,6 +101,7 @@ function Radios<T extends string>({
               value={o.value}
               checked={value === o.value}
               onChange={() => onChange(o.value)}
+              required={required}
               className="h-4 w-4"
             />
             {o.label}
@@ -227,7 +227,6 @@ function PetForm({ pet }: { pet?: Pet }) {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const toast = useToast();
-  const { select } = useCurrentPet();
   const today = todayKstBrowser();
   const healthItems = useCatalog(
     { category: "health", species: f.species || undefined },
@@ -301,11 +300,15 @@ function PetForm({ pet }: { pet?: Pet }) {
         ? await petsApi.update(pet!.id, { ...input, species: undefined })
         : await petsApi.create(input);
       if (editing && saved.tasks_outdated) markOutdated(saved.id); // 저장 응답 직후에 남긴다
-      await qc.invalidateQueries({ queryKey: qk.pets });
+      // 목록 캐시를 먼저 동기로 고친 뒤 이동한다. await invalidate 후 이동하면 새 목록으로 /pets/new가 한 번 더 렌더되어
+      // CurrentPetProvider의 URL 맞춤 effect가 옛 경로(/pets/new?pet=)로 되돌린다 (E2E S01 3단계에서 발견).
+      qc.setQueryData<Pet[]>(qk.pets, (old = []) =>
+        old.some((p) => p.id === saved.id) ? old.map((p) => (p.id === saved.id ? { ...p, ...saved } : p)) : [...old, saved],
+      );
       qc.removeQueries({ queryKey: qk.pet(saved.id) });
       toast(editing ? "저장했어요" : `${saved.name}를 만나서 반가워요!`);
-      select(saved.id);
       navigate(`/?pet=${saved.id}`);
+      void qc.invalidateQueries({ queryKey: qk.pets });
     } catch (err) {
       if (err instanceof ApiError && err.status === 400 && err.fields.length) {
         const next: Partial<Record<Req, string>> = {};
@@ -344,11 +347,12 @@ function PetForm({ pet }: { pet?: Pet }) {
           ) : (
             <Mascot species={f.species || "dog"} size={96} decorative />
           )}
-          <label className="flex flex-col gap-1 text-small">
+          <label className="flex min-w-0 flex-1 flex-col gap-1 text-small">
             <span className="font-bold">사진 선택 (선택사항)</span>
             <input
               type="file"
               accept="image/*"
+              className="w-full min-w-0 text-small"
               onChange={(e) => setPhoto(e.target.files?.[0] ? URL.createObjectURL(e.target.files[0]) : null)}
             />
             <span className="text-caption text-muted">

@@ -77,8 +77,8 @@
 | 로열 블루 | `--palette-blue-400` / `-600` / `-700` | `#4A7BF7` / `#3366E0` / `#2F5BD3` | 장식·큰 그래픽 / 버튼·링크 / 연한 배경 위 글자 |
 | 하늘 | `--palette-sky-200` / `-100` | `#BDE3FF` / `#E3F2FF` | 파스텔 포인트 / 연한 배경 |
 | 골드 | `--palette-gold-300` | `#FFC94D` | 반짝임·진행 표시 (글자색으로 쓰지 않음) |
-| 연분홍 | `--palette-pink-200` / `-100` / `-700` | `#FFB8C9` / `#FFE3EA` / `#B83A64` | 파스텔 포인트 / 연한 배경 / 고양이 강조 글자 |
-| 민트 | `--palette-mint-200` / `-100` | `#A8E6CF` / `#DDF5EA` | 파스텔 포인트 / 연한 배경 |
+| 연분홍 | `--palette-pink-200` / `-100` / `-700` | `#FFB8C9` / `#FFF0F3` / `#B83A64` | 파스텔 포인트 / 연한 배경 / 고양이 강조 글자 |
+| 민트 | `--palette-mint-200` / `-100` | `#A8E6CF` / `#E8F8F0` | 파스텔 포인트 / 연한 배경 |
 | 버터 | `--palette-butter-100` | `#FFF1C9` | 식단 카테고리 연한 배경 |
 | 밤하늘 | `--palette-night-900` / `-800` / `-700` | `#1B1F3B` / `#262B52` / `#323868` | 다크 배경 / 카드 / 띄운 면 |
 | 별빛 | `--palette-star-100` / `-300` / `-400` | `#F2F0FF` / `#B8B6D6` / `#7FA2FF` | 다크 본문 / 다크 보조 글자 / 다크 primary |
@@ -122,8 +122,8 @@
 | 카테고리 | 연한 배경 | 왼쪽 띠 | 기본 아이콘 | 글자 |
 |----------|-----------|---------|-------------|------|
 | 식단 `diet` | `--palette-butter-100` `#FFF1C9` | `--color-accent` | 🍚 | `--color-text` (9.8:1) |
-| 활동 `activity` | `--palette-mint-100` `#DDF5EA` | `--color-mint` | 🐾 | `--color-text` (9.6:1) |
-| 건강 `health` | `--palette-pink-100` `#FFE3EA` | `--color-pink` | 💉 | `--color-text` (9.2:1) |
+| 활동 `activity` | `--palette-mint-100` `#E8F8F0` | `--color-mint` | 🐾 | `--color-text` (9.6:1) |
+| 건강 `health` | `--palette-pink-100` `#FFF0F3` | `--color-pink` | 💉 | `--color-text` (9.2:1) |
 | 직접 추가 | `--color-surface` | `--color-border` | 사용자가 고른 아이콘 | `--color-text` |
 
 - 카드 이름 아래에는 카테고리 이름("식단", "활동", "건강 일정")을 **글자로** 함께 쓴다.
@@ -136,7 +136,9 @@
 | 토큰 | 개 `dog` | 고양이 `cat` | 쓰는 곳 |
 |------|----------|--------------|---------|
 | `--color-species` | `#BDE3FF` 하늘 | `#FFB8C9` 연분홍 | 선택된 반려동물 탭 배경, 인사 영역 배경 |
-| `--color-species-strong` | `#2F5BD3` | `#B83A64` | 선택 탭 글자·밑줄 (흰 배경 기준 5.9 / 5.5) |
+| `--color-species-strong` | `#2F5BD3` | `#B83A64` | 선택 탭 밑줄·아이콘 강조 (흰 배경 기준 5.9 / 5.5). `--color-species` 배경 위 글자에는 쓰지 않는다 (4.4 / 3.4로 미달) |
+
+> 밤하늘에서는 `--color-species`가 `#323868`(night-700), `--color-species-strong`이 `#BDE3FF`(개) / `#FFB8C9`(고양이)로 바뀐다. 2026-11-05 E2E axe 점검에서 밝은 하늘색 배경에 밝은 글자(1.19:1)가 겹치는 문제를 발견해 추가했다. 같은 점검에서 카테고리 연한 배경 위 primary 글자 버튼이 4.4:1로 미달해 `mint-100`·`pink-100`을 더 밝게 바꿨다 (`#E8F8F0` 4.6:1, `#FFF0F3` 4.6:1).
 
 종별 강조색은 **보조 강조**에만 쓴다. 주요 버튼은 종과 관계없이 `--color-primary`를 쓴다.
 
@@ -273,7 +275,7 @@
 ### 7.3 반려동물 탭
 
 - 알약 모양으로, 마스코트 아바타(24px)와 이름을 함께 보여 준다.
-- 선택된 탭은 배경 `--color-species`, 글자 `--color-species-strong`, `aria-selected="true"`이다.
+- 선택된 탭은 배경 `--color-species`, 글자 `--color-text`(굵게), 밑줄 `--color-species-strong`, `aria-selected="true"`이다.
 - 탭이 많아 넘치면 가로로 스크롤한다. 페이지 전체가 가로로 스크롤되면 안 된다.
 
 ### 7.4 할 일 카드

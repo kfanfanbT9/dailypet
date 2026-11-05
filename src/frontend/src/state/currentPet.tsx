@@ -47,11 +47,12 @@ export function CurrentPetProvider({ children }: { children: ReactNode }) {
   const wanted = params.get("pet") ?? safeGet();
   const pet = list.find((p) => p.id === wanted) ?? list[0] ?? null;
 
-  // URL을 실제 선택값과 맞춘다 (없는 id → 첫 반려동물)
+  // URL의 잘못된 ?pet=(없는 id·다른 사용자)만 실제 선택값으로 고친다. ?pet=이 없는 화면에는 붙이지 않는다 —
+  // 붙이면 다른 화면으로 이동하는 중(라우터 이동은 transition이라 늦게 반영)에 옛 경로로 되돌아갈 수 있다 (E2E S01 3단계).
   useEffect(() => {
     if (!query.data) return;
     const current = params.get("pet");
-    if (pet && current !== pet.id) {
+    if (pet && current && current !== pet.id) {
       const next = new URLSearchParams(params);
       next.set("pet", pet.id);
       setParams(next, { replace: true });

@@ -34,53 +34,35 @@ export function createChromaStore({ host = "localhost", port = 8001, database } 
     return handles.get(name);
   }
 
+  /** seed:reset이 컬렉션을 지우고 다시 만들면 캐시한 핸들(옛 id)이 NotFound가 된다 → 핸들을 버리고 한 번만 다시 연다.
+   *  (Python AppStore는 호출마다 get_or_create_collection을 해서 같은 문제가 없다) */
+  async function withCol(name, fn) {
+    try {
+      return await fn(await col(name));
+    } catch (e) {
+      if (e?.name !== "ChromaNotFoundError") throw e;
+      handles.delete(name);
+      return fn(await col(name));
+    }
+  }
+
   return {
     kind: "chroma",
     client,
     async get(name, { ids, where, limit } = {}) {
-      const c = await col(name);
-      const out = [];
-      let offset = 0;
-      for (;;) {
-        const pageLimit = limit ? Math.min(limit - out.length, PAGE) : PAGE;
-        const res = await c.get({
-          ids,
-          where,
-          limit: pageLimit,
-          offset,
-          include: ["documents", "metadatas"],
-        });
-        res.ids.forEach((id, i) =>
-          out.push({ id, row: decodeAppRecord(res.documents[i]), metadata: res.metadatas[i] ?? {} }),
-        );
-        if (res.ids.length < pageLimit || (limit && out.length >= limit) || ids) break;
-        offset += res.ids.length;
-      }
-      return out;
+      return withCol(name, (c) => getAll(c, { ids, where, limit }));
     },
     async upsert(name, rows) {
       if (rows.length === 0) return;
-      const c = await col(name);
-      const enc = rows.map(encodeAppRecord);
-      // Chroma upsert는 metadata를 합친다(빠진 키가 남음) → 이미 있는 id는 지우고 다시 넣는다 (ARCHITECTURE.md 5.1)
-      const ids = enc.map((e) => e.id);
-      const existing = (await c.get({ ids, include: [] })).ids;
-      if (existing.length) await c.delete({ ids: existing });
-      await c.add({
-        ids: enc.map((e) => e.id),
-        documents: enc.map((e) => e.document),
-        metadatas: enc.map((e) => e.metadata),
-        embeddings: enc.map(() => DUMMY_EMBEDDING),
-      });
+      await withCol(name, (c) => upsertRows(c, rows));
     },
     async delete(name, { ids, where } = {}) {
       if (!ids && !where) throw new Error("delete에는 ids 또는 where가 필요하다");
       if (ids && ids.length === 0) return;
-      const c = await col(name);
-      await c.delete({ ids, where });
+      await withCol(name, (c) => c.delete({ ids, where }));
     },
     async count(name) {
-      return (await col(name)).count();
+      return withCol(name, (c) => c.count());
     },
     async resetCollections(names) {
       for (const name of names) {
@@ -104,4 +86,39 @@ export function createChromaStore({ host = "localhost", port = 8001, database } 
       return true;
     },
   };
+}
+
+async function getAll(c, { ids, where, limit }) {
+  const out = [];
+  let offset = 0;
+  for (;;) {
+    const pageLimit = limit ? Math.min(limit - out.length, PAGE) : PAGE;
+    const res = await c.get({
+      ids,
+      where,
+      limit: pageLimit,
+      offset,
+      include: ["documents", "metadatas"],
+    });
+    res.ids.forEach((id, i) =>
+      out.push({ id, row: decodeAppRecord(res.documents[i]), metadata: res.metadatas[i] ?? {} }),
+    );
+    if (res.ids.length < pageLimit || (limit && out.length >= limit) || ids) break;
+    offset += res.ids.length;
+  }
+  return out;
+}
+
+async function upsertRows(c, rows) {
+  const enc = rows.map(encodeAppRecord);
+  // Chroma upsert는 metadata를 합친다(빠진 키가 남음) → 이미 있는 id는 지우고 다시 넣는다 (ARCHITECTURE.md 5.1)
+  const ids = enc.map((e) => e.id);
+  const existing = (await c.get({ ids, include: [] })).ids;
+  if (existing.length) await c.delete({ ids: existing });
+  await c.add({
+    ids: enc.map((e) => e.id),
+    documents: enc.map((e) => e.document),
+    metadatas: enc.map((e) => e.metadata),
+    embeddings: enc.map(() => DUMMY_EMBEDDING),
+  });
 }

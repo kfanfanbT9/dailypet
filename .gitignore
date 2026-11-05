@@ -7,3 +7,6 @@ data/chroma/
 node_modules/
 dist/
 data/checkpoints/
+test-results/
+playwright-report/
+src/frontend/tsconfig.tsbuildinfo
