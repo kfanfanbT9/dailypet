@@ -32,3 +32,4 @@ tzdata==2026.6
 
 # 테스트
 pytest==9.2.0
+pytest-rerunfailures==16.7   # chromadb 메모리 모드 간헐 오류에만 재실행 (pyproject.toml)

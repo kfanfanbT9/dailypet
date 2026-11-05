@@ -1,6 +1,8 @@
 [tool.pytest.ini_options]
 testpaths = ["src/tests"]
-addopts = "-ra"
+# chromadb 1.5.9 메모리 모드 간헐 오류('Error finding id')에만 재실행한다. 다른 실패는 그대로 드러난다.
+# 서버 모드(운영)에서는 재현되지 않음 (doc/phase1_task.md 13장)
+addopts = "-ra --reruns 2 --only-rerun 'Error finding id'"
 markers = [
     "llm: Amazon Bedrock 모델·임베딩을 실제로 호출한다 (비용 발생, 기본 실행에서 제외 권장)",
     "chroma: localhost:8001 Chroma 서버가 필요하다",
