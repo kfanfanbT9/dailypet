@@ -229,6 +229,7 @@ export function presentPrefs(petId: string, userId: string) {
     constraint: rows.filter((p) => p.kind === "constraint").map(view),
     frequent: [...counts]
       .filter(([, n]) => n >= 3)
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
       .map(([id, n]) => ({ catalog_item_id: id, item_name: catalogById.get(id)?.name ?? null, count: n })),
   };
 }

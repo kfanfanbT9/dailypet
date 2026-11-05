@@ -404,7 +404,7 @@ repos.users.getById(userId) / getByEmail(email) / create(row) / remove(userId)  
   - `complete`·`swap`·`remove`·`custom`: `interactions`만 기록 (점수 계산은 Python이 한다)
   - `itemId`는 카탈로그에 있어야 한다 (`custom`이고 자유 입력이면 null 허용)
 - [x] `POST /api/pets/:id/feedback` `{ itemId, signal }` → `recordSignal`. 할 일 버튼(👍/👎)은 이 API를 쓴다. 완료·교체·삭제 신호는 B-6 할 일 API가 **내부에서** 기록하므로 Frontend가 따로 보내지 않는다 (중복 기록 방지, D6)
-- [x] `GET /api/pets/:id/preferences`: `{ like: [...], dislike: [...](excluded_until, 오늘 기준 제외 중 여부), constraint: [...] }`. 사용자 공통 행(`pet_id` 없음)은 `scope: "all_pets"`로 표시하고 함께 돌려준다. 카탈로그 ID면 이름을 붙인다
+- [x] `GET /api/pets/:id/preferences`: `{ like: [...], dislike: [...](excluded_until, 오늘 기준 제외 중 여부), constraint: [...], frequent: [...] }`. `frequent`는 그 반려동물의 `interactions` 중 `complete` 3회 이상 카탈로그 항목(이름·횟수, 횟수순) — W11 "⭐ 자주 한 활동" 표시용 (phase3_task.md D4). 사용자 공통 행(`pet_id` 없음)은 `scope: "all_pets"`로 표시하고 함께 돌려준다. 카탈로그 ID면 이름을 붙인다
 - [x] `DELETE /api/pets/:id/preferences/:prefId`: 그 반려동물 또는 사용자 공통 행만. 공통 행 삭제는 응답에 `scope: "all_pets"`를 넣는다 (확인 창은 Frontend)
 - [x] `DELETE /api/pets/:id/preferences`: 그 반려동물의 `preferences`와 `interactions`를 모두 지운다 (ARCHITECTURE.md 3.8: 완료 횟수도 0). 사용자 공통 행은 남긴다
 

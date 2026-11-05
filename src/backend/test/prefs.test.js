@@ -122,6 +122,18 @@ describe("취향 (S04·S21)", () => {
     expect(await t.repos.interactions.list(USERS.jiwoo.id, { pet_id: "pet_nabi" })).toEqual(nabiBefore);
   });
 
+  it("D4: 보리 노즈워크 완료 3회 → frequent에 이름·횟수, 2회 이하는 없음, 초기화하면 빈 목록", async () => {
+    const t = await createTestApp();
+    const a = await loginAs(t.app, "jiwoo");
+    const prefs = (await a.get("/api/pets/pet_bori/preferences")).body;
+    expect(prefs.frequent).toEqual([
+      { catalog_item_id: "act_dog_nosework_find_it_01", item_name: expect.any(String), count: 3 },
+    ]);
+    expect((await a.get("/api/pets/pet_nabi/preferences")).body.frequent).toEqual([]);
+    await a.delete("/api/pets/pet_bori/preferences");
+    expect((await a.get("/api/pets/pet_bori/preferences")).body.frequent).toEqual([]);
+  });
+
   it("없는 카탈로그 ID 400, 다른 반려동물의 취향 행 삭제 404", async () => {
     const t = await createTestApp();
     const a = await loginAs(t.app, "seojun");

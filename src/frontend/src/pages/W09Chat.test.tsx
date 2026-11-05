@@ -231,7 +231,7 @@ describe("W09 채팅", () => {
 
   it("다른 반려동물 thread를 열면 전환하지 않고 W10으로", async () => {
     renderApp("/chat/thr_usr_69d308a849e0_pet_nabi_00000009?pet=pet_bori");
-    expect(await screen.findByRole("heading", { name: "W10History" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "보리 대화 기록" })).toBeInTheDocument();
   });
 
   it("추천 질문 칩은 종에 맞고 누르면 바로 보낸다", async () => {

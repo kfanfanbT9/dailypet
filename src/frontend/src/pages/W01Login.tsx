@@ -63,6 +63,11 @@ export default function W01Login() {
         <h1 className="font-display text-display text-text">DailyPet</h1>
         <p className="text-muted">오늘도 우리 아이와 반짝이는 하루를!</p>
       </div>
+      {params.get("bye") === "1" && (
+        <p role="status" className="rounded-card bg-info-bg p-3 text-center text-body">
+          그동안 함께해 줘서 고마워요
+        </p>
+      )}
       <form onSubmit={submit} noValidate className="flex flex-col gap-4">
         <Input
           ref={emailRef}

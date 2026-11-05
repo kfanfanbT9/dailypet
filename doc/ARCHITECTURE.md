@@ -538,7 +538,7 @@ Response는 `/query`와 같은 `{answer, contexts, trace}` 형식이다. 요청�
 | PATCH | `/api/health-events/:eventId` | 날짜 변경 `{ due_date }` → `scheduled`, 또는 이력 입력 `{ last_done_date }` → 이 일정을 `completed_date = last_done_date`로 `done` 처리하고 다음 회차·주기 생성. `needs_history` 해소 |
 | GET | `/api/notifications` | 도래·지연 일정 알림 |
 | POST | `/api/pets/:id/feedback` | `{ itemId, signal: like\|dislike\|complete\|swap\|remove\|custom }` 취향 신호 기록 |
-| GET / DELETE | `/api/pets/:id/preferences` | 내 취향 보기 (dislike에는 `excluded_until` 포함) / 전체 초기화 |
+| GET / DELETE | `/api/pets/:id/preferences` | 내 취향 보기 (dislike에는 `excluded_until` 포함, `frequent`: 그 반려동물이 3회 이상 완료한 카탈로그 항목 `{catalog_item_id, item_name, count}` 횟수순 — 화면 표시용, 점수 계산은 Python 한 곳, D4) / 전체 초기화 |
 | DELETE | `/api/pets/:id/preferences/:prefId` | 취향 항목 하나 삭제 |
 | GET | `/api/catalog?category=&species=&petId=` | 카탈로그 조회 (직접 추가할 할 일 선택용, 추천 불가 항목 제외). `petId`(내 반려동물)를 주면 Agent `POST /catalog/safe`로 그 반려동물 기준 안전 필터를 적용한 항목만 돌려준다 (4.1.3). 이때 Agent 장애면 503 (안전 필터 없이 목록을 주지 않는다) |
 | POST | `/api/chat` | `{ question, petId, threadId? }` → Agent `POST /query` 프록시. 응답은 Agent의 `{ answer, contexts, trace }`에 `thread_id`를 더한 것. `thread_id`는 trace의 마지막 `final` 또는 `interrupt` 이벤트(`status: "cancelled"` 제외)에서 꺼낸다 (4.1 표) |

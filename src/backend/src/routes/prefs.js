@@ -25,6 +25,8 @@ async function syncPetWeight(deps, userId, pet) {
   return updated;
 }
 
+const FREQUENT_MIN = 3;
+
 export function prefsRouter(deps) {
   const r = express.Router();
   const today = () => deps.config.today();
@@ -88,7 +90,17 @@ export function prefsRouter(deps) {
     const sorted = rows.sort(
       (a, b) => (b.updated_at ?? "").localeCompare(a.updated_at ?? "") || a.id.localeCompare(b.id),
     );
+    // 자주 한 활동 (D4): 완료 3회 이상 카탈로그 항목. 화면 표시용 집계이며 점수 계산은 Python 한 곳 (CLAUDE.md 4.2)
+    const counts = new Map();
+    for (const i of await deps.repos.interactions.list(req.userId, { pet_id: pet.id, signal: "complete" })) {
+      if (i.catalog_item_id) counts.set(i.catalog_item_id, (counts.get(i.catalog_item_id) ?? 0) + 1);
+    }
+    const frequent = [...counts]
+      .filter(([, n]) => n >= FREQUENT_MIN)
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+      .map(([id, count]) => ({ catalog_item_id: id, item_name: deps.catalog.get(id)?.name ?? null, count }));
     res.json({
+      frequent,
       like: sorted.filter((p) => p.kind === "like").map(view),
       dislike: sorted.filter((p) => p.kind === "dislike").map(view),
       constraint: sorted.filter((p) => p.kind === "constraint").map(view),
