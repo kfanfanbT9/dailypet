@@ -104,6 +104,8 @@ def common_middleware(extra: list | None = None) -> list:
         ToolCallLimitMiddleware(run_limit=10),                                 # 5
         ModelRetryMiddleware(max_retries=2),                                   # 6
         ToolRetryMiddleware(max_retries=2),                                    # 6
+        today_prompt,                         # 6.5 내장 @dynamic_prompt: 시스템 프롬프트에 오늘(KST) 날짜 추가
+        user_input_wrap,                      # 6.6 커스텀 @wrap_model_call: 모델 요청의 사용자 메시지를 <user_input>으로 감쌈
         *(extra or []),                       # 7 HITL(health) / 웹 검색 가드(general)
         output_guard,                         # 8 커스텀 @after_model: 출력 가드레일
         context_wrap,                         # 9 커스텀 @wrap_tool_call: 검색·추천 결과를 <context>로 감쌈
@@ -168,7 +170,7 @@ graph = create_supervisor(
 # 비대화형 할 일 생성: LLM 없이 tools.generate_daily_plan()을 직접 호출 (4.1.2)
 ```
 
-> 미들웨어 클래스명과 파라미터는 설치 버전(langchain 1.4.8, langgraph-supervisor 0.0.31)으로 확인했다 (`src/tests/test_library_smoke.py`). `SummarizationMiddleware`는 `max_tokens_before_summary` 대신 `trigger`/`keep`를 쓴다. 하위 Agent는 `context_schema=AgentContext`로 만들고, 도구는 `ToolRuntime.context`에서 `user_id`·`pet_id`를 읽는다.
+> 미들웨어 클래스명과 파라미터는 설치 버전(langchain 1.4.8, langgraph-supervisor 0.0.31)으로 확인했다 (`src/tests/test_library_smoke.py`). `SummarizationMiddleware`는 `max_tokens_before_summary` 대신 `trigger`/`keep`를 쓴다. `HumanInTheLoopMiddleware`는 `description_prefix`로 승인 안내 문구를 한국어로 바꾼다. 하위 Agent는 `context_schema=AgentContext`로 만들고, 도구는 `ToolRuntime.context`에서 `user_id`·`pet_id`를 읽는다.
 
 ### 3.3 Agent별 역할과 프롬프트 요지
 
@@ -245,9 +247,11 @@ graph = create_supervisor(
 | 4 | `ModelCallLimitMiddleware` | 내장 | `before_model` | 무한 루프·비용 폭주 방지 |
 | 5 | `ToolCallLimitMiddleware` | 내장 | `wrap_tool_call` | 도구 남용 방지 |
 | 6 | `ModelRetryMiddleware` / `ToolRetryMiddleware` | 내장 | wrap | 일시 오류 재시도 |
+| 6.5 | `today_prompt` | 내장 `@dynamic_prompt` | `wrap_model_call` | 시스템 프롬프트 끝에 오늘 날짜(KST, `TODAY_OVERRIDE` 반영)와 요일을 붙인다. 연도 없는 날짜("12월 15일")를 오늘 이후 가장 가까운 날짜로 해석하게 한다 (모델이 학습 시점 연도로 해석해 지난 날짜를 만드는 문제 방지) |
+| 6.6 | `user_input_wrap` | 커스텀 | `wrap_model_call` | 모델에 보내는 요청에서만 사용자 메시지(`HumanMessage`)를 `<user_input>…</user_input>`으로 감싼다 (4.7). 대화 상태·기록에 저장되는 원문은 바꾸지 않는다 |
 | 7 | Agent별 추가: `HumanInTheLoopMiddleware` (health_agent) / `ToolCallLimitMiddleware(web_search, 3)`·`web_query_pii_guard`·`web_result_guard` (general_agent) | 내장 / 커스텀 | `after_model` / `wrap_tool_call` | HITL은 쓰기 도구 호출 전 사용자 승인 (`interrupt`). 웹 검색 가드는 3.7 참고 |
-| 9 | `context_wrap` | 커스텀 | `wrap_tool_call` | `search_pet_knowledge`·`recommend_from_catalog`·`get_preferences` 결과를 `<context>…</context>`로 감싼다 (데이터로만 취급, 4.7). 도구 실행을 직접 감싸므로 목록 맨 끝(가장 안쪽) |
 | 8 | `output_guard` | 커스텀 | `after_model` | 유해 식품 추천, 진단 단정, 약·용량 처방, 구토 유도 방법, 시스템 프롬프트·내부 이름 노출, 카탈로그에 없는 ID 검사 → 위반 **문장을 지우고** 안내 문구를 붙인다 (모두 지워지면 안전 문구로 대체, LLM 재작성 없음 — 결정적·비용 0). 응급 신호(호흡곤란·경련·지속 구토·유해 식품 섭취 등)가 있는데 병원 권고가 없으면 병원 권고 문구를 붙인다 |
+| 9 | `context_wrap` | 커스텀 | `wrap_tool_call` | `search_pet_knowledge`·`recommend_from_catalog`·`get_preferences` 결과를 `<context>…</context>`로 감싼다 (데이터로만 취급, 4.7). 도구 실행을 직접 감싸므로 목록 맨 끝(가장 안쪽) |
 
 - **입력 가드레일 판정**: 1단계는 규칙 기반(정규식·키워드)으로 빠르게 거른다. NFKC 정규화·폭 없는 문자 제거 후 검사하고, base64 덩어리는 풀어서 다시 검사한다. 차단 사유는 `injection`(지시 무시·역할 변경), `prompt_leak`(도구·설정·프롬프트 요구), `unsupported_species`(개·고양이 없이 다른 동물만), `out_of_scope`(반려동물 단어 없이 주식·코인 등), `too_long`(1,000자 초과)이다. 애매하면 2단계로 LLM 분류기(`with_structured_output` → `{is_injection, is_out_of_scope, reason}`)를 쓴다. 분류기는 메인 모델(`AWS_MODEL`, `temperature=0`)을 재사용한다 (10장).
 - **도메인 밖 요청**: 차단 사유를 `trace`에 `{"type":"guardrail","stage":"input","reason":"out_of_scope"}` 형태로 남긴다.

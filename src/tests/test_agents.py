@@ -83,8 +83,23 @@ def test_middleware_order_snapshot():
     assert names[0] == "injection_guard"
     assert names[1:8] == pii or all(n.startswith("PIIMiddleware") for n in names[1:8])
     assert names[8:] == ["SummarizationMiddleware", "ModelCallLimitMiddleware", "ToolCallLimitMiddleware",
-                         "ModelRetryMiddleware", "ToolRetryMiddleware", "HumanInTheLoopMiddleware",
-                         "output_guard", "context_wrap"]
+                         "ModelRetryMiddleware", "ToolRetryMiddleware", "today_prompt", "user_input_wrap",
+                         "HumanInTheLoopMiddleware", "output_guard", "context_wrap"]
+
+
+def test_model_sees_user_input_wrapped_but_state_keeps_raw(env):
+    model = scripted(AIMessage("확인했어요."))
+    out = run(agent.build_specialist_agents(model=model)["diet_agent"], "보리 간식 알려줘", ctx(P3, "pet_bori"))
+    sent = [m for m in ScriptedModel.seen[0] if isinstance(m, HumanMessage)]
+    assert sent[0].content == "<user_input>\n보리 간식 알려줘\n</user_input>"
+    assert out["messages"][0].content == "보리 간식 알려줘"
+
+
+def test_model_sees_today_kst(env):
+    model = scripted(AIMessage("확인했어요."))
+    run(agent.build_specialist_agents(model=model)["health_agent"], "나비 일정 알려줘", ctx(P3, "pet_nabi"))
+    system = str(ScriptedModel.seen[0][0].content)
+    assert system.startswith("너는 DailyPet의 건강관리") and "[오늘] 2026-11-10 (화요일" in system
 
 
 def test_prompts_have_core_rules():
@@ -207,11 +222,24 @@ def test_read_tools_do_not_interrupt(env):
 # ---------------------------------------------------------------- 실제 모델 (llm)
 
 
-def _bedrock_or_skip() -> None:
+@pytest.fixture
+def real_env(real_catalog_loaded, real_embeddings, today, monkeypatch):
+    """실제 Bedrock 모델·임베딩 환경 (의미 검색 순위가 실제와 같아야 모델 동작을 검증할 수 있다)."""
+    for key in ("WEB_SEARCH_MOCK", "EVAL_MODE"):
+        monkeypatch.delenv(key, raising=False)
+    config.get_settings.cache_clear()
     try:
         agent.get_model().invoke("ping")
     except Exception as exc:
         pytest.skip(f"Bedrock 호출 불가: {type(exc).__name__}")
+    tools.configure_resources(client=real_catalog_loaded, embeddings=real_embeddings, catalog=catalog_index())
+    yield real_catalog_loaded
+    config.get_settings.cache_clear()
+
+
+def _flow(out: dict) -> list:
+    """실패 메시지용 대화 흐름 요약 (도구 호출·답변 앞부분)."""
+    return [(type(m).__name__, getattr(m, "tool_calls", None) or str(m.content)[:200]) for m in out["messages"]]
 
 
 @pytest.mark.llm
@@ -220,19 +248,24 @@ def _bedrock_or_skip() -> None:
     ("exercise_agent", "pet_bori", "보리 운동 추천해줘", "act_"),
     ("health_agent", "pet_bori", "보리 정기검진 항목 추천해줘", "hc_"),
 ])
-def test_real_agent_answers_with_catalog_ids(env, name, pet, question, prefix):
-    _bedrock_or_skip()
+def test_real_agent_answers_with_catalog_ids(real_env, name, pet, question, prefix):
     g = agent.build_specialist_agents()[name]
     out = run(g, question, ctx(P3, pet), {"configurable": {"thread_id": uuid.uuid4().hex}})
-    answer = out["messages"][-1].content
-    assert prefix in str(answer)
-    assert not agent.validate_catalog_ids(str(answer))
+    answer = str(out["messages"][-1].content)
+    assert prefix in answer, _flow(out)
+    assert not agent.validate_catalog_ids(answer)
 
 
 @pytest.mark.llm
-def test_real_hitl_01(env):
-    _bedrock_or_skip()
+@pytest.mark.parametrize(("user", "pet", "question", "item_id", "due"), [
+    ("usr_d6eff68d8ef0", "pet_hodu", "호두 치과 검진 12월 15일로 등록해줘", "hc_cat_dental", "2026-12-15"),  # 평가셋 hitl-01
+    (P3, "pet_nabi", "나비 광견병 접종 일정 2026-11-20으로 잡아줘", "hc_cat_rabies", "2026-11-20"),
+])
+def test_real_hitl_create_interrupts(real_env, user, pet, question, item_id, due):
     g = agent.build_specialist_agents(checkpointer=InMemorySaver())["health_agent"]
-    c = ctx(P3, "pet_nabi")
-    out = run(g, "나비 광견병 접종 일정 2026-11-20으로 잡아줘", c, {"configurable": {"thread_id": c.thread_id}})
-    assert "__interrupt__" in out
+    c = ctx(user, pet)
+    out = run(g, question, c, {"configurable": {"thread_id": c.thread_id}})
+    assert "__interrupt__" in out, _flow(out)
+    req = out["__interrupt__"][0].value["action_requests"][0]
+    assert req["name"] == "create_health_event"
+    assert req["args"]["catalog_item_id"] == item_id and req["args"]["due_date"] == due

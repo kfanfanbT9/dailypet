@@ -25,8 +25,11 @@ from langchain.agents.middleware import (
     SummarizationMiddleware,
     ToolCallLimitMiddleware,
     ToolRetryMiddleware,
+    ModelRequest,
     after_model,
     before_model,
+    dynamic_prompt,
+    wrap_model_call,
     wrap_tool_call,
 )
 from langchain.agents.middleware.pii import PIIMatch, apply_strategy
@@ -34,7 +37,7 @@ from langchain_core.messages import AIMessage, AnyMessage, BaseMessage, HumanMes
 from pydantic import BaseModel, Field
 
 from src import tools
-from src.config import AgentContext, find_injection
+from src.config import AgentContext, find_injection, today_kst
 
 # ================================================================ 1. PII 마스킹 (ARCHITECTURE.md 3.7)
 # 내장 PIIMiddleware와 API 계층·로그용 mask_pii가 **같은 규칙 목록(PII_RULES)** 을 쓴다.
@@ -547,7 +550,7 @@ EXERCISE_PROMPT = f"""너는 DailyPet의 운동·놀이 도우미다. 활동 종
 HEALTH_PROMPT = f"""너는 DailyPet의 건강관리 일정 도우미다. 접종·검진·구충 일정과 D-day를 안내한다.
 - 일정 조회는 get_health_schedule, 가까운 일정은 get_upcoming_events를 쓴다. D-day와 날짜는 도구 결과를 그대로 쓴다.
 - 새 일정 등록은 create_health_event, 날짜 변경은 update_health_event를 쓴다. 이 두 도구는 사용자 승인을 거친다. 날짜는 YYYY-MM-DD, 항목은 정기점검 카탈로그(hc_)에서 recommend_from_catalog(category="health")로 찾은 item_id만 쓴다.
-- "다음 주 금요일" 같은 표현은 도구 결과의 today를 기준으로 날짜를 계산해 확인한다.
+- "다음 주 금요일", "12월 15일" 같은 표현은 시스템 지시 끝의 [오늘] 날짜를 기준으로 YYYY-MM-DD로 바꾼다. 연도가 없으면 오늘 이후 가장 가까운 날짜로 본다.
 - 증상 상담은 하지 않는다. 증상이 있으면 동물병원 진료를 권한다.
 - 사용자가 선호를 말하면 remember_preference로 저장하고 알린다.
 {COMMON_RULES}"""
@@ -562,6 +565,33 @@ def context_wrap(request: Any, handler: Callable[[Any], Any]) -> Any:
     if isinstance(result, ToolMessage) and result.name in CONTEXT_TOOLS and isinstance(result.content, str):
         return result.model_copy(update={"content": f"<context>\n{result.content}\n</context>"})
     return result
+
+
+WEEKDAYS_KO = "월화수목금토일"
+
+
+@dynamic_prompt
+def today_prompt(request: ModelRequest) -> str:
+    """시스템 프롬프트 끝에 오늘 날짜(KST, TODAY_OVERRIDE 반영)를 붙인다.
+
+    모델은 오늘 날짜를 모르므로 "12월 15일"을 학습 시점 연도로 해석해 지난 날짜를 만들 수 있다.
+    """
+    t = today_kst()
+    base = request.system_message.text if request.system_message else ""
+    return (f"{base}\n\n[오늘] {t.isoformat()} ({WEEKDAYS_KO[t.weekday()]}요일, 한국 시간). "
+            "연도 없이 말한 날짜는 오늘 이후 가장 가까운 날짜로 해석한다.")
+
+
+@wrap_model_call(name="user_input_wrap")
+def user_input_wrap(request: ModelRequest, handler: Callable[[ModelRequest], Any]) -> Any:
+    """모델 요청의 사용자 메시지를 <user_input>으로 감싼다 (CLAUDE.md 4.7). 상태의 원문은 그대로 둔다."""
+    wrapped = [
+        m.model_copy(update={"content": f"<user_input>\n{m.content}\n</user_input>"})
+        if isinstance(m, HumanMessage) and isinstance(m.content, str) and not m.content.startswith("<user_input>")
+        else m
+        for m in request.messages
+    ]
+    return handler(request.override(messages=wrapped))
 
 
 def common_middleware(extra: list | None = None, model: Any | None = None) -> list:
@@ -579,6 +609,8 @@ def common_middleware(extra: list | None = None, model: Any | None = None) -> li
         ToolCallLimitMiddleware(run_limit=10),                              # 5
         ModelRetryMiddleware(max_retries=2),                                # 6
         ToolRetryMiddleware(max_retries=2),                                 # 6
+        today_prompt,                                                       # 6.5 오늘 날짜
+        user_input_wrap,                                                    # 6.6 <user_input>
         *(extra or []),                                                     # 7 Agent별
         output_guard,                                                       # 8 출력 가드레일
         context_wrap,                                                       # 9 도구 결과 <context>
