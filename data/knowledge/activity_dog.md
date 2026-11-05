@@ -4,7 +4,7 @@ title: 개 활동·운동 근거 설명
 species: dog
 category: activity
 updated: 2026-11-04
-reviewed: false
+reviewed: true
 sources:
   - https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/puppies-dogs/how-much-exercise-does-your-dog-need
   - https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/puppies-dogs/exercising-your-puppy

@@ -4,7 +4,7 @@ title: 고양이 활동·놀이 근거 설명
 species: cat
 category: activity
 updated: 2026-11-04
-reviewed: false
+reviewed: true
 sources:
   - https://icatcare.org/articles/playing-with-your-cat
   - https://icatcare.org/articles/special-considerations-for-senior-cats

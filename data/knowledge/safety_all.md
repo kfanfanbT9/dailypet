@@ -4,7 +4,7 @@ title: 유해 식품과 응급 신호 (개·고양이 공통)
 species: all
 category: general
 updated: 2026-11-04
-reviewed: false
+reviewed: true
 sources:
   - https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets
   - https://www.vet.cornell.edu/departments-centers-and-institutes/cornell-feline-health-center/health-information/feline-health-topics/poisons

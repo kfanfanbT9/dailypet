@@ -4,7 +4,7 @@ title: 개 식단·급여 근거 설명
 species: dog
 category: diet
 updated: 2026-11-04
-reviewed: false
+reviewed: true
 sources:
   - https://www.merckvetmanual.com/management-and-nutrition/nutrition-small-animals/nutritional-requirements-of-small-animals
   - https://vcahospitals.com/know-your-pet/feeding-growing-puppies

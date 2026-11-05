@@ -4,7 +4,7 @@ title: 고양이 식단·급여 근거 설명
 species: cat
 category: diet
 updated: 2026-11-04
-reviewed: false
+reviewed: true
 sources:
   - https://www.merckvetmanual.com/management-and-nutrition/nutrition-small-animals/nutritional-requirements-of-small-animals
   - https://www.merckvetmanual.com/cat-owners/selecting-and-providing-a-home-for-a-cat/proper-nutrition-for-cats

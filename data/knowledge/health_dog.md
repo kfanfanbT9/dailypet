@@ -4,7 +4,7 @@ title: 개 예방접종·정기점검 근거 설명
 species: dog
 category: health
 updated: 2026-11-04
-reviewed: false
+reviewed: true
 sources:
   - https://wsava.org/wp-content/uploads/2024/05/2024-Guidelines-for-the-Vaccination-of-Dogs-and-Cats.pdf
   - https://oavt.org/wp-content/uploads/event-manager-uploads/supporting_documentation/2022/09/2022-AAHA-Canine-vaccination-guidelines_presentation.pdf

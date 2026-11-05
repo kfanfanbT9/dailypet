@@ -4,7 +4,7 @@ title: 고양이 예방접종·정기점검 근거 설명
 species: cat
 category: health
 updated: 2026-11-04
-reviewed: false
+reviewed: true
 sources:
   - https://wsava.org/wp-content/uploads/2024/05/2024-Guidelines-for-the-Vaccination-of-Dogs-and-Cats.pdf
   - https://aaha.org/wp-content/uploads/globalassets/02-guidelines/feline-vaccination-guidlines/feline-vaccine-table.pdf

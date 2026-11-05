@@ -4,7 +4,7 @@ title: 개·고양이 공통 돌봄 기본 정보
 species: all
 category: general
 updated: 2026-11-04
-reviewed: false
+reviewed: true
 sources:
   - https://www.merckvetmanual.com/management-and-nutrition/nutrition-small-animals/nutritional-requirements-of-small-animals
   - https://wsava.org/global-guidelines/global-nutrition-guidelines/
