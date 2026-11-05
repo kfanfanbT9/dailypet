@@ -412,3 +412,24 @@ def test_catalog_safe_filters_allergy_and_species(env, llm_forbidden):
 def test_catalog_safe_403_and_401(env, llm_forbidden):
     assert llm_forbidden.post("/catalog/safe", headers=H, json={"user_id": P3, "pet_id": "pet_mocha", "category": "diet"}).status_code == 403
     assert llm_forbidden.post("/catalog/safe", json={"user_id": P3, "pet_id": "pet_bori", "category": "diet"}).status_code == 401
+
+
+# ================================================================ D3 화면 판정 근거
+
+
+def test_interrupt_summary_for_approval_card(env):
+    r = client_with(hitl_graph()).post("/query", headers=H, json={"question": "나비 광견병 11월 20일로 잡아줘",
+                                                                  "user_id": P3, "pet_id": "pet_nabi"})
+    [intr] = [e for e in r.json()["trace"] if e["type"] == "interrupt"]
+    assert intr["summary"] == {"action": "create", "item_name": tools.get_resources().catalog["hc_cat_rabies"]["name"],
+                               "due_date": "2026-11-20", "dose_no": None, "event_id": None}
+
+
+def test_final_emergency_flag(env):
+    sup = scripted(AIMessage("바로 동물병원에 가 주세요."))
+    r = client_with(make_graph(sup)).post("/query", headers=H, json={"question": "강아지가 초콜릿을 먹었어요", "user_id": P3})
+    final = r.json()["trace"][-1]
+    assert final["type"] == "final" and final["emergency"] is True
+    sup2 = scripted(AIMessage("당근 간식이 좋아요."))
+    r2 = client_with(make_graph(sup2)).post("/query", headers=H, json={"question": "보리 간식 추천해줘", "user_id": P3})
+    assert "emergency" not in r2.json()["trace"][-1]

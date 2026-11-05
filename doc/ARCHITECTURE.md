@@ -421,9 +421,11 @@ graph = create_supervisor(
   | `tool_call` | `agent`, `tool`, `args` | `args`는 PII 마스킹, `user_id` 제외 |
   | `tool_result` | `agent`, `tool`, `status`(ok/error), 있으면 `count`·`item_ids`·`sources`·`dropped`·`blocked`·`query` | 본문은 넣지 않는다 |
   | `guardrail` | `stage`(input/output/tool_result), `reason`, `agent`, 그 밖의 요약 값 | 3.6 |
-  | `interrupt` | `agent`, `tool`, `args`, `thread_id`, 취소 시 `status:"cancelled"` | HITL 승인 대기 / 새 질문으로 대기 작업이 거절된 경우 |
+  | `interrupt` | `agent`, `tool`, `args`, `thread_id`, `summary`, 취소 시 `status:"cancelled"` | HITL 승인 대기 / 새 질문으로 대기 작업이 거절된 경우. `summary`는 화면 승인 카드용 요약 `{action: "create"\|"update", item_name, due_date, dose_no, event_id}` — 화면은 `args`를 보여 주지 않고 `summary`만 쓴다 (phase3_task.md D3) |
   | `error` | `reason` | 원문 예외 메시지는 넣지 않는다 (9장) |
-  | `final` | `agent`, `thread_id` | 마지막 이벤트. 새 thread면 여기서 `thread_id`를 돌려준다 |
+  | `final` | `agent`, `thread_id`, 선택 `emergency` | 마지막 이벤트. 새 thread면 여기서 `thread_id`를 돌려준다. 질문에 응급 신호(호흡곤란·경련·유해 식품 섭취 등)가 있으면 API 계층이 `emergency: true`를 넣어 화면이 응급 강조 박스를 띄운다 |
+
+  **화면 판정 근거 (D3, 2026-11-05)** — 답한 도우미: 마지막 `handoff`(supervisor → 하위 Agent) 대상 / 승인 카드: `interrupt.summary` / 웹 출처: `web_search`의 `tool_result.sources` / 응급: `final.emergency` / 차단 안내: `guardrail`(stage `input`) / 취향 저장 칩: `remember_preference` `tool_call` / 다른 반려동물 쓰기 요청: 건강 도우미가 도구를 쓰지 않고 "«이름»를(을) 선택한 뒤 요청해 주세요" 문구로만 답하고, 화면이 그 이름이 내 반려동물이면 [전환] 버튼을 붙인다. 답변 속 카탈로그 ID(`(act_…)`)는 평가 계약상 남기고 **화면에서만** 지운다 (D6)
 - 에러 시에도 세 키를 유지하고 HTTP 상태코드로 구분 (예: 400 `question` 누락, 500 내부 오류)
 - 가드레일로 차단되어도 HTTP 200과 세 키를 그대로 반환한다. `answer`는 안내 문구, `trace`에는 `{"type":"guardrail", ...}`를 넣는다.
 - `answer`, `contexts`, `trace` 모두 PII 마스킹을 거친 값이다.

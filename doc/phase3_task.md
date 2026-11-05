@@ -352,12 +352,12 @@ flowchart LR
 | 표시 | 판정 근거 | 상태 |
 |------|-----------|------|
 | 답한 도우미 ("🍽 식단 도우미가 답했어요") | trace의 마지막 `handoff` 대상 → `traceLabels` | 확정 (trace 형식 4.1) |
-| 승인 카드 (HITL) | trace의 `{type:"interrupt"}` 이벤트와 그 안의 작업 요약(도구 이름, 일정 이름·날짜) | **D3** — interrupt 이벤트에 화면용 요약 필드가 필요 |
-| 웹 검색 출처 박스 | `web_search` tool_call이 있고, 답변 끝 출처 목록 또는 trace `tool_result`의 URL | **D3** — URL을 어디서 읽을지 |
-| 응급 강조 박스 | trace `guardrail` 이벤트의 응급 표시 또는 답변의 병원 권고 문구 | **D3** |
+| 승인 카드 (HITL) | trace의 `{type:"interrupt"}` 이벤트와 그 안의 작업 요약(도구 이름, 일정 이름·날짜) | 확정 (D3): interrupt `summary` {action, item_name, due_date, dose_no, event_id} — ARCHITECTURE.md 4.1 |
+| 웹 검색 출처 박스 | `web_search` tool_call이 있고, 답변 끝 출처 목록 또는 trace `tool_result`의 URL | 확정 (D3): `web_search` tool_result의 `sources` (http/https만) |
+| 응급 강조 박스 | trace `guardrail` 이벤트의 응급 표시 또는 답변의 병원 권고 문구 | 확정 (D3): `final.emergency: true` |
 | 가드레일 차단 안내 | trace `{type:"guardrail", stage:"input"}`이고 차단됨 → 일반 안내만 (사유 표시 안 함) | 확정 (S17) |
 | 취향 저장 칩 | trace에 `remember_preference` tool_call → 칩 "💝 취향에 저장했어요 [보기 ›]" (내용은 `GET .../preferences`를 다시 불러 보여 줌) | 확정 |
-| "나비를 선택한 뒤 요청해 주세요 [나비로 전환]" | 답변·trace에서 대상 반려동물 id를 알아야 함 | **D3** |
+| "나비를 선택한 뒤 요청해 주세요 [나비로 전환]" | 답변·trace에서 대상 반려동물 id를 알아야 함 | 확정 (D3): 답변 문구 "«이름»를(을) 선택한 뒤 요청해 주세요" + 내 반려동물 이름 일치 |
 
 **작업**
 - [ ] W09 레이아웃: 모바일 1열 / 데스크톱 왼쪽 대화 목록(W10 컴포넌트 재사용) + 오른쪽 대화창. 상단 [🗂 대화 기록] [✎ 새 대화]

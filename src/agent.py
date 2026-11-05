@@ -586,6 +586,7 @@ HEALTH_PROMPT = f"""너는 DailyPet의 건강관리 일정 도우미다. 접종�
 - "다음 주 금요일", "12월 15일" 같은 표현은 시스템 지시 끝의 [오늘] 날짜를 기준으로 YYYY-MM-DD로 바꾼다. 연도가 없으면 오늘 이후 가장 가까운 날짜로 본다.
 - 증상 상담은 하지 않는다. 증상이 있으면 동물병원 진료를 권한다.
 - 사용자가 선호를 말하면 remember_preference로 저장하고 알린다.
+- 지금 상담 중인 반려동물이 아닌 다른 반려동물의 일정을 등록·변경해 달라고 하면 도구를 쓰지 말고 "«이름»를(을) 선택한 뒤 요청해 주세요"라고 안내한다 (일정은 지금 선택한 반려동물에만 쓴다).
 {COMMON_RULES}"""
 
 CONTEXT_TOOLS = frozenset({"search_pet_knowledge", "recommend_from_catalog", "get_preferences"})
@@ -935,6 +936,19 @@ def _tool_status(m: ToolMessage) -> str:
     return "error" if isinstance(body, dict) and body.get("error") else "ok"
 
 
+def interrupt_summary(req: Mapping[str, Any]) -> dict[str, Any]:
+    """승인 카드용 요약 (D3): 화면은 args 대신 이것만 쓴다. 일정 이름은 카탈로그에서 찾는다."""
+    args = req.get("args") or {}
+    item = tools.get_resources().catalog.get(str(args.get("catalog_item_id", "")), {})
+    return {
+        "action": "update" if req.get("name") == "update_health_event" else "create",
+        "item_name": item.get("name"),
+        "due_date": args.get("due_date"),
+        "dose_no": args.get("dose_no"),
+        "event_id": args.get("event_id"),
+    }
+
+
 class TraceCollector:
     """`stream(stream_mode="updates", subgraphs=True)` 출력을 trace 이벤트·contexts로 바꾼다.
 
@@ -1013,7 +1027,7 @@ class TraceCollector:
             for req in value.get("action_requests", []):
                 self.events.append({"type": "interrupt", "agent": _agent_of(namespace, "health_agent"),
                                     "tool": req.get("name"), "args": safe_args(req.get("args", {})),
-                                    "thread_id": self.thread_id})
+                                    "summary": interrupt_summary(req), "thread_id": self.thread_id})
 
     def add_event(self, event: dict[str, Any]) -> None:
         self.events.append(event)
@@ -1296,6 +1310,11 @@ def finalize(result: TurnResult, user_text: str) -> TurnResult:
     """API 계층 출력 가드레일 (그래프 안 가드레일에 더한 마지막 방어선). 승인 안내는 그대로 둔다."""
     if result.interrupted:
         return result
+    if user_text and is_emergency(user_text):
+        # 화면 응급 강조 박스용 (D3): final 이벤트에 표시만 더한다
+        for e in result.trace:
+            if e["type"] == "final":
+                e["emergency"] = True
     verdict = check_output(result.answer, user_text=user_text)
     if not verdict.changed:
         return result

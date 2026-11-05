@@ -150,7 +150,7 @@
 |------|------|-----------|---------|
 | `--font-display` | **Jua** (Google Fonts, SIL OFL) | `"Apple SD Gothic Neo", sans-serif` | 화면 제목, 마스코트 인사, 빈 상태 제목. **18px 이상에서만** |
 | `--font-body` | **Nanum Gothic** (Google Fonts, SIL OFL) | `"Apple SD Gothic Neo", "Malgun Gothic", sans-serif` | 본문, 버튼, 입력, 표 |
-| `--font-mono` | `ui-monospace, "D2Coding", monospace` | — | 근거 보기의 카탈로그 ID 표시 |
+| `--font-mono` | `ui-monospace, "D2Coding", monospace` | — | 예비 (Version 1 화면은 카탈로그 ID를 보여 주지 않는다 — 답변·근거 보기에서도 지움, phase3_task.md D6) |
 
 - 글꼴 후보와 라이선스는 `doc/assets.md`에 기록한다 (ARCHITECTURE.md 7.6에서 "후보"로 둔 항목).
 - 장식 글꼴(Jua)은 한 화면에 제목 1~2곳만 쓴다 (P5). 버튼·입력·표·일정 날짜에는 쓰지 않는다.
