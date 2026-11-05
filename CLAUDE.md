@@ -64,6 +64,7 @@ mini-pjt/
 │   ├── phase1_task.md      Phase 1(Agent) 세부 개발 계획
 │   ├── phase2_task.md      Phase 2(Backend) 세부 개발 계획
 │   ├── phase3_task.md      Phase 3(Frontend) 세부 개발 계획
+│   ├── phase4_task.md      Phase 4(검토) 평가 실행 계획
 │   ├── wireframe.md        화면 와이어프레임 (W00~W12)
 │   ├── Style-guide.md      프론트엔드 스타일 가이드 (디자인 토큰·컴포넌트)
 │   └── assets.md           디자인 에셋(글꼴·마스코트·아이콘) 출처·라이선스 기록
