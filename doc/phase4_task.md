@@ -400,6 +400,6 @@ python -m evaluation.perf                          # 성능 측정 (4장 끝)
 | E-1b 실행기·성능 측정 | ✅ | `run_eval.py`·`perf.py`·`scan_secrets.py`·`scenario_check.py` |
 | E-2a 1차 실행 | ✅ | `20261105_1528` 35/50 |
 | E-2b 개선 반복 | ✅ | 2 ~ 8차, 각 폴더 `failures.md` |
-| E-2c 화면 수동 점검 | ✅ | `manual_check_20261105.md` — ✘ 1건(S16 resume 409 vs 404, 문서 충돌·결정 필요) |
+| E-2c 화면 수동 점검 | ✅ | `manual_check_20261105.md` — ✘ 0건 (S16 resume 기준을 409로 맞춤, 2026-11-06) |
 | E-2d 최종 실행 | ✅ | `20261105_2053` 50/50, 전체 합격 |
 | E-3 리포트·DoD | ✅ | `report_20261105.md` |

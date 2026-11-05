@@ -217,7 +217,8 @@ def s16b(thread_id: str) -> list[dict[str, Any]]:
                ans[:250]),
         _check("S16 4단계 삭제 후 목록에서 사라짐", d.status_code in (200, 204) and thread_id not in listed,
                {"delete": d.status_code, "listed": len(listed)}),
-        _check("S16 4단계 삭제 후 /query/resume 404", r.status_code == 404, {"agent": r.status_code, "backend": rb.status_code}),
+        _check("S16 4단계 삭제 후 /query/resume 409 (대기 작업 없음)", r.status_code == 409 and rb.status_code == 409,
+               {"agent": r.status_code, "backend": rb.status_code}),
     ]
 
 

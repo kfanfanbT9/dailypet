@@ -565,7 +565,7 @@ cd src/backend && npm run seed:reset -- --variant <이름>   # 변형 시드 (�
 **검증 포인트**
 - [ ] 3단계 답변이 보리·호박 토핑 맥락으로 이어진다 (재시작 후에도).
 - [ ] 나비 탭의 대화 목록에는 보리 대화가 없다.
-- [ ] 4단계 후 같은 thread로 `/query/resume` 호출 시 404.
+- [ ] 4단계 후 같은 thread로 `/query/resume` 호출 시 409 ("승인을 기다리는 작업이 없어요" — 대화 기록·checkpoint가 지워져 재개할 수 없음, ARCHITECTURE.md 4.1 상태 코드. 2026-11-06 404 → 409로 맞춤).
 
 ---
 

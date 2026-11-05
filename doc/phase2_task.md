@@ -492,7 +492,7 @@ repos.users.getById(userId) / getByEmail(email) / create(row) / remove(userId)  
   - Agent `POST /query/resume`. Agent가 403·404를 돌려주면 같은 코드로 넘긴다
 - [x] `GET /api/pets/:id/threads`: `chat_logs`를 `thread_id`로 묶어 `{ thread_id, started_at, last_at, title(첫 질문 앞 30자, 마스킹된 값), count }`를 최근 순으로
 - [x] `GET /api/threads/:threadId`: 소유자 확인(접두사 + `chat_logs.user_id`) 후 시간순 `{ question, answer, trace, created_at }`
-- [x] `DELETE /api/threads/:threadId`: 그 thread의 `chat_logs` + checkpoint 삭제 (`checkpoints.deleteThreads`). 이후 같은 thread로 resume하면 Agent가 404 (S16 4단계)
+- [x] `DELETE /api/threads/:threadId`: 그 thread의 `chat_logs` + checkpoint 삭제 (`checkpoints.deleteThreads`). 이후 같은 thread로 resume하면 Agent가 409 — 대기 작업 없음 (S16 4단계, 2026-11-06 404 → 409로 맞춤)
 - [x] Backend 로그에는 질문·답변을 남기지 않는다 (경로·상태·소요 시간만). `lib/mask.js`는 예외 메시지에 사용자 입력이 섞일 때만 쓴다
 
 **테스트** (`test/chat.test.js`, 가짜 Agent)
