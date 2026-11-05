@@ -3,6 +3,7 @@ import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AppRoutes, Providers, makeQueryClient } from "@/App";
 import { db } from "@/mocks/db";
+import { server } from "@/mocks/server";
 
 export const USERS = {
   haneul: "usr_1c3544ae18bc",
@@ -24,4 +25,22 @@ export function renderApp(path: string, opts: { as?: keyof typeof USERS | null; 
     </Providers>,
   );
   return { ...utils, user, client };
+}
+
+/** MSW로 나간 요청 기록 (메서드·경로) — "요청 0회", "pet_mocha가 쓰이지 않음" 확인용 */
+export function recordRequests() {
+  const calls: { method: string; path: string }[] = [];
+  const onStart = ({ request }: { request: Request }) => {
+    const url = new URL(request.url);
+    calls.push({ method: request.method, path: url.pathname + url.search });
+  };
+  server.events.on("request:start", onStart);
+  return {
+    calls,
+    count: (method: string, path: string | RegExp) =>
+      calls.filter(
+        (c) => c.method === method && (typeof path === "string" ? c.path === path : path.test(c.path)),
+      ).length,
+    stop: () => server.events.removeListener("request:start", onStart),
+  };
 }
